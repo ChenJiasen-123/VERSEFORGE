@@ -57,6 +57,10 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(rhyme['positions'][-1]['text'], '東')
         self.assertEqual(rhyme['positions'][-1]['line'], 4)
         self.assertEqual(result['history'][2]['metrical_feedback_sent'], sent)
+        transition = json.loads(call.call_args_list[2].args[1])['revision']['metrical_transition']
+        self.assertEqual(transition['counts']['fixed_failures'], 1)
+        self.assertEqual(transition['counts']['new_failures'], 1)
+        self.assertEqual(result['history'][1]['metrical_transition'], transition)
         self.assertEqual(result['history'][2]['issues'], [])
         self.assertEqual(result['prosody']['basic_target_check']['status'], 'unknown')
 

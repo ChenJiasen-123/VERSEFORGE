@@ -11,6 +11,7 @@ from .ci import specification as ci_specification, check_shape as check_ci_shape
 from .wujue import specification as wujue_specification, evidence as wujue_evidence
 from .aesthetic_examples import load_examples
 from .revision_scope import limits as local_limits, inspect_revision
+from .meter_changes import compare_meter
 
 
 @dataclass
@@ -159,8 +160,7 @@ CLASSICAL_AESTHETIC = '''
 '''
 
 
-def metrical_revision_feedback(poem, task):
-    """Carry rule evidence to repair without upgrading unresolved readings."""
+def _metrical_target_and_report(poem, task):
     if task.genre == 'qijue' and task.qijue_pattern:
         target = specification(task.qijue_pattern)
         report = qijue_evidence(poem['lines'], task.qijue_pattern)['basic_target_check']
@@ -171,13 +171,23 @@ def metrical_revision_feedback(poem, task):
         target = ci_specification(task.ci_profile)
         evidence = ci_evidence(poem['lines'], task.ci_profile)
         report = dict(evidence['tone_check'])
-        report['findings'] = report['findings'] + [x for x in evidence['rhyme_check']['findings'] if x['status'] in ('failed', 'unknown')]
+        report['findings'] = ([{**x, 'check': 'tone'} for x in report['findings']]
+                              + [{**x, 'check': 'rhyme'} for x in evidence['rhyme_check']['findings']])
         report['rule_source'] += ' ; ' + evidence['rhyme_check']['rule_source']
         statuses = {x['status'] for x in report['findings']}
         report['status'] = 'failed' if 'failed' in statuses else 'unknown' if 'unknown' in statuses else 'pass'
         report['scope'] = 'named_ci_tone_and_cilin_rhyme_feedback'
     else:
         return None
+    return target, report
+
+
+def metrical_revision_feedback(poem, task):
+    """Carry rule evidence to repair without upgrading unresolved readings."""
+    evidence = _metrical_target_and_report(poem, task)
+    if evidence is None:
+        return None
+    target, report = evidence
     normalized = [''.join(re.findall(r'[\u4e00-\u9fff]', line)) for line in poem['lines']]
     display = {'P': '平', 'Z': '仄', 'X': '可平可仄'}
     return {'status': report['status'], 'rule_source': report['rule_source'],
@@ -192,7 +202,8 @@ def metrical_revision_feedback(poem, task):
             'findings_to_review': [x for x in report['findings'] if x['status'] in ('failed', 'unknown')],
             'confirmed_tone_positions': [
                 {'line': x['line'], 'character': x['character'], 'tone': x['actual_tone']}
-                for x in report['findings'] if x['kind'] == 'tone' and x['status'] == 'pass'],
+                for x in report['findings'] if x['kind'] == 'tone' and x['status'] == 'pass'
+                and x.get('check') != 'rhyme'],
             'instruction': 'P为平、Z为仄。failed是所选谱与当前资料下明确不符，修改时保护其他已通过位置并兼顾诗意。unknown仅表示缺字或读音、归部未决，不等于错字，不要为消除unknown而机械换字；不得自行选择合谱读音冒充语境核验。每稿仍须重新检查；不构成完整合律认证。'}
 
 
@@ -237,6 +248,7 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
         if revision_anchor and revision_scope == 'local':
             payload['revision_limits'] = local_limits(revision_anchor['lines'])
         scope_report = None
+        transition = None
         try:
             settings = {'thinking': generation_thinking} if generation_thinking is not None and not client.mock else {}
             response = client.complete(system, json.dumps(payload, ensure_ascii=False), timeout=remaining, **settings)
@@ -247,6 +259,12 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
         try:
             poem = Poem.parse(response["content"])
             issues = check(poem, task)
+            if prior and prior.get('draft'):
+                previous_evidence = _metrical_target_and_report(prior['draft'], task)
+                current_evidence = _metrical_target_and_report(asdict(poem), task)
+                if previous_evidence and current_evidence:
+                    transition = compare_meter(prior['draft']['lines'], poem.lines,
+                                               previous_evidence[1], current_evidence[1])
             if revision_anchor and revision_scope == 'local':
                 scope_report = inspect_revision(revision_anchor['lines'], poem.lines)
                 issues.extend(scope_report['issues'])
@@ -256,6 +274,7 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
                         "usage": response.get("usage", {}), "attempt": attempt + 1,
                         'metrical_feedback_sent': feedback,
                         'revision_scope_check': scope_report,
+                        'metrical_transition': transition,
                         'request_settings': response.get('request_settings')})
         if poem and not issues:
             if not aesthetic or client.mock or attempt >= max_revisions:
@@ -274,10 +293,14 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
                 break
             prior = {'draft': asdict(poem), 'issues': [],
                      'aesthetic_review': critique['assessment']}
+            if transition:
+                prior['metrical_transition'] = transition
             if revision_anchor is None:
                 revision_anchor = asdict(poem)
             continue
         prior = {"draft": asdict(poem) if poem else None, "issues": issues}
+        if transition:
+            prior['metrical_transition'] = transition
     valid = [h for h in history if h["poem"]]
     best = min(valid, key=lambda h: len(h['issues'])) if valid else None
     comparisons = []

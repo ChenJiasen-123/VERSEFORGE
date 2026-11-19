@@ -1,5 +1,6 @@
 """Start from saved poems; at most two real repair calls per selected profile."""
 import hashlib
+import argparse
 import json
 from pathlib import Path
 from poetry_agent.client import DeepSeekClient, load_env
@@ -7,12 +8,16 @@ from poetry_agent.core import Task, compose
 from poetry_agent.aesthetics import failure_code
 
 if __name__ == '__main__':
-    folder = Path('runs/wujue-repair-trial-02')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--output-dir', type=Path, default=Path('runs/wujue-repair-trial-02'))
+    parser.add_argument('--profiles', nargs='+', choices=['ze_rhyme', 'ping_rhyme'], default=['ze_rhyme', 'ping_rhyme'])
+    args = parser.parse_args()
+    folder = args.output_dir
     if folder.exists(): raise SystemExit('existing trial will not be overwritten')
     folder.mkdir(parents=True)
     load_env('.env')
     live = DeepSeekClient()
-    for profile in ('ze_rhyme', 'ping_rhyme'):
+    for profile in args.profiles:
         source = Path('runs/wujue-matrix-trial-01') / (profile + '.json')
         raw = source.read_bytes()
         saved = json.loads(raw)
@@ -28,7 +33,8 @@ if __name__ == '__main__':
                     self.trace.append({'source': 'saved_second_draft'})
                     return {'content': json.dumps(seed, ensure_ascii=False), 'usage': {}}
                 self.trace.append({'source': 'live_repair',
-                                   'feedback': payload.get('revision', {}).get('metrical_feedback')})
+                                   'feedback': payload.get('revision', {}).get('metrical_feedback'),
+                                   'transition_sent': payload.get('revision', {}).get('metrical_transition')})
                 return live.complete(system, user, **kwargs)
 
         client = SeedThenLive()

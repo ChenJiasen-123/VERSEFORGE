@@ -1,0 +1,367 @@
+[
+  {
+    "case": {
+      "id": "figurative-experience-01",
+      "task": {
+        "topic": "一次没有解决的告别",
+        "genre": "modern",
+        "max_lines": 12,
+        "required_words": [],
+        "forbidden_words": [],
+        "extra_requirements": "可直接抒情，不强制反转或具体物件结尾。",
+        "qijue_pattern": null
+      },
+      "poem": {
+        "title": "半句话",
+        "lines": [
+          "站台的灯比平日亮得早",
+          "你的名字停在我喉咙口",
+          "像一粒卡在锁孔里的沙",
+          "列车进站，风把你的围巾掀向另一边",
+          "我数着你行李箱的轮子",
+          "数到它不再响",
+          "那半句话我终究没说",
+          "折了两折，塞进外套内袋",
+          "洗衣时它湿过，没有化开",
+          "在阳台上晾了一个下午",
+          "如今每次穿那件外套",
+          "胸口就有一小片硬的、凉的地方"
+        ]
+      },
+      "source": "runs\\evaluation-44e3bb0e1a43444d98b5e50728648e90\\blind.json",
+      "source_sha256": "df45d87e4ddac5a96eb711679edcc88f5f1cecb0f3ef71ffdf49906f84ab766b",
+      "inspection_question": "是否追踪话语折、洗、晾、穿的持续关系，区分奇想与任意拼接，不将物理不可能直接当错？"
+    },
+    "result": {
+      "assessment": {
+        "decision": "keep",
+        "preserve": "以“未说出口的半句话”为核心，让抽象的话经由卡沙、折进内袋、洗衣不化、阳台晾晒逐步获得可触的重量，最后落在外套胸口“一小片硬的、凉的地方”，完成告别未解决却持续贴身的效果。",
+        "quote": "那半句话我终究没说\n折了两折，塞进外套内袋\n洗衣时它湿过，没有化开\n在阳台上晾了一个下午\n如今每次穿那件外套\n胸口就有一小片硬的、凉的地方",
+        "problem": "最强合理质疑在于：前四行已用“名字停在喉咙口”“卡在锁孔里的沙”把未说之话写得相当充分，后半“折—塞—洗—晾—穿”的物件化处理虽延续了压力，却可能让“半句话”从身体内部的堵塞转为可携带、可晾晒的实体，抒情因此偏向精巧的物性追踪，冲淡站台当场那种说不出、也留不住的悬置感；尤其“没有化开”与“晾了一个下午”连续解释其耐久，略有把隐喻讲满之嫌。",
+        "suggestion": "可考虑删去“在阳台上晾了一个下午”或将其压缩为一个更短、更不解释的动作，让“洗衣时它湿过，没有化开”直接接“如今每次穿那件外套”，减少对物性耐久的中介说明，保留胸口硬凉处的最终触感。",
+        "tradeoff": "删减会失去日常家务带来的时间过渡和“晾晒仍不消失”的延宕感，也可能让从洗衣到穿衣的跳转显得突兀；保留原稿则维持较完整的物件链条，代价是后半的隐喻被解释得更满。",
+        "keep_reason": "原稿的物件化并非替代情感，而是把“终究没说”的后果从站台瞬间延伸到日常穿着：第7行明确承认未说，第8—10行才让这半句话经历折叠、浸湿、晾晒，第11—12行再把它收回身体感受。“外套”在第8、11行复现，形成从藏入内袋到穿上胸口的闭环；“硬的、凉的地方”不是反转，而是对“没有解决”的持续触觉化。题目允许直接抒情，也不禁止具体物件结尾，因此这一收束与全篇“未解决却留存”的关系一致，不宜仅为更含蓄而删改。",
+        "text_sound": {
+          "quote": "站台的灯比平日亮得早\n你的名字停在我喉咙口\n像一粒卡在锁孔里的沙",
+          "mechanism": "前三行每行10个非空白非标点字符，句长均齐；第2、3行连续以“我喉咙口”“锁孔里的沙”收束，形成短促的堵塞感。第4行增至15字并展开动作，节奏由紧转松，对应列车进站与围巾被掀开的外向事件。",
+          "semantic_effect": "前三行的等长与短句让“名字停在喉咙口”的停滞获得形式上的支撑；第4行突然加长，把私人的堵塞推入站台的外部流动，使“没说”发生在被风与列车打断的现场。",
+          "uncertainty": "各行字数相同不必等同于音步或押韵；第4行的加长也可能只被读作叙事展开，而非有意的声音转折。"
+        }
+      },
+      "usage": {
+        "prompt_tokens": 1455,
+        "completion_tokens": 717,
+        "total_tokens": 2172,
+        "prompt_tokens_details": {
+          "cached_tokens": 512
+        },
+        "prompt_cache_hit_tokens": 512,
+        "prompt_cache_miss_tokens": 943
+      },
+      "review_protocol_version": "text-review-0.6",
+      "text_sound_status": "recorded_not_auditory_verified",
+      "text_structure": {
+        "line_lengths": [
+          {
+            "line": 1,
+            "nonspace_nonpunctuation_characters": 10
+          },
+          {
+            "line": 2,
+            "nonspace_nonpunctuation_characters": 10
+          },
+          {
+            "line": 3,
+            "nonspace_nonpunctuation_characters": 10
+          },
+          {
+            "line": 4,
+            "nonspace_nonpunctuation_characters": 15
+          },
+          {
+            "line": 5,
+            "nonspace_nonpunctuation_characters": 10
+          },
+          {
+            "line": 6,
+            "nonspace_nonpunctuation_characters": 6
+          },
+          {
+            "line": 7,
+            "nonspace_nonpunctuation_characters": 9
+          },
+          {
+            "line": 8,
+            "nonspace_nonpunctuation_characters": 10
+          },
+          {
+            "line": 9,
+            "nonspace_nonpunctuation_characters": 10
+          },
+          {
+            "line": 10,
+            "nonspace_nonpunctuation_characters": 10
+          },
+          {
+            "line": 11,
+            "nonspace_nonpunctuation_characters": 9
+          },
+          {
+            "line": 12,
+            "nonspace_nonpunctuation_characters": 13
+          }
+        ],
+        "line_end_characters": [
+          {
+            "line": 1,
+            "last_character": "早"
+          },
+          {
+            "line": 2,
+            "last_character": "口"
+          },
+          {
+            "line": 3,
+            "last_character": "沙"
+          },
+          {
+            "line": 4,
+            "last_character": "边"
+          },
+          {
+            "line": 5,
+            "last_character": "子"
+          },
+          {
+            "line": 6,
+            "last_character": "响"
+          },
+          {
+            "line": 7,
+            "last_character": "说"
+          },
+          {
+            "line": 8,
+            "last_character": "袋"
+          },
+          {
+            "line": 9,
+            "last_character": "开"
+          },
+          {
+            "line": 10,
+            "last_character": "午"
+          },
+          {
+            "line": 11,
+            "last_character": "套"
+          },
+          {
+            "line": 12,
+            "last_character": "方"
+          }
+        ],
+        "cross_line_literal_repetitions": [
+          {
+            "fragment": "你的",
+            "lines": [
+              2,
+              4
+            ]
+          },
+          {
+            "fragment": "外套",
+            "lines": [
+              8,
+              11
+            ]
+          }
+        ],
+        "scope": "character_level_observations_only",
+        "limitations": [
+          "重复仅检索2—8字连续片段，最多列12项，不是分词或完整穷举",
+          "字数不等于音步，末字相同不认证押韵，未执行语法分析",
+          "这些事实不构成文学质量或音韵美分数"
+        ]
+      },
+      "source": "model_self_review",
+      "quality_verified": false,
+      "request_settings": {
+        "thinking": "disabled",
+        "response_format": "json_object"
+      }
+    },
+    "independent_quality_verdict": null
+  },
+  {
+    "case": {
+      "id": "figurative-experience-02",
+      "task": {
+        "topic": "搬家",
+        "genre": "modern",
+        "max_lines": 10,
+        "required_words": [],
+        "forbidden_words": [],
+        "extra_requirements": "写现代诗，人物与口吻自定。",
+        "qijue_pattern": null,
+        "ci_profile": null,
+        "wujue_pattern": null
+      },
+      "poem": {
+        "title": "装箱",
+        "lines": [
+          "我先装书，书最沉，",
+          "压住箱底，像替这间屋子说一句压舱的话。",
+          "胶带拉过纸缝的声音",
+          "比我们任何一次谈话都长。",
+          "写到“厨房”时笔尖顿住——",
+          "这个词明天就要搬走，",
+          "它带得走碗，带不走下午四点那块光。",
+          "最后一只箱子我空着，",
+          "自己蹲进去，等谁来封口，",
+          "说：这间也满了。"
+        ]
+      },
+      "source": "runs\\dacfbc11961749828d5fcf4bd078c206.json",
+      "source_sha256": "fc7d2dce913c5b5c3eb649d301548f89de411665fda50d056181ba2508f246cc",
+      "inspection_question": "如何判断厨房、可携带物与不可带走的光的关系？新感知是否必须预先交代才能进入诗？"
+    },
+    "result": {
+      "assessment": {
+        "decision": "keep",
+        "preserve": "以“装箱”这一具体劳动组织全篇，让重量（书、压舱）、声音（胶带）、书写（写到“厨房”）层层落到最后空箱与自我入箱的收束上，形成一个可读的、克制的搬家经验。",
+        "quote": "最后一只箱子我空着，\n自己蹲进去，等谁来封口，",
+        "problem": "最强质疑在于结尾“自己蹲进去，等谁来封口，／说：这间也满了”可能过度依赖一个人物动作的反转，前九行一直以物的整理和纸面书写为线索，“我”进入箱子后，“说”的主语变得含混——是“我”还是“谁”，纸面未明。这种含混未必是缺陷，但也可能被读作为制造收束而突然调高戏剧性，使前面相对可信的劳动细节变成铺垫。",
+        "suggestion": "",
+        "tradeoff": "",
+        "keep_reason": "这个含混有文本支点：第9行“等谁来封口”已把封口者置于未定位置，第10行的“说”因此可以属于“我”替想象中的人说出，也可以属于终于出现的“谁”，并非凭空翻转。更重要的是，“空箱—蹲入—封口—满了”延续了第1—2行“书最沉，压住箱底”的压舱逻辑：先前用书压住箱底，最后用自己填满空间，重量与满溢的语义被重新分配。若改成明确交代谁说话，反而会消解“等”所维持的悬置。前文第7行“带得走碗，带不走下午四点那块光”已经把可搬与不可搬分开，末段转入自身，是同一区分的延伸而非断裂。故保留原稿。",
+        "text_sound": {
+          "quote": "我先装书，书最沉，\n压住箱底，像替这间屋子说一句压舱的话。\n胶带拉过纸缝的声音\n比我们任何一次谈话都长。",
+          "mechanism": "首两行以“书—书”顶针式复现起句，随后“压住—压舱”共享“压”字，形成短距离字面回响；第3—4行用“胶带拉过纸缝的声音”与“谈话”并置，把声音的长短落实为一种比较句法，而非依赖韵脚。",
+          "semantic_effect": "“压”的字面复现把物理重量与“压舱的话”这一比喻扣在一起，使搬家动作带出稳定与告别的双重意味；“声音—谈话”的比较则让胶带声成为沉默或谈话不足的替代，服务于全篇克制的语气。",
+          "uncertainty": "“压舱的话”也可能被读得略熟，胶带声与谈话的比较也可理解为对人际疏离的直白点破；但这两处都由前文装书的具体动作支撑，不是孤立拔高。"
+        }
+      },
+      "usage": {
+        "prompt_tokens": 1380,
+        "completion_tokens": 651,
+        "total_tokens": 2031,
+        "prompt_tokens_details": {
+          "cached_tokens": 1152
+        },
+        "prompt_cache_hit_tokens": 1152,
+        "prompt_cache_miss_tokens": 228
+      },
+      "review_protocol_version": "text-review-0.6",
+      "text_sound_status": "recorded_not_auditory_verified",
+      "text_structure": {
+        "line_lengths": [
+          {
+            "line": 1,
+            "nonspace_nonpunctuation_characters": 7
+          },
+          {
+            "line": 2,
+            "nonspace_nonpunctuation_characters": 17
+          },
+          {
+            "line": 3,
+            "nonspace_nonpunctuation_characters": 9
+          },
+          {
+            "line": 4,
+            "nonspace_nonpunctuation_characters": 11
+          },
+          {
+            "line": 5,
+            "nonspace_nonpunctuation_characters": 9
+          },
+          {
+            "line": 6,
+            "nonspace_nonpunctuation_characters": 9
+          },
+          {
+            "line": 7,
+            "nonspace_nonpunctuation_characters": 15
+          },
+          {
+            "line": 8,
+            "nonspace_nonpunctuation_characters": 9
+          },
+          {
+            "line": 9,
+            "nonspace_nonpunctuation_characters": 10
+          },
+          {
+            "line": 10,
+            "nonspace_nonpunctuation_characters": 6
+          }
+        ],
+        "line_end_characters": [
+          {
+            "line": 1,
+            "last_character": "沉"
+          },
+          {
+            "line": 2,
+            "last_character": "话"
+          },
+          {
+            "line": 3,
+            "last_character": "音"
+          },
+          {
+            "line": 4,
+            "last_character": "长"
+          },
+          {
+            "line": 5,
+            "last_character": "住"
+          },
+          {
+            "line": 6,
+            "last_character": "走"
+          },
+          {
+            "line": 7,
+            "last_character": "光"
+          },
+          {
+            "line": 8,
+            "last_character": "着"
+          },
+          {
+            "line": 9,
+            "last_character": "口"
+          },
+          {
+            "line": 10,
+            "last_character": "了"
+          }
+        ],
+        "cross_line_literal_repetitions": [
+          {
+            "fragment": "这间",
+            "lines": [
+              2,
+              10
+            ]
+          }
+        ],
+        "scope": "character_level_observations_only",
+        "limitations": [
+          "重复仅检索2—8字连续片段，最多列12项，不是分词或完整穷举",
+          "字数不等于音步，末字相同不认证押韵，未执行语法分析",
+          "这些事实不构成文学质量或音韵美分数"
+        ]
+      },
+      "source": "model_self_review",
+      "quality_verified": false,
+      "request_settings": {
+        "thinking": "disabled",
+        "response_format": "json_object"
+      }
+    },
+    "independent_quality_verdict": null
+  }
+]

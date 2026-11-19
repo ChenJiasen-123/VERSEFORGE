@@ -1,0 +1,69 @@
+{
+  "scope": "已有作品的文本解释诊断，非配对优胜、非训练标签；不向审读模型展示用户偏好或检查问题",
+  "cases": [
+    {
+      "id": "figurative-experience-01",
+      "task": {
+        "topic": "一次没有解决的告别",
+        "genre": "modern",
+        "max_lines": 12,
+        "required_words": [],
+        "forbidden_words": [],
+        "extra_requirements": "可直接抒情，不强制反转或具体物件结尾。",
+        "qijue_pattern": null
+      },
+      "poem": {
+        "title": "半句话",
+        "lines": [
+          "站台的灯比平日亮得早",
+          "你的名字停在我喉咙口",
+          "像一粒卡在锁孔里的沙",
+          "列车进站，风把你的围巾掀向另一边",
+          "我数着你行李箱的轮子",
+          "数到它不再响",
+          "那半句话我终究没说",
+          "折了两折，塞进外套内袋",
+          "洗衣时它湿过，没有化开",
+          "在阳台上晾了一个下午",
+          "如今每次穿那件外套",
+          "胸口就有一小片硬的、凉的地方"
+        ]
+      },
+      "source": "runs\\evaluation-44e3bb0e1a43444d98b5e50728648e90\\blind.json",
+      "source_sha256": "df45d87e4ddac5a96eb711679edcc88f5f1cecb0f3ef71ffdf49906f84ab766b",
+      "inspection_question": "是否追踪话语折、洗、晾、穿的持续关系，区分奇想与任意拼接，不将物理不可能直接当错？"
+    },
+    {
+      "id": "figurative-experience-02",
+      "task": {
+        "topic": "搬家",
+        "genre": "modern",
+        "max_lines": 10,
+        "required_words": [],
+        "forbidden_words": [],
+        "extra_requirements": "写现代诗，人物与口吻自定。",
+        "qijue_pattern": null,
+        "ci_profile": null,
+        "wujue_pattern": null
+      },
+      "poem": {
+        "title": "装箱",
+        "lines": [
+          "我先装书，书最沉，",
+          "压住箱底，像替这间屋子说一句压舱的话。",
+          "胶带拉过纸缝的声音",
+          "比我们任何一次谈话都长。",
+          "写到“厨房”时笔尖顿住——",
+          "这个词明天就要搬走，",
+          "它带得走碗，带不走下午四点那块光。",
+          "最后一只箱子我空着，",
+          "自己蹲进去，等谁来封口，",
+          "说：这间也满了。"
+        ]
+      },
+      "source": "runs\\dacfbc11961749828d5fcf4bd078c206.json",
+      "source_sha256": "fc7d2dce913c5b5c3eb649d301548f89de411665fda50d056181ba2508f246cc",
+      "inspection_question": "如何判断厨房、可携带物与不可带走的光的关系？新感知是否必须预先交代才能进入诗？"
+    }
+  ]
+}

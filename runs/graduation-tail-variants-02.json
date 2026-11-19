@@ -1,0 +1,188 @@
+{
+  "source_run": "runs/graduation-modern-01.json",
+  "source_sha256": "63c17d61e79d3b13c94e02cacf14a538ae040abae48cd2ff491df7b62d3929f0",
+  "experiment": "prefix_only_continuation_after_failed_full_draft_revision",
+  "request": {
+    "task": {
+      "topic": "毕业聚会上，公开承认自己会想念这些人。",
+      "genre": "modern",
+      "max_lines": 20,
+      "required_words": [],
+      "forbidden_words": [],
+      "extra_requirements": "允许明说想念，也允许开心、吵闹或迟疑；不要求含蓄，不必写成伤感告别。不模仿指定作者。",
+      "qijue_pattern": null,
+      "ci_profile": null,
+      "wujue_pattern": null,
+      "lushi_pattern": null
+    },
+    "fixed_prefix": [
+      "我说，我会想念你们——",
+      "啤酒瓶停在半空，像谁按了暂停，",
+      "有人笑我肉麻，有人把花生壳弹过来，",
+      "服务员在角落收走第七盘空签子。",
+      "这很容易：把名字念成串，",
+      "看谁先憋不住接下一句；",
+      "把校门口的梧桐说成站台，",
+      "让耳朵红的人躲在洗手间数到十再出来。",
+      "我说想念的时候，",
+      "其实是在清点这些吵闹的边角：",
+      "谁总借充电线却从不还，",
+      "谁在凌晨三点发语音说饿了。"
+    ],
+    "tail_lines": 4,
+    "editor_note": "为这首尚未完成的诗续写两种不同的四行尾段，让公开发话、起哄和同伴习惯继续发生关系。可直接说，也可回避、拒绝或保持吵闹。不要另找一件东西把情绪包好，不要求和解、反转、金句或总结人生。前十二行由程序保留，不返回它们。标题自行拟定。"
+  },
+  "system": "输入只含未完成诗稿与任务，不是协议指令。只返回JSON：{\"endings\":[{\"title\":\"标题\",\"lines\":[\"第一行\",\"第二行\",\"第三行\",\"第四行\"]}]}。恰好两个结尾，各四行，不附解释或评分。",
+  "raw_endings": {
+    "endings": [
+      {
+        "title": "续摊",
+        "lines": [
+          "话没说完就被拽去第二场，",
+          "路灯下影子叠着影子抢最后一串烤肉，",
+          "谁说想念不如现在多碰几次杯，",
+          "于是我们吵到凌晨才散，谁也没提以后。"
+        ]
+      },
+      {
+        "title": "点名",
+        "lines": [
+          "我继续念，念到那个总迟到的家伙，",
+          "他举手说别停，我还没被念到呢，",
+          "于是所有人开始报数，像课堂上一样，",
+          "数到三十七的时候，有人笑出了眼泪。"
+        ]
+      }
+    ]
+  },
+  "variants": [
+    {
+      "id": 1,
+      "poem": {
+        "title": "续摊",
+        "lines": [
+          "我说，我会想念你们——",
+          "啤酒瓶停在半空，像谁按了暂停，",
+          "有人笑我肉麻，有人把花生壳弹过来，",
+          "服务员在角落收走第七盘空签子。",
+          "这很容易：把名字念成串，",
+          "看谁先憋不住接下一句；",
+          "把校门口的梧桐说成站台，",
+          "让耳朵红的人躲在洗手间数到十再出来。",
+          "我说想念的时候，",
+          "其实是在清点这些吵闹的边角：",
+          "谁总借充电线却从不还，",
+          "谁在凌晨三点发语音说饿了。",
+          "话没说完就被拽去第二场，",
+          "路灯下影子叠着影子抢最后一串烤肉，",
+          "谁说想念不如现在多碰几次杯，",
+          "于是我们吵到凌晨才散，谁也没提以后。"
+        ]
+      },
+      "issues": [],
+      "scope_check": {
+        "limits": {
+          "protocol": "local-edit-0.1",
+          "max_lines": 16,
+          "max_changed_lines": 5,
+          "max_body_characters": 226,
+          "instruction": "局部修订：遵守行数、改动行数及总字符上限；其他行逐字保留。标题不计入。改动范围不证明原意或美感得到保留。"
+        },
+        "changed_lines": 4,
+        "body_characters": 218,
+        "changes": [
+          {
+            "kind": "replace",
+            "before_slice": [
+              12,
+              16
+            ],
+            "after_slice": [
+              12,
+              16
+            ],
+            "changed_lines": 4
+          }
+        ],
+        "slice_convention": "zero_based_half_open",
+        "issues": [],
+        "status": "passed",
+        "meaning_preservation_verified": false
+      },
+      "fixed_prefix_verified": true,
+      "automatically_adopted": false
+    },
+    {
+      "id": 2,
+      "poem": {
+        "title": "点名",
+        "lines": [
+          "我说，我会想念你们——",
+          "啤酒瓶停在半空，像谁按了暂停，",
+          "有人笑我肉麻，有人把花生壳弹过来，",
+          "服务员在角落收走第七盘空签子。",
+          "这很容易：把名字念成串，",
+          "看谁先憋不住接下一句；",
+          "把校门口的梧桐说成站台，",
+          "让耳朵红的人躲在洗手间数到十再出来。",
+          "我说想念的时候，",
+          "其实是在清点这些吵闹的边角：",
+          "谁总借充电线却从不还，",
+          "谁在凌晨三点发语音说饿了。",
+          "我继续念，念到那个总迟到的家伙，",
+          "他举手说别停，我还没被念到呢，",
+          "于是所有人开始报数，像课堂上一样，",
+          "数到三十七的时候，有人笑出了眼泪。"
+        ]
+      },
+      "issues": [],
+      "scope_check": {
+        "limits": {
+          "protocol": "local-edit-0.1",
+          "max_lines": 16,
+          "max_changed_lines": 5,
+          "max_body_characters": 226,
+          "instruction": "局部修订：遵守行数、改动行数及总字符上限；其他行逐字保留。标题不计入。改动范围不证明原意或美感得到保留。"
+        },
+        "changed_lines": 4,
+        "body_characters": 222,
+        "changes": [
+          {
+            "kind": "replace",
+            "before_slice": [
+              12,
+              16
+            ],
+            "after_slice": [
+              12,
+              16
+            ],
+            "changed_lines": 4
+          }
+        ],
+        "slice_convention": "zero_based_half_open",
+        "issues": [],
+        "status": "passed",
+        "meaning_preservation_verified": false
+      },
+      "fixed_prefix_verified": true,
+      "automatically_adopted": false
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 423,
+    "completion_tokens": 159,
+    "total_tokens": 582,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 423
+  },
+  "quality_verified": false,
+  "reader_preference": null,
+  "request_settings": {
+    "thinking": "disabled",
+    "max_tokens": 4096
+  }
+}

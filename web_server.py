@@ -15,7 +15,7 @@ from urllib.parse import urlsplit
 from uuid import uuid4
 from poetry_agent.client import load_env, DeepSeekClient
 from poetry_agent.aesthetics import failure_code
-from poetry_agent.studio import run_studio
+from poetry_agent.studio import run_studio, STUDIO_PROTOCOL
 
 ROOT = Path(__file__).resolve().parent
 ASSETS = ROOT / 'web'
@@ -130,7 +130,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(403, {'error': '仅允许本机访问。'})
         path = urlsplit(self.path).path
         if path == '/health':
-            return self.send(200, {'application': 'VERSEFORGE', 'pid': os.getpid()})
+            return self.send(200, {'application': 'VERSEFORGE', 'pid': os.getpid(), 'workflow_protocol': STUDIO_PROTOCOL})
         if path == '/api/session':
             identity = self.session() or secrets.token_urlsafe(32)
             with self.studio.lock:

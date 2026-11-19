@@ -37,7 +37,19 @@ function render(job) {
   $('direction').textContent=brief.directions?.[brief.selected_direction] || '';
  }
  const checks=result.checks || {};
- const pending=(checks.final_hard_issues?.length || 0)>0 || checks.revision_semantics_rechecked===false;
+ const report=checks.final_requirement_report;
+ $('requirement-review').hidden=!report;
+ const labels={satisfied:'已找到依据',violated:'存在冲突',uncertain:'待确认',not_required:'并非硬要求'};
+ $('requirement-evidence').replaceChildren(...(report?.checks || []).map(row=>{
+  const li=document.createElement('li');
+  const heading=document.createElement('p');heading.textContent=(labels[row.status] || '待确认')+' · '+row.requirement;
+  const evidence=document.createElement('p');evidence.className='small muted';
+  evidence.textContent=row.evidence ? '作品引文：'+row.evidence : row.reason;
+  if(row.evidence_issue) evidence.textContent+='（这项依据仍需确认）';
+  li.append(heading,evidence);return li;
+ }));
+ if(report && !report.checks?.length){const li=document.createElement('li');li.textContent='这次核对未完整返回，作品已保留。';$('requirement-evidence').append(li);}
+ const pending=(checks.final_hard_issues?.length || 0)>0 || checks.revision_semantics_rechecked===false || checks.requirements_confirmed===false;
  $('result-note').hidden=!pending;
  $('result-note').textContent=pending?'这版已生成。部分题目要求仍需确认，可展开题目理解或再换一个构思。':'';
 }

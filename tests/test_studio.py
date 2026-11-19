@@ -21,10 +21,15 @@ def brief(**updates):
     return value
 
 
+def checked(evidence='水位线'):
+    return {'checks': [{'id': 'r1', 'status': 'satisfied', 'source_quote': '不超过30行',
+                        'evidence': evidence, 'reason': '正文未超过行数上限。'}]}
+
+
 class StudioTests(unittest.TestCase):
     def test_examples_remain_optional_and_original_prompt_reaches_writer(self):
         prompt = '写给十年后的自己。不超过30行，可以是短信、邮件退信、AI助手提醒。'
-        client = Client([brief(), {'title': '河床', 'lines': ['水位线留在旧树上']}, {'violations': []}])
+        client = Client([brief(), {'title': '河床', 'lines': ['水位线留在旧树上']}, checked()])
         result = run_studio(prompt, client=client)
         payload = client.requests[1][1]['task']
         self.assertIn(prompt, payload['extra_requirements'])
@@ -42,20 +47,27 @@ class StudioTests(unittest.TestCase):
         self.assertEqual(len(client.requests), 1)
 
     def test_checker_cannot_invent_a_requirement_not_quoted_from_prompt(self):
-        client = Client([brief(), {'title': '河床', 'lines': ['水位线']}, {'violations': [
-            {'requirement': '必须使用短信', 'quote': '', 'problem': '没写短信'}]}])
+        client = Client([brief(), {'title': '河床', 'lines': ['水位线']}, {'checks': [
+            {'id': 'r1', 'status': 'violated', 'source_quote': '必须使用短信', 'evidence': '', 'reason': '没写短信'}]}])
         result = run_studio('写一首诗，不超过30行，可以是短信。', client=client)
         self.assertEqual(result['checks']['initial_requirement_conflicts'], [])
         self.assertEqual(len(client.requests), 3)
 
     def test_confirmed_hard_conflict_gets_one_revision_and_both_drafts_are_kept(self):
-        client = Client([brief(), {'title': '河床', 'lines': ['明天再寄出']}, {'violations': [
-            {'requirement': '信已经寄出', 'quote': '明天再寄出', 'problem': '时态不符'}]},
-            {'title': '河床', 'lines': ['寄出之后，树又长高了一寸']}])
+        initial = {'checks': [
+            {'id': 'r1', 'status': 'violated', 'source_quote': '信已经寄出', 'evidence': '明天再寄出', 'reason': '时态不符'},
+            {'id': 'r2', 'status': 'satisfied', 'source_quote': '不超过30行', 'evidence': '明天再寄出', 'reason': '只有一行。'}]}
+        final = {'checks': [
+            {'id': 'r1', 'status': 'satisfied', 'source_quote': '信已经寄出', 'evidence': '寄出之后', 'reason': '已经寄出。'},
+            {'id': 'r2', 'status': 'satisfied', 'source_quote': '不超过30行', 'evidence': '', 'reason': '只有一行。'}]}
+        client = Client([brief(requirements=['信已经寄出', '不超过30行']), {'title': '河床', 'lines': ['明天再寄出']}, initial,
+            {'title': '河床', 'lines': ['寄出之后，树又长高了一寸']}, final])
         result = run_studio('信已经寄出，不超过30行。', client=client)
         self.assertEqual(len(result['drafts']), 2)
-        self.assertEqual(len(client.requests), 4)
-        self.assertFalse(result['checks']['revision_semantics_rechecked'])
+        self.assertEqual(len(client.requests), 5)
+        self.assertTrue(result['checks']['revision_semantics_rechecked'])
+        self.assertTrue(result['checks']['requirements_confirmed'])
+        self.assertEqual(client.requests[-1][1]['poem']['lines'], ['寄出之后，树又长高了一寸'])
 
     def test_failed_requirement_check_retains_the_generated_poem(self):
         client = Client([brief(), {'title': '河床', 'lines': ['水位线']}])

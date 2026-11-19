@@ -28,6 +28,9 @@
 | 箱のお家 | 日语原作网页呈现全文 | [reading-notes-31.md](reading-notes-31.md) | [来源](https://misuzuuta.jp/product/箱のお家/) |
 | 明るい方へ | 日语原作网页呈现全文 | [reading-notes-33.md](reading-notes-33.md) | [来源](https://www.city.nagato.yamaguchi.jp/site/misuzu/44578.html) |
 | 大漁 | 日语原作网页呈现全文 | [reading-notes-33.md](reading-notes-33.md) | [来源](https://www.nippon.com/ja/articles/-/3102) |
+| 御本 | 日语网页正文16行全文，未核印本 | [reading-notes-39.md](reading-notes-39.md) | [来源](https://misuzuuta.jp/product/2016_gohon_1/) |
+| さくらの木 | 日语网页正文13行全文，未核印本 | [reading-notes-39.md](reading-notes-39.md) | [来源](https://misuzuuta.jp/product/2017_sakuranoki_1/) |
+| 波の子守唄 | 日语网页正文10行全文，未核印本 | [reading-notes-39.md](reading-notes-39.md) | [来源](https://misuzuuta.jp/product/波の子守唄/) |
 
 ## 海子
 

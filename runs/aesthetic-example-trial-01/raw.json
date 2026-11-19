@@ -1,0 +1,102 @@
+[
+  {
+    "sample_id": "fc864e8e3e8f",
+    "examples_enabled": false,
+    "scope": "one_generation_no_review_or_revision",
+    "quality_verified": false,
+    "result": {
+      "task": {
+        "topic": "第一次在菜市场讲价",
+        "genre": "modern",
+        "max_lines": 10,
+        "required_words": [],
+        "forbidden_words": [],
+        "extra_requirements": "写现代诗，人物与口吻自定。",
+        "qijue_pattern": null,
+        "ci_profile": null,
+        "wujue_pattern": null
+      },
+      "model": "deepseek-flash",
+      "prompt_version": "modern-aesthetic-0.4",
+      "aesthetic_experiment": true,
+      "aesthetic_examples": null,
+      "revision_scope": "local",
+      "mode": "live",
+      "status": "constraints_passed",
+      "poem": {
+        "title": "香菜",
+        "lines": [
+          "姜堆前，我把“太贵”含在舌下",
+          "像含一颗化不开的冰糖",
+          "老板娘的手在秤杆上停了一停",
+          "秤砣往下坠，替我讲了半句",
+          "“少两毛。”我的声音细成一根豆芽",
+          "她笑，抓一把香菜塞进袋口：",
+          "“拿去吧，你还没学会狠。”",
+          "塑料袋勒进指节，一路发烫——",
+          "那两毛没讲下来，我只讲下了",
+          "一个从此不好意思再讲的下午"
+        ]
+      },
+      "issues": [],
+      "prosody": null,
+      "metrical_target": null,
+      "ci_target": null,
+      "ci_prosody_status": null,
+      "ci_evidence": null,
+      "history": [
+        {
+          "poem": {
+            "title": "香菜",
+            "lines": [
+              "姜堆前，我把“太贵”含在舌下",
+              "像含一颗化不开的冰糖",
+              "老板娘的手在秤杆上停了一停",
+              "秤砣往下坠，替我讲了半句",
+              "“少两毛。”我的声音细成一根豆芽",
+              "她笑，抓一把香菜塞进袋口：",
+              "“拿去吧，你还没学会狠。”",
+              "塑料袋勒进指节，一路发烫——",
+              "那两毛没讲下来，我只讲下了",
+              "一个从此不好意思再讲的下午"
+            ]
+          },
+          "issues": [],
+          "usage": {
+            "prompt_tokens": 601,
+            "completion_tokens": 649,
+            "total_tokens": 1250,
+            "prompt_tokens_details": {
+              "cached_tokens": 384
+            },
+            "completion_tokens_details": {
+              "reasoning_tokens": 532
+            },
+            "prompt_cache_hit_tokens": 384,
+            "prompt_cache_miss_tokens": 217
+          },
+          "attempt": 1,
+          "metrical_feedback_sent": null,
+          "request_settings": {
+            "max_tokens": 4096,
+            "response_format": "json_object",
+            "thinking": "service_default"
+          }
+        }
+      ],
+      "comparisons": [],
+      "elapsed_seconds": 4.906,
+      "limitations": [
+        "硬检查覆盖格式、词语及指定谱体与现有韵表中的明确冲突；不认证完整格律、文学质量或原创性",
+        "审读及比较为模型自评，不代表审美已验证；比较失败或平局保留较早候选；mock不执行审读"
+      ]
+    }
+  },
+  {
+    "sample_id": "c44cf223c5e7",
+    "examples_enabled": true,
+    "scope": "one_generation_no_review_or_revision",
+    "quality_verified": false,
+    "failure_code": "output_length"
+  }
+]

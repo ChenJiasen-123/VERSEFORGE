@@ -6,13 +6,13 @@ from .aesthetics import compare, failure_code
 
 
 def compose_candidates(task, client, count=1, max_revisions=2, budget=120,
-                       aesthetic=False, revision_scope='local'):
+                       aesthetic=False, revision_scope='local', *, use_examples=False, generation_thinking=None):
     if type(count) is not int or not 1 <= count <= 3:
         raise ValueError('候选数须为1—3的整数')
     if not 0 < budget <= 600:
         raise ValueError('时间预算须大于0且不超过600秒')
     if count == 1:
-        return compose(task, client, max_revisions, budget, aesthetic, revision_scope)
+        return compose(task, client, max_revisions, budget, aesthetic, revision_scope, use_examples=use_examples, generation_thinking=generation_thinking)
     started = time.monotonic()
     runs = []
     selections = []
@@ -23,7 +23,7 @@ def compose_candidates(task, client, count=1, max_revisions=2, budget=120,
         # Reserve part of the shared budget for comparison; no added retries.
         allocation = remaining * 0.8 / (count - index)
         try:
-            runs.append(compose(task, client, max_revisions, allocation, aesthetic, revision_scope))
+            runs.append(compose(task, client, max_revisions, allocation, aesthetic, revision_scope, use_examples=use_examples, generation_thinking=generation_thinking))
         except RuntimeError:
             if not runs:
                 raise

@@ -31,6 +31,8 @@ def main():
     parser.add_argument("--requirements", default="")
     parser.add_argument("--mock", action="store_true", help="离线模拟，不调用API，不产生API费用")
     parser.add_argument("--aesthetic", action="store_true", help="按体裁启用审读、修订及候选比较；尚未证明质量提升")
+    parser.add_argument('--aesthetic-examples', action='store_true', help='现代诗可选实验：读取用户正面点评片段，须同时启用--aesthetic')
+    parser.add_argument('--generation-thinking', choices=['enabled', 'disabled'], help='可选生成思考模式；不指定时沿用服务默认，审读与比较仍独立设置')
     parser.add_argument("--speak", action="store_true", help="打印模拟朗诵文本，不播放声音")
     parser.add_argument("--max-revisions", type=int, choices=range(3), default=2)
     parser.add_argument('--candidates', type=int, choices=range(1, 4), default=1, help='独立生成候选数量，共享总时间预算')
@@ -48,7 +50,7 @@ def main():
         client = MockClient() if args.mock else DeepSeekClient()
         print(f"模式：{'离线模拟' if args.mock else '真实API（可能产生费用）'}；模型：{client.model}")
         result = compose_candidates(task, client, args.candidates, args.max_revisions, args.budget, aesthetic=args.aesthetic,
-                         revision_scope=args.revision_scope)
+                         revision_scope=args.revision_scope, use_examples=args.aesthetic_examples, generation_thinking=args.generation_thinking)
         result["run_id"] = uuid4().hex
         result["created_at"] = datetime.now(timezone.utc).isoformat()
         result["speech_text"] = speech_text(result["poem"]) if result["poem"] else None

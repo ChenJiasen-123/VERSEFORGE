@@ -9,6 +9,7 @@ from .rhyme_data import qijue_evidence
 from .qijue_profiles import specification
 from .ci import specification as ci_specification, check_shape as check_ci_shape, evidence as ci_evidence
 from .wujue import specification as wujue_specification, evidence as wujue_evidence
+from .aesthetic_examples import load_examples
 
 
 @dataclass
@@ -182,13 +183,18 @@ def metrical_revision_feedback(poem, task):
             'instruction': 'P为平、Z为仄。failed是所选谱与当前资料下明确不符，修改时保护其他已通过位置并兼顾诗意。unknown仅表示缺字或读音、归部未决，不等于错字，不要为消除unknown而机械换字；不得自行选择合谱读音冒充语境核验。每稿仍须重新检查；不构成完整合律认证。'}
 
 
-def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision_scope='local'):
+def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision_scope='local', *, use_examples=False, generation_thinking=None):
     if revision_scope not in ('local', 'rewrite'):
         raise ValueError('revision_scope须为local或rewrite')
     if type(max_revisions) is not int or not 0 <= max_revisions <= 2:
         raise ValueError('修订次数须为0—2的整数')
     if isinstance(budget, bool) or not isinstance(budget, (int, float)) or not 0 < budget <= 600:
         raise ValueError('时间预算须大于0且不超过600秒')
+    if use_examples and (not aesthetic or task.genre != 'modern'):
+        raise ValueError('审美示例实验仅支持启用审读规则的现代诗')
+    if generation_thinking not in (None, 'enabled', 'disabled'):
+        raise ValueError('生成思考模式须为enabled、disabled或不指定')
+    examples, examples_metadata = load_examples() if use_examples else (None, None)
     extra = MODERN_AESTHETIC if task.genre == 'modern' else CLASSICAL_AESTHETIC
     system = SYSTEM + extra if aesthetic else SYSTEM
     started = time.monotonic()
@@ -200,6 +206,8 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
         if remaining <= 0:
             break
         payload = {"task": asdict(task)}
+        if examples is not None:
+            payload['positive_examples'] = examples
         if task.qijue_pattern:
             payload['metrical_target'] = specification(task.qijue_pattern)
         if task.wujue_pattern:
@@ -218,7 +226,8 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
                 'max_body_characters': sum(map(len, revision_anchor['lines'])),
                 'instruction': '局部修订：不增加正文行数或总字符数；可以缩短，不要求填满上限。'}
         try:
-            response = client.complete(system, json.dumps(payload, ensure_ascii=False), timeout=remaining)
+            settings = {'thinking': generation_thinking} if generation_thinking is not None and not client.mock else {}
+            response = client.complete(system, json.dumps(payload, ensure_ascii=False), timeout=remaining, **settings)
         except RuntimeError:
             if not history:
                 raise
@@ -280,6 +289,8 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
     return {"task": asdict(task), "model": client.model,
             "prompt_version": {'modern': 'modern-aesthetic-0.4', 'qijue': 'qijue-aesthetic-0.1', 'wujue': 'wujue-aesthetic-0.1', 'ci': 'ci-aesthetic-0.2'}[task.genre] if aesthetic else "1",
             "aesthetic_experiment": aesthetic,
+            'aesthetic_examples': examples_metadata,
+            'generation_thinking': generation_thinking or 'service_default',
             "revision_scope": revision_scope,
             "mode": "mock" if client.mock else "live",
             "status": "constraints_passed" if best and not best["issues"] else "needs_review",

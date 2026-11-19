@@ -31,6 +31,8 @@ def propose_line_repairs(poem, task, client, *, budget=90, include_unknown=False
     if type(max_tokens) is not int or max_tokens not in (4096, 8192, 16384):
         raise ValueError('候选输出上限须为4096、8192或16384')
     started = time.monotonic()
+    if task.genre in ('wulv', 'qilv'):
+        raise ValueError('句级候选目前不支持八句律诗，请使用整稿修复')
     Poem.parse(json.dumps(poem, ensure_ascii=False))
     pair = _metrical_target_and_report(poem, task)
     if pair is None:

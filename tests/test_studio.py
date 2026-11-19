@@ -41,8 +41,8 @@ class StudioTests(unittest.TestCase):
         self.assertEqual(len(client.requests), 3)
 
     def test_unsupported_form_is_not_silently_converted_to_jueju(self):
-        client = Client([brief(genre='unsupported', unsupported_reason='当前未实现七律。')])
-        result = run_studio('写一首七律', client=client)
+        client = Client([brief(genre='unsupported', unsupported_reason='当前未实现鹧鸪天。')])
+        result = run_studio('写一首鹧鸪天', client=client)
         self.assertEqual(result['status'], 'unsupported')
         self.assertEqual(len(client.requests), 1)
 

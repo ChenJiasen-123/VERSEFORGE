@@ -7,6 +7,7 @@ from .qijue_profiles import specification
 from .wujue import specification as wujue_specification
 from .ci import specification as ci_specification
 from .cilin import rhyme_evidence
+from .lushi import specification as lushi_specification
 
 
 def body_hash(lines):
@@ -14,8 +15,8 @@ def body_hash(lines):
 
 
 def apply_review(poem, profile, ledger, *, genre='qijue'):
-    if genre not in ('qijue', 'wujue', 'ci'):
-        raise ValueError('读音复核仅支持五言律绝、七绝与指定词谱')
+    if genre not in ('qijue', 'wujue', 'wulv', 'qilv', 'ci'):
+        raise ValueError('读音复核仅支持指定近体诗基本谱与指定词谱')
     if ledger.get('genre', 'qijue') != genre:
         raise ValueError('复核体裁不一致；五言律绝与词记录须显式声明genre')
     if ledger.get('body_sha256') != body_hash(poem['lines']):
@@ -25,6 +26,7 @@ def apply_review(poem, profile, ledger, *, genre='qijue'):
     import re
     lines = [''.join(re.findall(r'[\u4e00-\u9fff]', line)) for line in poem['lines']]
     target = (ci_specification(profile) if genre == 'ci' else
+              lushi_specification(genre, profile) if genre in ('wulv', 'qilv') else
               wujue_specification(profile) if genre == 'wujue' else specification(profile))
     ci_feet = {(i-1, target['line_lengths'][i-1]-1) for i in target['rhyme_lines_1based']} if genre == 'ci' else set()
     overrides, ci_overrides = {}, {}
@@ -64,6 +66,7 @@ def apply_review(poem, profile, ledger, *, genre='qijue'):
     report = validate(lines, target['tones'], [(i-1, last) for i in target['rhyme_lines_1based']],
                       historical_lexicon(), target['source'], overrides)
     return {'basic_target_check': report, 'reviewer_kind': ledger['reviewer_kind'],
+            'parallelism_status': 'unknown' if genre in ('wulv', 'qilv') else 'not_required_by_this_tool',
             'genre': genre, 'profile': profile, 'body_sha256': body_hash(poem['lines']),
             'scope': 'exact_poem_and_selected_basic_target', 'overall_literary_quality_verified': False,
             'limitations': ['读音判断由具名复核记录提供，程序不独立认证其字书解释', '不覆盖全部合法变格或原创性']}

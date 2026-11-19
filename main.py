@@ -21,7 +21,8 @@ def main():
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--task", type=Path, help="JSON任务文件")
     source.add_argument("--topic", help="创作主题")
-    parser.add_argument("--genre", choices=["modern", "qijue", 'wujue', 'ci'], default="modern")
+    parser.add_argument("--genre", choices=["modern", "qijue", 'wujue', 'wulv', 'qilv', 'ci'], default="modern")
+    parser.add_argument('--lushi-pattern', choices=['ping_rhyme','ping_no_rhyme','ze_rhyme','ze_no_rhyme'])
     parser.add_argument('--wujue-pattern', choices=['ping_rhyme','ping_no_rhyme','ze_rhyme','ze_no_rhyme'])
     parser.add_argument('--ci-profile', choices=['baixiang_yijiangnan_liyu'])
     parser.add_argument('--qijue-pattern', choices=['ping_rhyme','ping_no_rhyme','ze_rhyme','ze_no_rhyme'])
@@ -45,7 +46,8 @@ def main():
             raise ValueError("时间预算须在1—600秒之间")
         task = Task(**json.loads(args.task.read_text(encoding="utf-8-sig"))) if args.task else Task(
             args.topic, args.genre, args.max_lines, args.required, args.forbidden, args.requirements,
-            qijue_pattern=args.qijue_pattern, ci_profile=args.ci_profile, wujue_pattern=args.wujue_pattern)
+            qijue_pattern=args.qijue_pattern, ci_profile=args.ci_profile, wujue_pattern=args.wujue_pattern,
+            lushi_pattern=args.lushi_pattern)
         load_env(ROOT / ".env")
         client = MockClient() if args.mock else DeepSeekClient()
         print(f"模式：{'离线模拟' if args.mock else '真实API（可能产生费用）'}；模型：{client.model}")

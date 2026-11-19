@@ -184,7 +184,7 @@ class Handler(BaseHTTPRequestHandler):
             prompt, genre, preference = data.get('prompt'), data.get('genre', 'auto'), data.get('preference', '')
             if not isinstance(prompt, str) or not 2 <= len(prompt.strip()) <= 10000 or not isinstance(preference, str) or len(preference) > 2000:
                 raise ValueError()
-            if genre not in ('auto', 'modern', 'wujue', 'qijue', 'ci'):
+            if genre not in ('auto', 'modern', 'wujue', 'qijue', 'wulv', 'qilv', 'ci'):
                 raise ValueError()
             previous = data.get('previous')
             if previous is not None:

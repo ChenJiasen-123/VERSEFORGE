@@ -50,8 +50,10 @@ function render(job) {
  }));
  if(report && !report.checks?.length){const li=document.createElement('li');li.textContent='这次核对未完整返回，作品已保留。';$('requirement-evidence').append(li);}
  const pending=(checks.final_hard_issues?.length || 0)>0 || checks.revision_semantics_rechecked===false || checks.requirements_confirmed===false;
- $('result-note').hidden=!pending;
+ const parallelPending=checks.parallelism_status==='unknown';
+ $('result-note').hidden=!(pending || parallelPending);
  $('result-note').textContent=pending?'这版已生成。部分题目要求仍需确认，可展开题目理解或再换一个构思。':'';
+ if(parallelPending) $('result-note').textContent+=' 律诗中间两联的对仗仍需人工核对。';
 }
 async function history() {
  const rows=await api('/api/jobs');

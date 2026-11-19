@@ -139,9 +139,12 @@
 | 昆明即景 | 茶铺、小楼两部分网页全文 | [reading-notes-34.md](reading-notes-34.md) | [来源](https://www.xuges.com/xdmj/lhy/sj/47.htm) |
 | 城楼上 | 网页转录全文 | [reading-notes-34.md](reading-notes-34.md) | [来源](https://www.xuges.com/xdmj/lhy/sj/28.htm) |
 
+| 桥 | 笔记42取得网页转录32行全文，补此前读取缺口；刊载信息未核 | [reading-notes-42.md](reading-notes-42.md) | [来源](https://www.xuges.com/xdmj/lhy/sj/61.htm) |
+
 ## 如何据此选择下一次阅读
 
 - 先检查题材、结构和来源是否过度集中，再决定补读或复读；不以数量达标代替深入。
 - 单篇读得较浅时，先补具体位置、反解和声音假设；不要仅因已有一个标题就认定研究充分。
 - 版本影响语义、发话边界或分行时，优先核对；没有读到的完整文本不由目录与摘要补齐。
 - 朗读、听者反馈与参数训练另行记录，本目录不为它们提供完成证据。
+

@@ -23,9 +23,9 @@ def export():
     items.append((read(source)['poem'], source, '真实API单字修订稿，归舟改归人。网页主表自动报告仍有待核字；对本版另做助手语境复核后，所选平起首句入韵基本谱检查通过。只限本版正文、指定基本谱及所列读音依据，不认证文学质量、原创性或全部变格。[本版复核记录](runs/spring-river-literary-revision-context-report.json)'))
     source = 'runs/ad895a55c6fb4bd1a4c8cead3f28b22d.json'
     items.append((read(source)['poem'], source, '保留真实API原稿，后续候选未明确胜出；积雪与露水的感知连接、语境读音仍待核。'))
-    source = 'runs/8855e36e0d544d249a33613b1a3a31ba.json'
-    items.append((read(source)['poem'], source, '真实API原稿；在本版助手核音表明示读法下，所选白香词谱李煜例作谱体及词林归部检查通过（過采用去读）。原始自动报告仍待核；末句动作关系仍需精修，不认证文学质量或全部变格。[本版复核记录](runs/ci-rain-town-context-report.json)'))
-    text = ['# 项目诗词作品选\n', '从已保存的真实API运行中选择六篇，保留原始字形和标点。这里的“选”是整理范围，不代表评奖排名、人工认可、原创性认证或参数微调成果。助手另写的备选没有混入这份API作品集。\n']
+    source = 'runs/ci-rain-town-final-line-revision-02.json'
+    items.append((read(source)['poem'], source, '真实API单字修订稿；用户在“濕燕掠簷風／濕燕避簷風”两种末句中明确选择后者，前四句不变。新正文在独立助手核音表明示读法下，通过所选白香词谱李煜例作与词林归部检查（過采用去读）。该偏好不等于整词获奖或全部变格认证。[本版复核记录](runs/ci-rain-town-final-line-revision-02-report.json)、[用户选择](research/user-text-feedback-03.json)'))
+    text = ['# 项目诗词作品选\n', '从已保存的真实API运行中选择六篇，保留对应版本的字形和标点。各篇的用户反馈与复核范围单独注明，不由入选推定评奖排名、整体质量、原创性认证或参数微调成果。助手另写的备选没有混入这份API作品集。\n']
     for poem, source, note in items:
         text.append('## ' + poem['title'] + '\n')
         text.append('  \n'.join(poem['lines']) + '\n')

@@ -20,7 +20,7 @@ def export():
     source = 'runs/e70eafa3f2a94516a9bf1faf3dc137dc.json'
     items.append((read(source)['poem'], source, '真实API双稿模型选出；屏幕收走话语等解释仍有分歧，非独立评审优胜。'))
     source = 'runs/0bb992abb57943bfba50d409bf8caa99-literary-revision.json'
-    items.append((read(source)['poem'], source, '真实API单字修订稿，归舟改归人。原稿有单独的语境声韵复核，修订稿自动报告仍待核，不混用两个版本的验收结论。'))
+    items.append((read(source)['poem'], source, '真实API单字修订稿，归舟改归人。网页主表自动报告仍有待核字；对本版另做助手语境复核后，所选平起首句入韵基本谱检查通过。只限本版正文、指定基本谱及所列读音依据，不认证文学质量、原创性或全部变格。[本版复核记录](runs/spring-river-literary-revision-context-report.json)'))
     source = 'runs/ad895a55c6fb4bd1a4c8cead3f28b22d.json'
     items.append((read(source)['poem'], source, '保留真实API原稿，后续候选未明确胜出；积雪与露水的感知连接、语境读音仍待核。'))
     source = 'runs/8855e36e0d544d249a33613b1a3a31ba.json'

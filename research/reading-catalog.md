@@ -32,6 +32,10 @@
 | さくらの木 | 日语网页正文13行全文，未核印本 | [reading-notes-39.md](reading-notes-39.md) | [来源](https://misuzuuta.jp/product/2017_sakuranoki_1/) |
 | 波の子守唄 | 日语网页正文10行全文，未核印本 | [reading-notes-39.md](reading-notes-39.md) | [来源](https://misuzuuta.jp/product/波の子守唄/) |
 
+| 不思議 | 日语网页正文12行全文，未核印本 | [reading-notes-44.md](reading-notes-44.md) | [来源](https://misuzuuta.jp/product/不思議/) |
+| 仲なおり | 日语网页正文8行全文，未核印本 | [reading-notes-44.md](reading-notes-44.md) | [来源](https://misuzuuta.jp/product/仲なおり/) |
+| 空のあちら | 日语网页正文8行全文，未核印本 | [reading-notes-44.md](reading-notes-44.md) | [来源](https://misuzuuta.jp/product/空のあちら/) |
+
 ## 海子
 
 | 作品／单元 | 实际范围 | 阅读笔记 | 文本来源 |

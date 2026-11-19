@@ -37,7 +37,7 @@ def main():
     parser.add_argument("--max-revisions", type=int, choices=range(3), default=2)
     parser.add_argument('--candidates', type=int, choices=range(1, 4), default=1, help='独立生成候选数量，共享总时间预算')
     parser.add_argument('--revision-scope', choices=['local', 'rewrite'], default='local',
-                        help='审美修订范围：local限制篇幅，rewrite允许重写')
+                        help='审美修订范围：local限制改动行数及篇幅，rewrite允许重写')
     parser.add_argument("--budget", type=int, default=120, help="流程时间预算，秒；网络超时不是硬实时截止")
     args = parser.parse_args()
     try:

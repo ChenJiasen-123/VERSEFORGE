@@ -169,7 +169,8 @@ class WorkflowTests(unittest.TestCase):
         client.mock = False
         result = compose(Task('等待'), client, max_revisions=1, aesthetic=True)
         self.assertEqual(result['poem']['lines'], ['灯'])
-        self.assertEqual(len(result['history'][1]['issues']), 2)
+        self.assertTrue(result['history'][1]['issues'])
+        self.assertEqual(result['history'][1]['revision_scope_check']['status'], 'failed')
         self.assertEqual(result['comparisons'], [])
 
     def test_aesthetic_revision_cannot_displace_valid_draft_with_broken_one(self):

@@ -10,6 +10,7 @@ from .qijue_profiles import specification
 from .ci import specification as ci_specification, check_shape as check_ci_shape, evidence as ci_evidence
 from .wujue import specification as wujue_specification, evidence as wujue_evidence
 from .aesthetic_examples import load_examples
+from .revision_scope import limits as local_limits, inspect_revision
 
 
 @dataclass
@@ -222,9 +223,8 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
                 if feedback is not None:
                     payload['revision']['metrical_feedback'] = feedback
         if revision_anchor and revision_scope == 'local':
-            payload['revision_limits'] = {'max_lines': len(revision_anchor['lines']),
-                'max_body_characters': sum(map(len, revision_anchor['lines'])),
-                'instruction': '局部修订：不增加正文行数或总字符数；可以缩短，不要求填满上限。'}
+            payload['revision_limits'] = local_limits(revision_anchor['lines'])
+        scope_report = None
         try:
             settings = {'thinking': generation_thinking} if generation_thinking is not None and not client.mock else {}
             response = client.complete(system, json.dumps(payload, ensure_ascii=False), timeout=remaining, **settings)
@@ -236,15 +236,14 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
             poem = Poem.parse(response["content"])
             issues = check(poem, task)
             if revision_anchor and revision_scope == 'local':
-                if len(poem.lines) > len(revision_anchor['lines']):
-                    issues.append('局部修订不得增加正文行数')
-                if sum(map(len, poem.lines)) > sum(map(len, revision_anchor['lines'])):
-                    issues.append('局部修订不得增加正文总字符数')
+                scope_report = inspect_revision(revision_anchor['lines'], poem.lines)
+                issues.extend(scope_report['issues'])
         except ValueError as exc:
             poem, issues = None, [str(exc)]
         history.append({"poem": asdict(poem) if poem else None, "issues": issues,
                         "usage": response.get("usage", {}), "attempt": attempt + 1,
                         'metrical_feedback_sent': feedback,
+                        'revision_scope_check': scope_report,
                         'request_settings': response.get('request_settings')})
         if poem and not issues:
             if not aesthetic or client.mock or attempt >= max_revisions:

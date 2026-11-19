@@ -2,6 +2,7 @@
 import json
 import time
 from .text_structure import inspect_structure, compare_lineation, literal_repetitions
+from .sound_basis import validate_basis
 
 TASK_MODALITY = '''
 准确解释题目语气：“不必／无需”只是不强制，“可以／允许”表示可选，不等于禁止其他成立写法。
@@ -25,6 +26,8 @@ def failure_code(error):
     if isinstance(error, json.JSONDecodeError):
         return 'invalid_json'
     message = str(error)
+    if message.startswith(('文本重复', '文本行位', '文本相邻', '文本字数', '文本声音依据', '文本声音解释')):
+        return 'invalid_sound_basis'
     if message == '现代诗审读缺少文本声音分析':
         return 'missing_text_sound'
     if isinstance(error, RuntimeError):
@@ -152,7 +155,13 @@ def review(poem, task, client, timeout):
     if task.get('genre') == 'modern':
         schema['text_sound'] = {'quote': '正文连续原文',
             'mechanism': '可核对的重复、句长、句法或分行安排',
-            'semantic_effect': '它怎样参与意义', 'uncertainty': '其他可能读法'}
+            'semantic_effect': '它怎样参与意义', 'uncertainty': '其他可能读法',
+            'basis': {'kind': 'literal_repeat或line_pair或interpretation'}}
+        system += '''\ntext_sound.basis必须选择一种结构：
+literal_repeat：{"kind":"literal_repeat","fragment":"引文中的2—8字连续片段","occurrence_count":2}，次数按移除分行但保留标点空白的全文重叠出现统计。
+line_pair：{"kind":"line_pair","first_line":1,"second_line":2,"is_next_line":true,"length_relation":"first_longer或equal或first_shorter或not_claimed"}，行号从1开始；长短仅指去标点空白字符数，不是句长或音步。
+interpretation：{"kind":"interpretation","why_unverified":"具体说明尚未独立验证的句法或读法"}。它不是事实校验通过。
+声称重复次数或前后相邻关系时，采用相应可核结构；只讨论句法或可能读法时用interpretation。自由评论未被程序逐句认证，不得借一个字段通过宣称整段解释已证明。'''
         system += '''\n现代诗的text_sound必填，即使选择keep也须完成。
 留意语言是否过于稳妥：每句虽正确，却没有属于这次经验的发现。也要保护成立的陌生表达，判断它如何由前文支撑、怎样改变读者对处境的感受。没有醒目句不自动是缺点；不要为追金句强制加比喻或反转，也不要把新奇一律解释成不自然而磨平。
 只根据纸面分析，不声称实际听过，不用停顿时长、押韵率或形容词替代依据；没有特殊安排也可如实说明，不能虚构韵脚或重复。
@@ -185,14 +194,18 @@ def review(poem, task, client, timeout):
     sound = obj.get('text_sound')
     if task.get('genre') == 'modern' and sound is None:
         raise ValueError('现代诗审读缺少文本声音分析')
+    basis_report = None
     if sound is not None:
         if not isinstance(sound, dict) or any(not isinstance(sound.get(k), str) or not sound[k].strip()
                 for k in ('quote', 'mechanism', 'semantic_effect', 'uncertainty')):
             raise ValueError('文本声音观察结构无效')
         if sound['quote'] not in '\n'.join(poem['lines']):
             raise ValueError('审读引用不在正文中')
+        if task.get('genre') == 'modern':
+            basis_report = validate_basis(poem['lines'], sound['quote'], sound.get('basis'))
     return {'assessment': obj, 'usage': response.get('usage', {}),
-            'review_protocol_version': 'text-review-0.9',
+            'review_protocol_version': 'text-review-1.0',
+            'text_sound_basis_check': basis_report,
             'text_sound_status': 'recorded_not_auditory_verified' if sound else 'not_recorded',
             'text_structure': inspect_structure(poem['lines']),
             'source': 'model_self_review', 'quality_verified': False,

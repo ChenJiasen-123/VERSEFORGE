@@ -25,7 +25,8 @@ def output(lines):
 
 def review_output(fields):
     fields['text_sound'] = dict(quote=fields['quote'], mechanism='短行',
-        semantic_effect='突出等候的对象', uncertainty='也可以与后文接续理解')
+        semantic_effect='突出等候的对象', uncertainty='也可以与后文接续理解',
+        basis={'kind':'interpretation','why_unverified':'仅作可能的句法解释'})
     return json.dumps(fields)
 
 

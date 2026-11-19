@@ -40,13 +40,24 @@ def validate(lines, tones, rhyme_positions, lexicon, rule_source, contextual_rea
             item = {'line': i + 1, 'character': j + 1, 'text': char,
                     'expected_tone': expected, 'sources': sorted({r.source for r in readings})}
             item['reading_basis'] = 'context_review' if (i, j) in overrides else 'web_table'
+            glyph = getattr(lexicon, 'glyph_evidence', {}).get(char) if (i, j) not in overrides else None
+            # If every form has evidence, ordinary union-of-readings checks apply:
+            # matching tones do not select a form, differing tones remain unknown.
+            unresolved_glyph = glyph and glyph['missing_candidates']
+            if glyph:
+                item['glyph_evidence'] = glyph
+                item['reading_basis'] = 'web_table_with_glyph_candidates'
             if expected == 'X':
                 # No tone requirement here; this is not a resolved reading.
                 rhyme_candidates = {rhyme for tone, rhyme in candidates}
-                if len(rhyme_candidates) == 1:
+                if len(rhyme_candidates) == 1 and not unresolved_glyph:
                     resolved[(i, j)] = next(iter(rhyme_candidates))
                 item.update(kind='tone', status='not_required', reading_resolved=False,
                             attested_tones=sorted({tone for tone, rhyme in candidates}))
+                findings.append(item)
+                continue
+            if unresolved_glyph:
+                item.update(status='unknown', kind='incomplete_glyph_candidates' if candidates else 'missing_reading')
                 findings.append(item)
                 continue
             tone_candidates = {tone for tone, rhyme in candidates}

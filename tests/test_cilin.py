@@ -49,7 +49,13 @@ class CilinTests(unittest.TestCase):
             with self.assertRaises(ValueError): extract(paths)
 
     def test_dong_and_dong_can_share_ci_part_without_merging_pingshui_groups(self):
-        report = rhyme_evidence(with_feet('東冬風'), specification(PROFILE))
+        from poetry_agent.prosody import Reading
+        # Explicit synthetic reading isolates the rhyme-system rule. Without it,
+        # OpenCC's 冬/鼕 alternatives now expose a missing Cilin main-table form.
+        lines = with_feet('東冬風')
+        self.assertEqual(rhyme_evidence(lines, specification(PROFILE))['status'], 'unknown')
+        report = rhyme_evidence(lines, specification(PROFILE),
+                                {(3, 6): [Reading('P', '詞林第1部', 'test fixture: supplied winter reading')]})
         self.assertEqual(report['status'], 'pass')
         self.assertEqual(report['findings'][-1]['groups'], ['詞林第1部'] * 3)
 

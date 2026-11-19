@@ -2,17 +2,20 @@
 import json
 import re
 from pathlib import Path
+from functools import lru_cache
 from .prosody import Reading, validate
+from .glyphs import with_glyph_candidates
 from .qijue_profiles import specification
 
 
+@lru_cache(maxsize=1)
 def historical_lexicon():
     data = json.loads((Path(__file__).parent / 'data/pingshui-excerpts.json').read_text(encoding='utf-8'))
     lexicon = {}
     for group in data['groups']:
         for char in group['characters']:
             lexicon.setdefault(char, []).append(Reading(group['tone'], group['name'], data['source']))
-    return lexicon
+    return with_glyph_candidates(lexicon)
 
 
 def lookup_excerpt(character):
@@ -20,9 +23,11 @@ def lookup_excerpt(character):
         raise ValueError('Expected one character')
     path = Path(__file__).parent / 'data' / 'pingshui-excerpts.json'
     data = json.loads(path.read_text(encoding='utf-8'))
+    lexicon = historical_lexicon()
     return {'character': character, 'memberships': [
-        {'tone': g['tone'], 'rhyme': g['name']} for g in data['groups']
-        if character in g['characters']], 'source': data['source'],
+        {'tone': tone, 'rhyme': rhyme} for tone, rhyme in sorted({
+            (r.tone, r.rhyme) for r in lexicon.get(character, ())})], 'source': data['source'],
+        'glyph_evidence': lexicon.glyph_evidence.get(character),
         'reading_resolved': False, 'coverage': 'partial',
         'limitations': data['limitations']}
 
@@ -49,7 +54,7 @@ def qijue_evidence(lines, profile=None):
             'standard_line_types': types,
             'limitations': ['未指定起式及首句入韵方式，未验证平仄、粘对或拗救',
                             '归部交集不是语境读音判定，也不构成押韵通过',
-                            '不自动转换简繁，缺字及多音仍需复核']}
+                            '不改写原稿；字形候选有独立来源，一对多、多音及缺字仍待核']}
     if profile:
         target = specification(profile)
         lexicon = historical_lexicon()

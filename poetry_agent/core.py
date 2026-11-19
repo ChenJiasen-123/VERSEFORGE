@@ -162,10 +162,13 @@ CLASSICAL_AESTHETIC = '''
 def metrical_revision_feedback(poem, task):
     """Carry rule evidence to repair without upgrading unresolved readings."""
     if task.genre == 'qijue' and task.qijue_pattern:
+        target = specification(task.qijue_pattern)
         report = qijue_evidence(poem['lines'], task.qijue_pattern)['basic_target_check']
     elif task.genre == 'wujue':
+        target = wujue_specification(task.wujue_pattern)
         report = wujue_evidence(poem['lines'], task.wujue_pattern)['basic_target_check']
     elif task.genre == 'ci' and task.ci_profile:
+        target = ci_specification(task.ci_profile)
         evidence = ci_evidence(poem['lines'], task.ci_profile)
         report = dict(evidence['tone_check'])
         report['findings'] = report['findings'] + [x for x in evidence['rhyme_check']['findings'] if x['status'] in ('failed', 'unknown')]
@@ -175,7 +178,16 @@ def metrical_revision_feedback(poem, task):
         report['scope'] = 'named_ci_tone_and_cilin_rhyme_feedback'
     else:
         return None
+    normalized = [''.join(re.findall(r'[\u4e00-\u9fff]', line)) for line in poem['lines']]
+    display = {'P': '平', 'Z': '仄', 'X': '可平可仄'}
     return {'status': report['status'], 'rule_source': report['rule_source'],
+            'feedback_protocol': 'metrical-feedback-0.2',
+            'line_targets': [
+                {'line': i + 1, 'current_text': normalized[i] if i < len(normalized) else '',
+                 'required_tones': pattern,
+                 'required_tones_chinese': '／'.join(display[c] for c in pattern)}
+                for i, pattern in enumerate(target['tones'])],
+            'rhyme_lines_1based': target['rhyme_lines_1based'],
             'scope': report['scope'],
             'findings_to_review': [x for x in report['findings'] if x['status'] in ('failed', 'unknown')],
             'confirmed_tone_positions': [

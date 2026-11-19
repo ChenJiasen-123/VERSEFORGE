@@ -113,6 +113,10 @@
 | 我有一个恋爱 | 网页转录25行全文，异文注释不计正文 | [reading-notes-38.md](reading-notes-38.md) | [来源](https://zh.wikisource.org/wiki/我有一個戀愛) |
 | 残诗 | 全篇复读：呼告与回应，非新增作品 | [reading-notes-38.md](reading-notes-38.md) | [来源](https://zh.wikisource.org/zh-hans/殘詩) |
 
+| 这是一个懦怯的世界 | 网页转录全文；未核原刊 | [reading-notes-46.md](reading-notes-46.md) | [来源](https://zh.wikisource.org/zh-hant/這是一個懦怯的世界) |
+| 我等候你 | 网页正文77行全文；原刊关键句与卷期未核，不采搜索摘要为定本 | [reading-notes-46.md](reading-notes-46.md) | [来源](https://shigeku.com/shiku/xs/xuzhimo/040.htm) |
+| 阔的海 | 网页正文11行全文；未核印本 | [reading-notes-46.md](reading-notes-46.md) | [来源](https://zh.wikisource.org/zh-hant/闊的海) |
+
 ## 林徽因
 
 | 作品／单元 | 实际范围 | 阅读笔记 | 文本来源 |

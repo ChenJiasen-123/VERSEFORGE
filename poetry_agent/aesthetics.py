@@ -51,7 +51,7 @@ COMPARE_SYSTEM += '''
 '''
 
 
-def compare(a, b, task, client, timeout, *, relation='independent'):
+def compare(a, b, task, client, timeout, *, relation='independent', lineation_control=False):
     if relation not in ('independent', 'revision'):
         raise ValueError('候选关系须为independent或revision')
     lineation = compare_lineation(a['lines'], b['lines'])
@@ -60,10 +60,13 @@ def compare(a, b, task, client, timeout, *, relation='independent'):
         system += '\n本次A是较早稿，B是后续修订稿。检查修改是否回应问题、是否只扩写、是否损伤有效部分或把独特表达改成平稳解释。不因B是修订稿就认定更好。'
     else:
         system += '\n本次A与B是独立生成的候选，不是原稿与改稿。按各自整体关系比较，不把B默认为新增、扩写或对A的解释，不要求一稿保留另一稿的意象或结尾。'
+    if lineation['applicable'] and lineation_control:
+        system += '''\n同字异分行的对照控制：字词、标点、否定、引语内容与语法成分在两稿完全相同。先明确共有的文本效果，再说明换行如何改变其显著性或读法。若谓语缺失、引语未完成、动作或比喻存在，两稿都具有该事实；不能把其中一稿说成补全了另一稿所缺的内容、因果或人物。可以讨论分行诱发的另一种句法切分，但须引用实际边界并明确这是可能读法，不把它说成新增的字面事实。选优必须依赖差异，不能仅用共有优点支持一稿。'''
     if lineation['applicable']:
         system += '''\nlineation_difference标出相同字词标点下的换行差异。若有差异，优先在差异附近取引文，理由须讨论至少一处具体边界：前后句法如何连接，意义重心怎样变化，可能损失什么。换行不等于必然停顿，不能仅因短行就称更有节奏；若差异并未带来充分的优劣依据，可以判tie。相同字词不代表分行无实质作用。程序没有分析句法或预测朗读。'''
     response = client.complete(system, json.dumps(
-        {'task': task, 'a': a, 'b': b, 'comparison_relation': relation, 'lineation_difference': lineation}, ensure_ascii=False), timeout=timeout, max_tokens=4096, thinking='disabled')
+        {'task': task, 'a': a, 'b': b, 'comparison_relation': relation,
+            'experimental_lineation_control': lineation_control, 'lineation_difference': lineation}, ensure_ascii=False), timeout=timeout, max_tokens=4096, thinking='disabled')
     obj = json.loads(response['content'])
     if not isinstance(obj, dict) or obj.get('choice') not in ('a', 'b', 'tie'):
         raise ValueError('比较决定无效')
@@ -76,6 +79,7 @@ def compare(a, b, task, client, timeout, *, relation='independent'):
     return {'assessment': obj, 'usage': response.get('usage', {}),
             'comparison_protocol_version': 'text-compare-0.5',
             'comparison_relation': relation,
+            'experimental_lineation_control': lineation_control,
             'lineation_difference': lineation,
             'source': 'model_self_review', 'quality_verified': False,
             'request_settings': {'thinking': 'disabled', 'response_format': 'json_object'}}

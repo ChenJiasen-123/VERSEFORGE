@@ -4,6 +4,7 @@ import re
 from pathlib import Path
 from .prosody import validate
 from .rhyme_data import historical_lexicon
+from .cilin import rhyme_evidence
 
 
 def specification(name):
@@ -33,5 +34,7 @@ def evidence(lines, name):
     statuses = {f['status'] for f in report['findings']}
     report['status'] = 'failed' if 'failed' in statuses else ('unknown' if 'unknown' in statuses else 'pass')
     report['scope'] = 'named_ci_profile_tones_against_web_main_table'
-    return {'status': 'unknown', 'tone_check': report, 'rhyme_status': 'not_covered',
+    rhyme = rhyme_evidence(normalized, profile)
+    return {'status': 'unknown', 'tone_check': report, 'rhyme_status': rhyme['status'],
+            'rhyme_check': rhyme,
             'profile': name, 'limitations': profile['limitations']}

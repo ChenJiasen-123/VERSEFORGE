@@ -89,9 +89,16 @@ def check(poem: Poem, task: Task) -> list[str]:
             issues.append(f"正文{len(poem.lines)}行，超过{task.max_lines}行")
     elif task.genre == 'ci':
         issues.extend(check_ci_shape(poem.lines, task.ci_profile))
-        for finding in ci_evidence(poem.lines, task.ci_profile)['tone_check']['findings']:
+        ci_report = ci_evidence(poem.lines, task.ci_profile)
+        for finding in ci_report['tone_check']['findings']:
             if finding['status'] == 'failed' and finding['kind'] == 'tone':
                 issues.append(f"按所选词谱与当前主表，第{finding['line']}句第{finding['character']}字应为{finding['expected_tone']}，已见为{finding['actual_tone']}；须核音义并修改")
+        for finding in ci_report['rhyme_check']['findings']:
+            if finding['status'] == 'failed':
+                if finding['kind'] == 'rhyme':
+                    issues.append('所选词谱的韵脚在词林正韵网页主字表归部不一致，须核音义并修改')
+                elif finding['kind'] == 'tone':
+                    issues.append(f"按所选词韵，第{finding['line']}句韵脚“{finding['text']}”应为{finding['expected_tone']}，当前词林主表已见为{finding['actual_tone']}；须核音义并修改")
     else:
         width, name = (5, '五言律绝') if task.genre == 'wujue' else (7, '七言绝句')
         if len(poem.lines) != 4:
@@ -157,7 +164,13 @@ def metrical_revision_feedback(poem, task):
     elif task.genre == 'wujue':
         report = wujue_evidence(poem['lines'], task.wujue_pattern)['basic_target_check']
     elif task.genre == 'ci' and task.ci_profile:
-        report = ci_evidence(poem['lines'], task.ci_profile)['tone_check']
+        evidence = ci_evidence(poem['lines'], task.ci_profile)
+        report = dict(evidence['tone_check'])
+        report['findings'] = report['findings'] + [x for x in evidence['rhyme_check']['findings'] if x['status'] in ('failed', 'unknown')]
+        report['rule_source'] += ' ; ' + evidence['rhyme_check']['rule_source']
+        statuses = {x['status'] for x in report['findings']}
+        report['status'] = 'failed' if 'failed' in statuses else 'unknown' if 'unknown' in statuses else 'pass'
+        report['scope'] = 'named_ci_tone_and_cilin_rhyme_feedback'
     else:
         return None
     return {'status': report['status'], 'rule_source': report['rule_source'],
@@ -265,7 +278,7 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
                 record['failure_code'] = failure_code(exc)
             comparisons.append(record)
     return {"task": asdict(task), "model": client.model,
-            "prompt_version": {'modern': 'modern-aesthetic-0.4', 'qijue': 'qijue-aesthetic-0.1', 'wujue': 'wujue-aesthetic-0.1', 'ci': 'ci-aesthetic-0.1'}[task.genre] if aesthetic else "1",
+            "prompt_version": {'modern': 'modern-aesthetic-0.4', 'qijue': 'qijue-aesthetic-0.1', 'wujue': 'wujue-aesthetic-0.1', 'ci': 'ci-aesthetic-0.2'}[task.genre] if aesthetic else "1",
             "aesthetic_experiment": aesthetic,
             "revision_scope": revision_scope,
             "mode": "mock" if client.mock else "live",
@@ -277,5 +290,5 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
             'ci_prosody_status': 'unknown' if task.genre == 'ci' else None,
             'ci_evidence': ci_evidence(best['poem']['lines'], task.ci_profile) if best and task.genre == 'ci' else None,
             "history": history, "comparisons": comparisons, "elapsed_seconds": round(time.monotonic() - started, 3),
-            "limitations": ["仅检查明确的格式与词语约束，不认证文学质量、原创性、押韵或平仄",
+            "limitations": ["硬检查覆盖格式、词语及指定谱体与现有韵表中的明确冲突；不认证完整格律、文学质量或原创性",
                              "审读及比较为模型自评，不代表审美已验证；比较失败或平局保留较早候选；mock不执行审读"]}

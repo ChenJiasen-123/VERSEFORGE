@@ -12,4 +12,4 @@ class CiTranscriptionTests(unittest.TestCase):
         self.assertEqual([len(s) for s in profile['tones']], profile['line_lengths'])
         # 昨夜夢魂中: the annotated third position is 仄, not 平.
         self.assertEqual(profile['tones'][1][2], 'Z')
-        self.assertIsNone(profile['rhyme_system'])
+        self.assertEqual(profile['rhyme_system'], 'cilin-web-main-12977287')

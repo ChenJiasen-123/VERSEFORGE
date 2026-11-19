@@ -14,7 +14,7 @@ class CiTests(unittest.TestCase):
         lines = ['東'*n for n in [3,5,7,7,5]]
         r = evidence(lines, 'baixiang_yijiangnan_liyu')
         self.assertEqual(r['tone_check']['status'], 'failed')
-        self.assertEqual(r['rhyme_status'], 'not_covered')
+        self.assertEqual(r['rhyme_status'], 'pass')
         self.assertEqual(r['status'], 'unknown')
 
     def test_ci_requires_exact_profile(self):

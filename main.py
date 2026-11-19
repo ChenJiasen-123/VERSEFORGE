@@ -61,7 +61,7 @@ def main():
         print("\n状态：" + result["status"])
         for issue in result["issues"]:
             print("- " + issue)
-        print("提示：仅检查格式和词语约束，不认证文学质量、原创性或格律。")
+        print("提示：程序检查范围有限，作品仍需审校。")
         if result.get('prosody'):
             print('格律状态：待核；韵脚归部证据已写入运行记录 prosody 字段。')
         print(f"运行记录：{path}")

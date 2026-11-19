@@ -81,6 +81,12 @@
 | 月光插图 | 出版方试读网页所呈全文；词内折行不认证为作者分行 | [reading-notes-41.md](reading-notes-41.md) | [来源](https://www.booklife.com.tw/product-detail/04400025) |
 | 迷途 | 出版方试读网页所呈全文；词内折行不认证为作者分行 | [reading-notes-41.md](reading-notes-41.md) | [来源](https://www.booklife.com.tw/product-detail/04400025) |
 
+| 流星雨 | 出版方网页所呈正文12行全文，未核印本；新版后记另计 | [reading-notes-45.md](reading-notes-45.md) | [来源](https://www.booklife.com.tw/product-detail/04400033) |
+| 素描时光 | 出版方网页所呈正文8行全文，未核印本；新版后记另计 | [reading-notes-45.md](reading-notes-45.md) | [来源](https://www.booklife.com.tw/product-detail/04400033) |
+| 山樱 | 出版方网页所呈正文12行全文，未核印本；新版后记另计 | [reading-notes-45.md](reading-notes-45.md) | [来源](https://www.booklife.com.tw/product-detail/04400033) |
+| 雨夜 | 出版方网页所呈正文11行全文，未核印本；新版后记另计 | [reading-notes-45.md](reading-notes-45.md) | [来源](https://www.booklife.com.tw/product-detail/04400033) |
+| 悬崖菊 | 出版方网页所呈正文6行全文，未核印本；新版后记另计 | [reading-notes-45.md](reading-notes-45.md) | [来源](https://www.booklife.com.tw/product-detail/04400033) |
+
 ## 徐志摩
 
 | 作品／单元 | 实际范围 | 阅读笔记 | 文本来源 |

@@ -41,7 +41,7 @@ def compose_candidates(task, client, count=1, max_revisions=2, budget=120,
             break
         record = {'a_candidate': best[0] + 1, 'b_candidate': index + 1}
         try:
-            record.update(compare(best[1]['poem'], run['poem'], asdict(task), client, remaining))
+            record.update(compare(best[1]['poem'], run['poem'], asdict(task), client, remaining, relation='independent'))
             if record['assessment']['choice'] == 'b':
                 best = (index, run)
         except (ValueError, RuntimeError, KeyError, TypeError) as exc:

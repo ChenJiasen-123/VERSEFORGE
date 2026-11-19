@@ -270,7 +270,7 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
                 break
             record = {'a_attempt': best['attempt'], 'b_attempt': candidate['attempt']}
             try:
-                record.update(compare(best['poem'], candidate['poem'], asdict(task), client, remaining))
+                record.update(compare(best['poem'], candidate['poem'], asdict(task), client, remaining, relation='revision'))
                 if record['assessment']['choice'] == 'b':
                     best = candidate
             except (ValueError, RuntimeError, KeyError, TypeError) as exc:

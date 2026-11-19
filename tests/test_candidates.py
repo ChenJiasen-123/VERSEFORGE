@@ -6,6 +6,13 @@ from poetry_agent.candidates import compose_candidates
 
 
 class CandidateTests(unittest.TestCase):
+    def test_separate_compositions_are_not_labeled_as_revisions(self):
+        results = [{'poem': {'lines': ['甲']}, 'issues': []}, {'poem': {'lines': ['乙']}, 'issues': []}]
+        client = MockClient()
+        client.mock = False
+        with patch('poetry_agent.candidates.compose', side_effect=results), patch('poetry_agent.candidates.compare', return_value={'assessment': {'choice': 'tie'}}) as compare:
+            compose_candidates(Task('题'), client, count=2)
+        self.assertEqual(compare.call_args.kwargs['relation'], 'independent')
     def test_hard_constraints_take_priority_without_comparing_broken_candidate(self):
         results = [{'poem': {'lines': ['甲']}, 'issues': ['缺词']},
                    {'poem': {'lines': ['乙']}, 'issues': []}]

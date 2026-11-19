@@ -111,6 +111,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(client.calls, 4)
         self.assertEqual(result['poem']['lines'], ['灯在门外'])
         self.assertFalse(result['history'][0]['aesthetic_review']['quality_verified'])
+        self.assertEqual(result['comparisons'][0]['comparison_relation'], 'revision')
 
     def test_comparison_can_retain_original_or_fail_safely(self):
         critique = review_output(dict(decision='revise', preserve='等待', quote='灯',

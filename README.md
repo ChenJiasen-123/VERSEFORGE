@@ -39,7 +39,7 @@ python main.py --topic 雨后小城 --genre ci --ci-profile baixiang_yijiangnan_
 
 谱中的 X 为可平可仄，记作 not_required，不表示该字读音已经确定。平仄与韵部独立，多音字不自动挑能过关的一音，未知不升级为合律。韵书网页主表已有106个分组与快照校验值，但未完成原书逐字校勘。
 
-任务支持 topic、genre、max_lines、required_words、forbidden_words、extra_requirements、qijue_pattern、ci_profile。关键词只查正文，不查标题；附加要求由模型理解，程序并未确定性验证全部自然语言条件。
+任务支持 topic、genre、max_lines、required_words、forbidden_words、extra_requirements、qijue_pattern、wujue_pattern、ci_profile。关键词只查正文，不查标题；附加要求由模型理解，程序并未确定性验证全部自然语言条件。
 
 ## 审读、修订与选稿
 
@@ -48,6 +48,8 @@ python main.py --topic 雨后小城 --genre ci --ci-profile baixiang_yijiangnan_
 `--revision-scope local`默认限制审美修订不增加基准稿行数及总字符数，仅控制篇幅，不保证只改几个字。`rewrite`允许在题目上限内重写。硬条件修复在建立审美修订基准前不受这一篇幅限制。
 
 同等硬条件候选以带双方短引文的模型比较选择；平局或失败保留已有稿。`--candidates 2`可独立生成两稿（最多3稿），先比较硬条件，再比较同等候选，不保证比单稿好。
+
+比较记录注明independent（不同创作候选）或revision（较早稿与后续修订）。前者分别评价整体关系，后者另核修改所得与损失，不把所有B稿默认视为改稿。
 
 默认单候选最多3次生成、2次审读、2次比较；多候选还增加跨候选比较。`--budget`为共享时间预算（1—600秒），不是硬实时截止；预算、失败或提前保留会减少调用。无完成审读不等于认可原稿，失败类型写入记录。
 

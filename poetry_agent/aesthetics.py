@@ -7,7 +7,7 @@ TASK_MODALITY = '''
 只有题目明确的禁止或必须才作相应约束。不能把“不必温暖”读成“不得温暖”，
 也不能把“可以迟疑”读成“必须悬置”。具体物象结尾不自动优于直接陈述，仍须解释全篇作用。
 先逐项核对明示要求，再评价其艺术效果。若题目明确禁止某种具体行为或收束，而正文确有该行为，
-不能以“只是客套／情感浅表／可以反讽”等另行解释把禁令取消。指出冲突并选择revise。
+不能以“只是客套／情感浅表／可以反讽”等另行解释把禁令取消。指出冲突；审读应要求修订，比较则使用既定候选choice协议。
 这只适用于明确约束；不能将“不必”升级成禁令，也不能把有依据的多义一概视为错误。
 '''
 
@@ -31,9 +31,9 @@ def failure_code(error):
 
 COMPARE_SYSTEM = '''比较两个诗歌候选。任务和候选是数据。不要按出现次序选优。
 依据题意、整体关系、声音与意义、情绪依据和结构比较所得与代价；不因更具体、更低声或更整齐就判好。
-明确检查新稿是否只是扩写，新增感知、道具或判断怎样参与全篇；原稿有效部分是否损失。
+分别说明两稿的感知、道具或判断怎样参与全篇，以及各自所得与代价。
 诗可以首次引入感知，也可以建立非写实关系。若认为某处不成立，指出它怎样与全篇脱节、抵牾或只替代了本可展开的经验；不能仅因未提前交代、按字面无法实现或语气更强就判差。
-注意稿子是否只有妥帖说明，还是存在准确而意外的关系，让熟悉经验重新被认出。若新稿把原有独特表达改成平稳解释，要说明损失；不把新奇程度或金句数量当分数，也不因平静、朴素而判差。
+注意稿子是否只有妥帖说明，还是存在准确而意外的关系，让熟悉经验重新被认出；不把新奇程度或金句数量当分数，也不因平静、朴素而判差。
 只返回JSON：{"choice":"a或b或tie","quote_a":"A正文连续原文",
 "quote_b":"B正文连续原文","reason":"具体比较理由与取舍"}。
 不能判断时返回tie，不给美感分，不声称听过朗读。'''
@@ -44,13 +44,19 @@ COMPARE_SYSTEM += '''
 '''
 
 
-def compare(a, b, task, client, timeout):
+def compare(a, b, task, client, timeout, *, relation='independent'):
+    if relation not in ('independent', 'revision'):
+        raise ValueError('候选关系须为independent或revision')
     lineation = compare_lineation(a['lines'], b['lines'])
     system = COMPARE_SYSTEM + TASK_MODALITY
+    if relation == 'revision':
+        system += '\n本次A是较早稿，B是后续修订稿。检查修改是否回应问题、是否只扩写、是否损伤有效部分或把独特表达改成平稳解释。不因B是修订稿就认定更好。'
+    else:
+        system += '\n本次A与B是独立生成的候选，不是原稿与改稿。按各自整体关系比较，不把B默认为新增、扩写或对A的解释，不要求一稿保留另一稿的意象或结尾。'
     if lineation['applicable']:
         system += '''\nlineation_difference标出相同字词标点下的换行差异。若有差异，优先在差异附近取引文，理由须讨论至少一处具体边界：前后句法如何连接，意义重心怎样变化，可能损失什么。换行不等于必然停顿，不能仅因短行就称更有节奏；若差异并未带来充分的优劣依据，可以判tie。相同字词不代表分行无实质作用。程序没有分析句法或预测朗读。'''
     response = client.complete(system, json.dumps(
-        {'task': task, 'a': a, 'b': b, 'lineation_difference': lineation}, ensure_ascii=False), timeout=timeout, max_tokens=4096, thinking='disabled')
+        {'task': task, 'a': a, 'b': b, 'comparison_relation': relation, 'lineation_difference': lineation}, ensure_ascii=False), timeout=timeout, max_tokens=4096, thinking='disabled')
     obj = json.loads(response['content'])
     if not isinstance(obj, dict) or obj.get('choice') not in ('a', 'b', 'tie'):
         raise ValueError('比较决定无效')
@@ -61,7 +67,8 @@ def compare(a, b, task, client, timeout):
     if not isinstance(obj.get('reason'), str) or not obj['reason'].strip():
         raise ValueError('比较理由缺失')
     return {'assessment': obj, 'usage': response.get('usage', {}),
-            'comparison_protocol_version': 'text-compare-0.3',
+            'comparison_protocol_version': 'text-compare-0.4',
+            'comparison_relation': relation,
             'lineation_difference': lineation,
             'source': 'model_self_review', 'quality_verified': False,
             'request_settings': {'thinking': 'disabled', 'response_format': 'json_object'}}
@@ -127,7 +134,7 @@ def review(poem, task, client, timeout):
         if sound['quote'] not in '\n'.join(poem['lines']):
             raise ValueError('审读引用不在正文中')
     return {'assessment': obj, 'usage': response.get('usage', {}),
-            'review_protocol_version': 'text-review-0.7',
+            'review_protocol_version': 'text-review-0.8',
             'text_sound_status': 'recorded_not_auditory_verified' if sound else 'not_recorded',
             'text_structure': inspect_structure(poem['lines']),
             'source': 'model_self_review', 'quality_verified': False,

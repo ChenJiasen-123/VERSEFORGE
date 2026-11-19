@@ -1,6 +1,6 @@
 # 五位作者逐篇阅读目录
 
-2026-11-18。由当前阅读证据索引整理，列的是阅读记录，不是训练语料或全集书目。重复标题表示复读、版本或分析深化，不增加独立作品数；同一作品的日语与中文也不应相加。组诗按原索引单元登记，子篇另注明，不与单篇数量混算。
+2026-11-19。由当前阅读证据索引整理，列的是阅读记录，不是训练语料或全集书目。重复标题表示复读、版本或分析深化，不增加独立作品数；同一作品的日语与中文也不应相加。组诗按原索引单元登记，子篇另注明，不与单篇数量混算。
 
 索引记录网页全文，不自动认证原刊完整性、分行或字形。阅读深度和限制须继续查看对应笔记；助手分析不是独立人类评价。
 
@@ -70,6 +70,10 @@
 | 盼望 | 教学转录中指定四篇所呈全文；非整本诗集 | [reading-notes-22.md](reading-notes-22.md) | [来源](https://www.ylvs.chc.edu.tw/resource/openfid.php?id=24782) |
 | 大雾——献给父亲 | 出版方页面两诗完整呈现；另补读代序全文 | [reading-notes-29.md](reading-notes-29.md) | [来源](https://www.booklife.com.tw/product-detail/04400285) |
 | 英雄孔温．窟哇 | 出版方页面两诗完整呈现；另补读代序全文 | [reading-notes-29.md](reading-notes-29.md) | [来源](https://www.booklife.com.tw/product-detail/04400285) |
+| 梦中街巷 | 出版方试读网页所呈全文；词内折行不认证为作者分行 | [reading-notes-41.md](reading-notes-41.md) | [来源](https://www.booklife.com.tw/product-detail/04400025) |
+| 四月栀子 | 出版方试读网页所呈全文；词内折行不认证为作者分行 | [reading-notes-41.md](reading-notes-41.md) | [来源](https://www.booklife.com.tw/product-detail/04400025) |
+| 月光插图 | 出版方试读网页所呈全文；词内折行不认证为作者分行 | [reading-notes-41.md](reading-notes-41.md) | [来源](https://www.booklife.com.tw/product-detail/04400025) |
+| 迷途 | 出版方试读网页所呈全文；词内折行不认证为作者分行 | [reading-notes-41.md](reading-notes-41.md) | [来源](https://www.booklife.com.tw/product-detail/04400025) |
 
 ## 徐志摩
 

@@ -1,4 +1,4 @@
-# VERSEFORGE · 诗词创作 Agent
+# 诗词创作 Agent
 
 Python 3.11+，标准库运行，调用 DeepSeek API。当前聚焦文本审美、创作、改稿与格律；按用户最新选择，不推进参数训练或朗读开发。
 
@@ -20,6 +20,7 @@ mock 固定输出，不使用密钥、不调用 API，不能评价创作质量�
 python main.py --topic 雨后的公交站 --max-lines 10 --aesthetic
 python main.py --topic 雨后的公交站 --max-lines 10 --aesthetic --candidates 2
 python main.py --topic 雨后春江 --genre qijue --qijue-pattern ping_rhyme --aesthetic
+python main.py --topic 雨后巷中候人 --genre wujue --wujue-pattern ze_no_rhyme --aesthetic
 python main.py --topic 雨后小城 --genre ci --ci-profile baixiang_yijiangnan_liyu
 ```
 
@@ -31,6 +32,7 @@ python main.py --topic 雨后小城 --genre ci --ci-profile baixiang_yijiangnan_
 |---|---|---|
 | modern | 正文行数上限、必用词／禁用词；可选文学审读 | 没有确定性的文学或音韵美评分 |
 | qijue | 四句七字；可指定四种基本谱；与网页平水主表核对、定位明确不符 | 完整语境辨音、简繁异体、所有变格与完整合律认证 |
+| wujue | 四句五字；须指定四种律绝基本谱之一；平仄与韵脚核对、结构化修订反馈 | 古绝、所有变格、完整语境辨音；当前离线核音工具入口仍仅支持七绝 |
 | ci | 指定白香词谱李煜例作忆江南；五句3／5／7／7／5字及所选谱体平仄 | 其他词牌、完整词韵及语境辨音 |
 
 七绝起式：ping_rhyme、ping_no_rhyme、ze_rhyme、ze_no_rhyme。不指定起式时不强加基本谱。词必须指定 ci_profile；不把同名词牌所有变体视为同一模板。

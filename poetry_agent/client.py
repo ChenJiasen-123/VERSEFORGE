@@ -78,7 +78,9 @@ class MockClient:
 
     def complete(self, system, user, timeout):
         task = json.loads(user)["task"]
-        if task["genre"] == "qijue":
+        if task['genre'] == 'wujue':
+            lines = ['暮雨侵苔徑', '疏燈照客衣', '寒窗聞葉落', '倚戶待人歸']
+        elif task["genre"] == "qijue":
             lines = ["细雨初收山色新", "溪桥流水过前村", "东风吹绿田间草", "燕子归来又一春"]
         else:
             lines = ["长江把夜色推向岸边", "他摘下手套，掌心留着机器的温度", "换班的灯亮了", "一只饭盒接住清晨"]

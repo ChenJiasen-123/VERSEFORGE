@@ -1,6 +1,6 @@
 """Text-grounded model review; not a literary score or human preference label."""
 import json
-from .text_structure import inspect_structure, compare_lineation
+from .text_structure import inspect_structure, compare_lineation, literal_repetitions
 
 TASK_MODALITY = '''
 准确解释题目语气：“不必／无需”只是不强制，“可以／允许”表示可选，不等于禁止其他成立写法。
@@ -55,7 +55,9 @@ def compare(a, b, task, client, timeout, *, relation='independent', lineation_co
     if relation not in ('independent', 'revision'):
         raise ValueError('候选关系须为independent或revision')
     lineation = compare_lineation(a['lines'], b['lines'])
+    literal_evidence = {'a': literal_repetitions(a['lines']), 'b': literal_repetitions(b['lines'])}
     system = COMPARE_SYSTEM + TASK_MODALITY + TEXT_EVIDENCE
+    system += '\nliteral_repetition_evidence提供连续字片段的出现总数和原行字位；提及次数时须核对。片段可跨分行，未列出的片段不表示不存在，也不代表句法、停顿或音步已被认证。'
     if relation == 'revision':
         system += '\n本次A是较早稿，B是后续修订稿。检查修改是否回应问题、是否只扩写、是否损伤有效部分或把独特表达改成平稳解释。不因B是修订稿就认定更好。'
     else:
@@ -66,7 +68,8 @@ def compare(a, b, task, client, timeout, *, relation='independent', lineation_co
         system += '''\nlineation_difference标出相同字词标点下的换行差异。若有差异，优先在差异附近取引文，理由须讨论至少一处具体边界：前后句法如何连接，意义重心怎样变化，可能损失什么。换行不等于必然停顿，不能仅因短行就称更有节奏；若差异并未带来充分的优劣依据，可以判tie。相同字词不代表分行无实质作用。程序没有分析句法或预测朗读。'''
     response = client.complete(system, json.dumps(
         {'task': task, 'a': a, 'b': b, 'comparison_relation': relation,
-            'experimental_lineation_control': lineation_control, 'lineation_difference': lineation}, ensure_ascii=False), timeout=timeout, max_tokens=4096, thinking='disabled')
+            'experimental_lineation_control': lineation_control, 'lineation_difference': lineation,
+            'literal_repetition_evidence': literal_evidence}, ensure_ascii=False), timeout=timeout, max_tokens=4096, thinking='disabled')
     obj = json.loads(response['content'])
     if not isinstance(obj, dict) or obj.get('choice') not in ('a', 'b', 'tie'):
         raise ValueError('比较决定无效')
@@ -77,10 +80,11 @@ def compare(a, b, task, client, timeout, *, relation='independent', lineation_co
     if not isinstance(obj.get('reason'), str) or not obj['reason'].strip():
         raise ValueError('比较理由缺失')
     return {'assessment': obj, 'usage': response.get('usage', {}),
-            'comparison_protocol_version': 'text-compare-0.5',
+            'comparison_protocol_version': 'text-compare-0.6',
             'comparison_relation': relation,
             'experimental_lineation_control': lineation_control,
             'lineation_difference': lineation,
+            'literal_repetition_evidence': literal_evidence,
             'source': 'model_self_review', 'quality_verified': False,
             'request_settings': {'thinking': 'disabled', 'response_format': 'json_object'}}
 

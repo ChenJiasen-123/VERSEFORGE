@@ -1,0 +1,418 @@
+{
+  "protocol": "lineation-order-probe-0.1",
+  "records": [
+    {
+      "id": "waiting_predicate",
+      "task": {
+        "genre": "modern",
+        "topic": "等父亲把话说完"
+      },
+      "a": {
+        "title": "半句",
+        "lines": [
+          "父亲说，等我老了",
+          "就把这间屋子",
+          "他把窗开了一点",
+          "后半句话一直没有暖过来"
+        ]
+      },
+      "b": {
+        "title": "半句",
+        "lines": [
+          "父亲说，等我老了就把这间屋子",
+          "他把窗开了一点",
+          "后半句话一直没有暖过来"
+        ]
+      },
+      "orders": [
+        {
+          "reversed": false,
+          "review": {
+            "assessment": {
+              "choice": "tie",
+              "quote_a": "就把这间屋子",
+              "quote_b": "父亲说，等我老了就把这间屋子",
+              "reason": "两稿文字与标点完全相同，仅分行不同。A在“等我老了”后断行，使“就把这间屋子”单独成行，句法上悬置了父亲未说尽的条件与动作，也让“屋子”成为视觉与语义的停顿点；代价是“父亲说”与直接引语被切得更碎，读者需跨行接续。B把“父亲说，等我老了就把这间屋子”排为一行，引语更连贯，条件与动作紧接，但“屋子”后直接接“他把窗开了一点”，前后两个动作的边界更依赖标点而非分行，悬置感较弱。差异主要落在“就把这间屋子”前后的分行上：A让未完成的引语停在“屋子”，与题名“半句”及末行“后半句话”的未完成感更贴合；B让父亲的话与“他把窗开了一点”并置更紧，可能强化说话与开窗之间的即时转折。两稿各有依据，A的悬置与B的连贯均可成立，未形成足以判优的实质高下。"
+            },
+            "usage": {
+              "prompt_tokens": 1241,
+              "completion_tokens": 265,
+              "total_tokens": 1506,
+              "prompt_tokens_details": {
+                "cached_tokens": 384
+              },
+              "prompt_cache_hit_tokens": 384,
+              "prompt_cache_miss_tokens": 857
+            },
+            "comparison_protocol_version": "text-compare-0.6",
+            "comparison_relation": "independent",
+            "experimental_lineation_control": false,
+            "lineation_difference": {
+              "applicable": true,
+              "same_wording_and_punctuation": true,
+              "a_line_count": 4,
+              "b_line_count": 3,
+              "changed_boundaries": [
+                {
+                  "character_offset": 8,
+                  "break_in_a": true,
+                  "break_in_b": false,
+                  "before": "父亲说，等我老了",
+                  "after": "就把这间屋子他把窗开了一"
+                }
+              ],
+              "truncated": false,
+              "scope": "literal_boundaries_not_predicted_pauses_or_quality",
+              "empty_lines_present": false
+            },
+            "source": "model_self_review",
+            "quality_verified": false,
+            "request_settings": {
+              "thinking": "disabled",
+              "response_format": "json_object"
+            }
+          },
+          "original_choice": "tie"
+        },
+        {
+          "reversed": true,
+          "review": {
+            "assessment": {
+              "choice": "a",
+              "quote_a": "就把这间屋子",
+              "quote_b": "就把这间屋子",
+              "reason": "两稿字面相同，差异只在A前两行在“屋子”处断行，B在“老了”与“屋子”处各断一次。A的断行使“父亲说，等我老了就把这间屋子”形成一个悬置的、未完成的直接引语：屋子是“话”的宾语，读者正等他把话说完；下一句“他把窗开了一点”才转入动作，制造出话语被动作打断的现场感。B把“父亲说，等我老了”单独成行，语气更像一个完整的停顿，随后“就把这间屋子”再起，仍保留未完成感，但两次断行把句子切得更碎，稍弱化了“这句话本身没说完”的连续性，也更容易让人觉得分行在替读者分段。两稿结尾相同，核心意象和情绪都成立；A的断行让“后半句话一直没有暖过来”更直接地承接那个悬置的宾语，结构上更紧。代价是A第一行较长，视觉上不如B疏朗；B的短行更醒目，但所得主要是版面上的停顿感，未带来更准确而意外的关系。故取A。"
+            },
+            "usage": {
+              "prompt_tokens": 1241,
+              "completion_tokens": 267,
+              "total_tokens": 1508,
+              "prompt_tokens_details": {
+                "cached_tokens": 640
+              },
+              "prompt_cache_hit_tokens": 640,
+              "prompt_cache_miss_tokens": 601
+            },
+            "comparison_protocol_version": "text-compare-0.6",
+            "comparison_relation": "independent",
+            "experimental_lineation_control": false,
+            "lineation_difference": {
+              "applicable": true,
+              "same_wording_and_punctuation": true,
+              "a_line_count": 3,
+              "b_line_count": 4,
+              "changed_boundaries": [
+                {
+                  "character_offset": 8,
+                  "break_in_a": false,
+                  "break_in_b": true,
+                  "before": "父亲说，等我老了",
+                  "after": "就把这间屋子他把窗开了一"
+                }
+              ],
+              "truncated": false,
+              "scope": "literal_boundaries_not_predicted_pauses_or_quality",
+              "empty_lines_present": false
+            },
+            "source": "model_self_review",
+            "quality_verified": false,
+            "request_settings": {
+              "thinking": "disabled",
+              "response_format": "json_object"
+            }
+          },
+          "original_choice": "b"
+        }
+      ],
+      "order_consistent": false
+    },
+    {
+      "id": "repeated_request",
+      "task": {
+        "genre": "modern",
+        "topic": "孩子第一次独自买东西"
+      },
+      "a": {
+        "title": "零钱",
+        "lines": [
+          "再数一次",
+          "她说",
+          "再数一次",
+          "硬币还是那些硬币",
+          "她的手已经不再攥着我的手"
+        ]
+      },
+      "b": {
+        "title": "零钱",
+        "lines": [
+          "再数一次她说再数一次",
+          "硬币还是那些硬币",
+          "她的手已经不再攥着我的手"
+        ]
+      },
+      "orders": [
+        {
+          "reversed": false,
+          "review": {
+            "assessment": {
+              "choice": "a",
+              "quote_a": "再数一次",
+              "quote_b": "再数一次她说再数一次",
+              "reason": "两稿字词相同，差别只在A把“她说”前后的“再数一次”分行，B把两次重复压在同一行。A的短行让“再数一次”先作为孩子自己的声音出现，隔一行才出现“她说”，形成说话人略显迟疑的辨认；硬币与手的两个否定式断言随后落在各自独立行，最后“她的手已经不再攥着我的手”单独成句，使“不再攥着”这一动作变化成为全篇重心。B首行连续“再数一次她说再数一次”，把重复和转述挤在一起，更接近口语记录，也让“她说”更像插入语；代价是两次重复的间隔感消失，孩子催促与叙述者倾听之间的层次变弱。A的所得是分行制造了数数、辨认说话人、确认硬币、发现手已松开的递进；代价是短行可能显得刻意。B所得是紧凑，代价是“她说”与第二次“再数一次”的边界模糊，主体关系不如A清楚。整体上A的边界更服务于第一次独自买东西时孩子数钱、母亲放手这一具体关系。"
+            },
+            "usage": {
+              "prompt_tokens": 1837,
+              "completion_tokens": 262,
+              "total_tokens": 2099,
+              "prompt_tokens_details": {
+                "cached_tokens": 640
+              },
+              "prompt_cache_hit_tokens": 640,
+              "prompt_cache_miss_tokens": 1197
+            },
+            "comparison_protocol_version": "text-compare-0.6",
+            "comparison_relation": "independent",
+            "experimental_lineation_control": false,
+            "lineation_difference": {
+              "applicable": true,
+              "same_wording_and_punctuation": true,
+              "a_line_count": 5,
+              "b_line_count": 3,
+              "changed_boundaries": [
+                {
+                  "character_offset": 4,
+                  "break_in_a": true,
+                  "break_in_b": false,
+                  "before": "再数一次",
+                  "after": "她说再数一次硬币还是那些"
+                },
+                {
+                  "character_offset": 6,
+                  "break_in_a": true,
+                  "break_in_b": false,
+                  "before": "再数一次她说",
+                  "after": "再数一次硬币还是那些硬币"
+                }
+              ],
+              "truncated": false,
+              "scope": "literal_boundaries_not_predicted_pauses_or_quality",
+              "empty_lines_present": false
+            },
+            "source": "model_self_review",
+            "quality_verified": false,
+            "request_settings": {
+              "thinking": "disabled",
+              "response_format": "json_object"
+            }
+          },
+          "original_choice": "a"
+        },
+        {
+          "reversed": true,
+          "review": {
+            "assessment": {
+              "choice": "a",
+              "quote_a": "再数一次她说再数一次",
+              "quote_b": "她说",
+              "reason": "两稿字词和标点完全相同，差别只在分行。A把两次“再数一次”压在同一行，只用一个“她说”作间隔，读来像孩子催促后母亲（或叙述者）的转述紧贴着重复，重复的急迫感和声音的粘连被保留下来；代价是“她说”容易被快速吞过，转述层次稍弱。B把“她说”单独成行，使说话者的介入被突出，孩子的声音被叙述框住，重复的即时性略降，结构上更清楚地分出“她说”与“再数一次”的层次。就全篇言，A的三行更像一个连续动作和声音的推进，从数硬币到“她的手已经不再攥着我的手”这一转折更紧凑；B因多次断行，把“再数一次”拆成两次独立发声，节奏更停顿，但代价是原本连续的催促感被切成片段。两稿后两行相同，核心意象“硬币还是那些硬币”与结尾的手的独立都成立；A在声音与意义的贴合上更完整，故选A。",
+              "reason_notes": "未把分行当作朗读停顿的证明；仅比较分行对语义连接和重心的影响。"
+            },
+            "usage": {
+              "prompt_tokens": 1837,
+              "completion_tokens": 278,
+              "total_tokens": 2115,
+              "prompt_tokens_details": {
+                "cached_tokens": 640
+              },
+              "prompt_cache_hit_tokens": 640,
+              "prompt_cache_miss_tokens": 1197
+            },
+            "comparison_protocol_version": "text-compare-0.6",
+            "comparison_relation": "independent",
+            "experimental_lineation_control": false,
+            "lineation_difference": {
+              "applicable": true,
+              "same_wording_and_punctuation": true,
+              "a_line_count": 3,
+              "b_line_count": 5,
+              "changed_boundaries": [
+                {
+                  "character_offset": 4,
+                  "break_in_a": false,
+                  "break_in_b": true,
+                  "before": "再数一次",
+                  "after": "她说再数一次硬币还是那些"
+                },
+                {
+                  "character_offset": 6,
+                  "break_in_a": false,
+                  "break_in_b": true,
+                  "before": "再数一次她说",
+                  "after": "再数一次硬币还是那些硬币"
+                }
+              ],
+              "truncated": false,
+              "scope": "literal_boundaries_not_predicted_pauses_or_quality",
+              "empty_lines_present": false
+            },
+            "source": "model_self_review",
+            "quality_verified": false,
+            "request_settings": {
+              "thinking": "disabled",
+              "response_format": "json_object"
+            }
+          },
+          "original_choice": "b"
+        }
+      ],
+      "order_consistent": false
+    },
+    {
+      "id": "direct_promise",
+      "task": {
+        "genre": "modern",
+        "topic": "向失约的朋友重新作出承诺"
+      },
+      "a": {
+        "title": "周日",
+        "lines": [
+          "这次我来",
+          "你不用再把水烧开又放凉",
+          "这次我来得早一点"
+        ]
+      },
+      "b": {
+        "title": "周日",
+        "lines": [
+          "这次",
+          "我来",
+          "你不用再把水烧开",
+          "又放凉",
+          "这次我来得早一点"
+        ]
+      },
+      "orders": [
+        {
+          "reversed": false,
+          "review": {
+            "assessment": {
+              "choice": "a",
+              "quote_a": "你不用再把水烧开又放凉",
+              "quote_b": "你不用再把水烧开",
+              "reason": "两稿措辞相同，B只在“这次”“我来”和“又放凉”处切分。A首行“这次我来”作为完整承诺直接成立，“你不用再把水烧开又放凉”连续一句写出对方反复等待、动作落空的日常经验，与第三行“我来得早一点”形成从承担到具体行动的递进，声音和意义较连贯。B把“这次”“我来”拆开，首行语气更迟疑，但“我来”独立成行后又被下一行“你不用”迅速接走，承诺的重心被切碎；“又放凉”另起一行虽可能突出这一细节，代价是“烧开又放凉”的连续动作感被削弱，且全篇只靠分行制造顿挫，所得有限。A在整体关系上更准确而自然，故选A。"
+            },
+            "usage": {
+              "prompt_tokens": 1467,
+              "completion_tokens": 207,
+              "total_tokens": 1674,
+              "prompt_tokens_details": {
+                "cached_tokens": 640
+              },
+              "prompt_cache_hit_tokens": 640,
+              "prompt_cache_miss_tokens": 827
+            },
+            "comparison_protocol_version": "text-compare-0.6",
+            "comparison_relation": "independent",
+            "experimental_lineation_control": false,
+            "lineation_difference": {
+              "applicable": true,
+              "same_wording_and_punctuation": true,
+              "a_line_count": 3,
+              "b_line_count": 5,
+              "changed_boundaries": [
+                {
+                  "character_offset": 2,
+                  "break_in_a": false,
+                  "break_in_b": true,
+                  "before": "这次",
+                  "after": "我来你不用再把水烧开又放"
+                },
+                {
+                  "character_offset": 12,
+                  "break_in_a": false,
+                  "break_in_b": true,
+                  "before": "这次我来你不用再把水烧开",
+                  "after": "又放凉这次我来得早一点"
+                }
+              ],
+              "truncated": false,
+              "scope": "literal_boundaries_not_predicted_pauses_or_quality",
+              "empty_lines_present": false
+            },
+            "source": "model_self_review",
+            "quality_verified": false,
+            "request_settings": {
+              "thinking": "disabled",
+              "response_format": "json_object"
+            }
+          },
+          "original_choice": "a"
+        },
+        {
+          "reversed": true,
+          "review": {
+            "assessment": {
+              "choice": "tie",
+              "quote_a": "你不用再把水烧开",
+              "quote_b": "你不用再把水烧开又放凉",
+              "reason": "两稿文字几乎相同，差异主要在分行：A把“这次／我来／你不用再把水烧开／又放凉／这次我来得早一点”拆成五段，B压缩为三行。A的连续短行让“这次”“我来”各自独立，并把“烧开”与“又放凉”分置两行，动作的徒劳与落空感被更明显地停顿出来；代价是句法被切碎，读者需要自行连缀“这次我来”。B保持“你不用再把水烧开又放凉”的完整动作链，重复的“这次我来”在首尾形成承诺框架，语义更连贯、语气更稳；代价是“烧开／放凉”的对照少了一次分行造成的悬置。两稿都通过“你不用再”和“来得早一点”把失约后的重新承诺落在具体动作上，没有只作妥帖说明；也都没有出现与题意明显脱节或抵牾之处。A的分行有可感的动作停顿，B的连贯句法也有清楚的承诺结构，优劣不足以判定，故取平。"
+            },
+            "usage": {
+              "prompt_tokens": 1467,
+              "completion_tokens": 264,
+              "total_tokens": 1731,
+              "prompt_tokens_details": {
+                "cached_tokens": 640
+              },
+              "prompt_cache_hit_tokens": 640,
+              "prompt_cache_miss_tokens": 827
+            },
+            "comparison_protocol_version": "text-compare-0.6",
+            "comparison_relation": "independent",
+            "experimental_lineation_control": false,
+            "lineation_difference": {
+              "applicable": true,
+              "same_wording_and_punctuation": true,
+              "a_line_count": 5,
+              "b_line_count": 3,
+              "changed_boundaries": [
+                {
+                  "character_offset": 2,
+                  "break_in_a": true,
+                  "break_in_b": false,
+                  "before": "这次",
+                  "after": "我来你不用再把水烧开又放"
+                },
+                {
+                  "character_offset": 12,
+                  "break_in_a": true,
+                  "break_in_b": false,
+                  "before": "这次我来你不用再把水烧开",
+                  "after": "又放凉这次我来得早一点"
+                }
+              ],
+              "truncated": false,
+              "scope": "literal_boundaries_not_predicted_pauses_or_quality",
+              "empty_lines_present": false
+            },
+            "source": "model_self_review",
+            "quality_verified": false,
+            "request_settings": {
+              "thinking": "disabled",
+              "response_format": "json_object"
+            }
+          },
+          "original_choice": "tie"
+        }
+      ],
+      "order_consistent": false
+    }
+  ],
+  "fixture_origin": "assistant_original_exercise_not_author_corpus",
+  "quality_verified": false,
+  "experimental_lineation_control": false,
+  "limitations": [
+    "换序一致不等于判断正确；样本不能代表所有现代诗",
+    "只作纸面分行比较，未生成或评价朗读"
+  ]
+}

@@ -2,6 +2,43 @@
 import unicodedata
 
 
+def literal_repetitions(lines):
+    """Count overlapping spans; remove line breaks only, never punctuation."""
+    stream = ''.join(lines)
+    locations = [(i, j) for i, line in enumerate(lines, 1)
+                 for j in range(1, len(line) + 1)]
+    spans = {}
+    for start in range(len(stream)):
+        for width in range(2, min(8, len(stream) - start) + 1):
+            fragment = stream[start:start + width]
+            if all(c.isalnum() for c in fragment):
+                spans.setdefault(fragment, []).append(start)
+    repeated = sorted(((s, starts) for s, starts in spans.items() if len(starts) > 1),
+                      key=lambda item: (-len(item[0]), item[0]))
+    kept = []
+    for fragment, starts in repeated:
+        if any(len(starts) == len(other_starts) and
+               all(any(k <= start and start + len(fragment) <= k + len(other)
+                       for k in other_starts) for start in starts)
+               for other, other_starts in kept):
+            continue
+        kept.append((fragment, starts))
+        if len(kept) > 12:
+            break
+    return {'items': [{'fragment': fragment, 'occurrence_count': len(starts),
+                      'occurrences': [{'start_line': locations[k][0],
+                                       'start_character': locations[k][1],
+                                       'end_line': locations[k + len(fragment) - 1][0],
+                                       'end_character': locations[k + len(fragment) - 1][1]}
+                                      for k in starts[:32]],
+                      'occurrence_positions_truncated': len(starts) > 32}
+                     for fragment, starts in kept[:12]],
+            'truncated': len(kept) > 12,
+            'scope': 'literal_character_stream_with_line_breaks_removed_only',
+            'limitations': ['统计2—8字连续片段，最多12项各列32个位置；可跨分行，保留空白标点；允许重叠，不等于词或句法重复',
+                            '位置按原行Unicode字符从1计；次数不评价节奏或文学质量']}
+
+
 def compare_lineation(a, b):
     """Locate changed boundaries only when wording and punctuation are identical."""
     if ''.join(a) != ''.join(b):
@@ -49,6 +86,7 @@ def inspect_structure(lines):
             break
     return {'line_lengths': lengths, 'line_end_characters': endings,
             'cross_line_literal_repetitions': kept,
+            'literal_repetition_occurrences': literal_repetitions(lines),
             'scope': 'character_level_observations_only',
             'limitations': ['重复仅检索2—8字连续片段，最多列12项，不是分词或完整穷举',
                             '字数不等于音步，末字相同不认证押韵，未执行语法分析',

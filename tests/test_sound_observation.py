@@ -1,6 +1,6 @@
 import json
 import unittest
-from poetry_agent.aesthetics import review
+from poetry_agent.aesthetics import review, failure_code
 
 
 class Reply:
@@ -12,6 +12,17 @@ class Reply:
 
 
 class SoundObservationTests(unittest.TestCase):
+    def test_modern_keep_without_sound_analysis_is_incomplete(self):
+        class MissingSound(Reply):
+            def complete(self, *args, **kwargs):
+                result = super().complete(*args, **kwargs)
+                data = json.loads(result['content'])
+                del data['text_sound']
+                return {'content': json.dumps(data)}
+        with self.assertRaises(ValueError) as error:
+            review({'lines': ['灯']}, {'genre': 'modern'}, MissingSound('灯'), 10)
+        self.assertEqual(failure_code(error.exception), 'missing_text_sound')
+
     def test_sound_evidence_must_exist_in_the_poem(self):
         with self.assertRaises(ValueError):
             review({'lines': ['灯']}, {'genre': 'modern'}, Reply('风'), 10)

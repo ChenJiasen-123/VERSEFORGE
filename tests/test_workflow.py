@@ -23,6 +23,12 @@ def output(lines):
     return json.dumps({"title": "测试", "lines": lines}, ensure_ascii=False)
 
 
+def review_output(fields):
+    fields['text_sound'] = dict(quote=fields['quote'], mechanism='短行',
+        semantic_effect='突出等候的对象', uncertainty='也可以与后文接续理解')
+    return json.dumps(fields)
+
+
 class WorkflowTests(unittest.TestCase):
     def test_metric_feedback_distinguishes_mismatch_from_unresolved_reading(self):
         lines = ['雨雷送雨漲春江', '柳岸初晴燕影雙', '石徑微寒花尚濕', '歸舟半掩小篷窗']
@@ -96,7 +102,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(result["prompt_version"], "modern-aesthetic-0.4")
 
     def test_review_drives_revision_and_preserves_hard_constraints(self):
-        critique = json.dumps(dict(decision='revise', preserve='等待', quote='灯',
+        critique = review_output(dict(decision='revise', preserve='等待', quote='灯',
                                    problem='关系不明', suggestion='明确位置', tradeoff='减少开放性'))
         comparison = json.dumps(dict(choice='b', quote_a='灯', quote_b='灯在门外', reason='位置使等待对象更明确，损失开放性'))
         client = SequenceClient([output(['灯']), critique, output(['灯在门外']), comparison])
@@ -107,7 +113,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertFalse(result['history'][0]['aesthetic_review']['quality_verified'])
 
     def test_comparison_can_retain_original_or_fail_safely(self):
-        critique = json.dumps(dict(decision='revise', preserve='等待', quote='灯',
+        critique = review_output(dict(decision='revise', preserve='等待', quote='灯',
                                    problem='关系不明', suggestion='明确位置', tradeoff='减少开放性'))
         for decision in ('a', 'tie', 'invalid'):
             comparison = json.dumps(dict(choice=decision, quote_a='灯', quote_b='灯在门外', reason='新稿说明过多'))
@@ -118,7 +124,7 @@ class WorkflowTests(unittest.TestCase):
             self.assertEqual(len(result['comparisons']), 1)
 
     def test_invented_review_quote_cannot_trigger_revision(self):
-        critique = json.dumps(dict(decision='revise', preserve='等待', quote='不存在',
+        critique = review_output(dict(decision='revise', preserve='等待', quote='不存在',
                                    problem='问题', suggestion='改', tradeoff='代价'))
         client = SequenceClient([output(['灯']), critique])
         client.mock = False
@@ -139,7 +145,7 @@ class WorkflowTests(unittest.TestCase):
 
     def test_expired_review_budget_stops_revision(self):
         clock = [0.0]
-        critique = json.dumps(dict(decision='revise', preserve='等待', quote='灯',
+        critique = review_output(dict(decision='revise', preserve='等待', quote='灯',
                                    problem='关系不明', suggestion='明确位置', tradeoff='减少开放性'))
         client = SequenceClient([output(['灯']), critique])
         client.mock = False
@@ -156,7 +162,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(result['poem']['lines'], ['灯'])
 
     def test_local_revision_rejects_expansion(self):
-        critique = json.dumps(dict(decision='revise', preserve='等待', quote='灯',
+        critique = review_output(dict(decision='revise', preserve='等待', quote='灯',
                                    problem='关系不明', suggestion='明确位置', tradeoff='减少开放性'))
         client = SequenceClient([output(['灯']), critique, output(['灯在门外', '等你'])])
         client.mock = False
@@ -166,7 +172,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(result['comparisons'], [])
 
     def test_aesthetic_revision_cannot_displace_valid_draft_with_broken_one(self):
-        critique = json.dumps(dict(decision='revise', preserve='等待', quote='灯',
+        critique = review_output(dict(decision='revise', preserve='等待', quote='灯',
                                    problem='关系不明', suggestion='明确位置', tradeoff='减少开放性'))
         client = SequenceClient([output(['灯']), critique, output(['门外'])])
         client.mock = False

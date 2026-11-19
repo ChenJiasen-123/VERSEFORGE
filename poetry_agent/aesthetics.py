@@ -17,6 +17,8 @@ def failure_code(error):
     if isinstance(error, json.JSONDecodeError):
         return 'invalid_json'
     message = str(error)
+    if message == '现代诗审读缺少文本声音分析':
+        return 'missing_text_sound'
     if isinstance(error, RuntimeError):
         if '（length）' in message:
             return 'output_length'
@@ -106,6 +108,8 @@ def review(poem, task, client, timeout):
     if obj['decision'] == 'revise' and any(not obj[k].strip() for k in ('problem', 'suggestion', 'tradeoff')):
         raise ValueError('修改缺少理由或取舍')
     sound = obj.get('text_sound')
+    if task.get('genre') == 'modern' and sound is None:
+        raise ValueError('现代诗审读缺少文本声音分析')
     if sound is not None:
         if not isinstance(sound, dict) or any(not isinstance(sound.get(k), str) or not sound[k].strip()
                 for k in ('quote', 'mechanism', 'semantic_effect', 'uncertainty')):
@@ -113,7 +117,7 @@ def review(poem, task, client, timeout):
         if sound['quote'] not in '\n'.join(poem['lines']):
             raise ValueError('审读引用不在正文中')
     return {'assessment': obj, 'usage': response.get('usage', {}),
-            'review_protocol_version': 'text-review-0.4',
+            'review_protocol_version': 'text-review-0.5',
             'text_sound_status': 'recorded_not_auditory_verified' if sound else 'not_recorded',
             'text_structure': inspect_structure(poem['lines']),
             'source': 'model_self_review', 'quality_verified': False,

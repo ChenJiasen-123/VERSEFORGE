@@ -24,7 +24,7 @@ function list(id, rows) {
 }
 function render(job) {
  const result=job.result;
- if (!result || result.status==='unsupported') {state.poem=null;$('poem').hidden=true;$('empty').hidden=false;$('understanding').hidden=true;$('copy').disabled=$('download').disabled=$('again').disabled=true;error(result?.message || job.error || '没有得到作品。');return;}
+ if (!result || result.status==='unsupported') {state.poem=null;$('poem').hidden=true;$('empty').hidden=false;$('understanding').hidden=true;$('meter-review').hidden=true;$('copy').disabled=$('download').disabled=$('again').disabled=true;error(result?.message || job.error || '没有得到作品。');return;}
  state.poem=result.poem; state.job=job.id;
  $('empty').hidden=true; $('poem').hidden=false;
  $('poem-title').textContent=result.poem.title;
@@ -37,6 +37,18 @@ function render(job) {
   $('direction').textContent=brief.directions?.[brief.selected_direction] || '';
  }
  const checks=result.checks || {};
+ const meter=checks.final_meter;
+ const classical=result.task?.genre && result.task.genre!=='modern';
+ $('meter-review').hidden=!(meter || classical);
+ const meterLabels={pass:'当前基本谱检查通过，尚未认证语境核音或完整合律。',unknown:'仍有核音或韵部未确定项。',failed:'发现与当前基本谱冲突的项目。'};
+ $('meter-summary').textContent=meter ? (meterLabels[meter.report.status] || '结果仍需核对。') : '这份历史记录没有保存逐项格律证据。';
+ const kinds={rhyme:'韵脚',shape:'句数或字数',ambiguous_reading:'多音待核',missing_reading:'缺少核音依据',incomplete_glyph_candidates:'字形候选证据不全',tone:'平仄'};
+ $('meter-findings').replaceChildren(...(meter?.report.findings || []).filter(row=>row.status==='unknown' || row.status==='failed').map(row=>{
+  const li=document.createElement('li');
+  const location=row.line ? `第${row.line}句第${row.character}字「${row.text}」` : (row.positions || []).map(p=>`第${p.line}句「${p.text}」`).join('、');
+  li.textContent=(row.status==='failed'?'冲突':'待核')+' · '+(kinds[row.kind] || '规则核对')+(location?'：'+location:'');
+  return li;
+ }));
  const report=checks.final_requirement_report;
  $('requirement-review').hidden=!report;
  const labels={satisfied:'已找到依据',violated:'存在冲突',uncertain:'待确认',not_required:'并非硬要求'};
@@ -51,9 +63,11 @@ function render(job) {
  if(report && !report.checks?.length){const li=document.createElement('li');li.textContent='这次核对未完整返回，作品已保留。';$('requirement-evidence').append(li);}
  const pending=(checks.final_hard_issues?.length || 0)>0 || checks.revision_semantics_rechecked===false || checks.requirements_confirmed===false;
  const parallelPending=checks.parallelism_status==='unknown';
- $('result-note').hidden=!(pending || parallelPending);
+ const meterPending=meter ? meter.report.status!=='pass' : classical;
+ $('result-note').hidden=!(pending || parallelPending || meterPending);
  $('result-note').textContent=pending?'这版已生成。部分题目要求仍需确认，可展开题目理解或再换一个构思。':'';
  if(parallelPending) $('result-note').textContent+=' 律诗中间两联的对仗仍需人工核对。';
+ if(meterPending) $('result-note').textContent+=' 平仄或押韵仍需核对，可展开逐项结果查看。';
 }
 async function history() {
  const rows=await api('/api/jobs');
@@ -89,5 +103,5 @@ $('prompt').addEventListener('input',count);
 document.querySelectorAll('[data-example]').forEach(button=>button.addEventListener('click',()=>{if(state.busy)return;$('prompt').value=samples[button.dataset.example];count();$('prompt').focus();}));
 $('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(plainText());$('saved').textContent='已复制作品';}catch{error('浏览器暂未允许复制，可选中文字复制，或下载文字。');}});
 $('download').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([plainText()],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=state.poem.title.replace(/[<>:"/\\|?*]/g,'_')+'.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
-$('new').addEventListener('click',()=>{if(state.busy)return;state.poem=null;$('prompt').value='';$('preference').value='';count();$('poem').hidden=true;$('empty').hidden=false;$('understanding').hidden=true;$('result-note').hidden=true;$('saved').textContent='';$('copy').disabled=$('download').disabled=$('again').disabled=true;error('');$('prompt').focus();});
+$('new').addEventListener('click',()=>{if(state.busy)return;state.poem=null;$('prompt').value='';$('preference').value='';count();$('poem').hidden=true;$('empty').hidden=false;$('understanding').hidden=true;$('meter-review').hidden=true;$('result-note').hidden=true;$('saved').textContent='';$('copy').disabled=$('download').disabled=$('again').disabled=true;error('');$('prompt').focus();});
 (async()=>{try{const session=await api('/api/session');state.csrf=session.csrf;state.configured=session.configured;$('connection').textContent=session.configured?'本地创作服务已就绪':'创作服务尚未配置';$('connection').classList.toggle('ready',session.configured);setBusy(false);await history();}catch(e){state.configured=false;setBusy(false);$('connection').textContent='本地服务未连接';error(e.message);}})();

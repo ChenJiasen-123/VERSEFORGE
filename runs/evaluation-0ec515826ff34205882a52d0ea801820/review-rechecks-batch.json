@@ -1,0 +1,153 @@
+[
+  {
+    "sample": "2",
+    "poem": {
+      "title": "检票口",
+      "lines": [
+        "你把伞收拢，水顺着伞骨",
+        "滴在我鞋尖，又渗进地砖缝",
+        "候车厅的灯坏了半排",
+        "剩下的光落在你背包的拉链上",
+        "广播念着别处的站名",
+        "我听见你喉咙里也有一次播报",
+        "却没有说出目的地",
+        "你转身时，背包带滑下肩",
+        "我抬手，最终只替自己",
+        "拉正了衣领",
+        "那趟车开走后，检票口一直空着",
+        "像一句没能递出去的话"
+      ]
+    },
+    "task": {
+      "topic": "一次没有解决的告别",
+      "genre": "modern",
+      "max_lines": 12,
+      "required_words": [],
+      "forbidden_words": [],
+      "extra_requirements": "可直接抒情，不强制反转或具体物件结尾。"
+    },
+    "review": {
+      "assessment": {
+        "decision": "keep",
+        "preserve": "以未完成的动作收束情感：抬手想帮对方却改为整理自己衣领，把告别的克制与错位留在身体动作里。",
+        "quote": "我抬手，最终只替自己\n拉正了衣领",
+        "problem": "",
+        "suggestion": "",
+        "tradeoff": ""
+      },
+      "usage": {
+        "prompt_tokens": 397,
+        "completion_tokens": 1550,
+        "total_tokens": 1947,
+        "prompt_tokens_details": {
+          "cached_tokens": 256
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1481
+        },
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 141
+      },
+      "source": "model_self_review",
+      "quality_verified": false
+    },
+    "seconds": 11.109
+  },
+  {
+    "sample": "3",
+    "poem": {
+      "title": "日常小故障观察员",
+      "lines": [
+        "雨停后我撑开伞，",
+        "把它撑成一朵倒着开的花。",
+        "公交车在站牌前打了个嗝，",
+        "下来三个人，又吞回两个。",
+        "冰箱门一开就认真审问我：",
+        "“你确定那盒酸奶不是房客？”",
+        "我点头，灯灭了，",
+        "像它憋不住笑，赶紧关上门。",
+        "电梯里的镜子总比我早到，",
+        "先替我把领口扶正，",
+        "再提醒我：别对楼层按钮",
+        "许愿，它只负责上下。"
+      ]
+    },
+    "task": {
+      "topic": "发现日常中的可笑之处",
+      "genre": "modern",
+      "max_lines": 12,
+      "required_words": [],
+      "forbidden_words": [],
+      "extra_requirements": "轻快或幽默；不把他人的困境当笑料。"
+    },
+    "review": {
+      "assessment": {
+        "decision": "keep",
+        "preserve": "最值得保护的是把日常物件写成有小小脾气的角色，用拟人制造轻快幽默而不拿他人困境取笑；冰箱审问酸奶、灯灭像憋笑关门等细节，维持了观察员顽皮但不刻薄的口吻。",
+        "quote": "冰箱门一开就认真审问我：\n“你确定那盒酸奶不是房客？”",
+        "problem": "",
+        "suggestion": "",
+        "tradeoff": ""
+      },
+      "usage": {
+        "prompt_tokens": 408,
+        "completion_tokens": 2294,
+        "total_tokens": 2702,
+        "prompt_tokens_details": {
+          "cached_tokens": 256
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 2194
+        },
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 152
+      },
+      "source": "model_self_review",
+      "quality_verified": false
+    },
+    "seconds": 15.047
+  },
+  {
+    "sample": "diagnostic",
+    "poem": {
+      "title": "清晨",
+      "lines": [
+        "我站在工厂门口，",
+        "我的梦想是最美的梦想，",
+        "所有人从此没有疲惫，",
+        "宇宙为我的灯鼓掌。"
+      ]
+    },
+    "task": {
+      "topic": "换班后的清晨",
+      "genre": "modern",
+      "extra_requirements": "允许明亮与疲惫并存，不宣称全体工人的经历。"
+    },
+    "review": {
+      "assessment": {
+        "decision": "revise",
+        "preserve": "站在工厂门口的个人视角，以及用“灯”带出的清晨明亮感；同时应保留疲惫可以被承认的空间。",
+        "quote": "所有人从此没有疲惫，",
+        "problem": "“所有人”把个人愿望扩展为对全体工人的全称断言，替所有人消除疲惫，既与“不宣称全体工人的经历”相冲突，也使后面的“宇宙为我的灯鼓掌”缺少来自具体处境的支撑。",
+        "suggestion": "收缩为换班后“我”的个人经验：保留疲惫，让门口或“我的灯”成为有限的明亮，不用“所有人”作普遍承诺。",
+        "tradeoff": "会损失原句直接、宏阔的祝愿感，以及“从此没有疲惫”的强烈宣言效果。"
+      },
+      "usage": {
+        "prompt_tokens": 289,
+        "completion_tokens": 687,
+        "total_tokens": 976,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 528
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 289
+      },
+      "source": "model_self_review",
+      "quality_verified": false
+    },
+    "seconds": 5.344
+  }
+]

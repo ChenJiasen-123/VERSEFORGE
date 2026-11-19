@@ -1,0 +1,91 @@
+{
+  "original": {
+    "title": "清晨",
+    "lines": [
+      "我站在工厂门口，",
+      "我的梦想是最美的梦想，",
+      "所有人从此没有疲惫，",
+      "宇宙为我的灯鼓掌。"
+    ]
+  },
+  "review": {
+    "assessment": {
+      "decision": "revise",
+      "preserve": "站在工厂门口的个人视角，以及用“灯”带出的清晨明亮感；同时应保留疲惫可以被承认的空间。",
+      "quote": "所有人从此没有疲惫，",
+      "problem": "“所有人”把个人愿望扩展为对全体工人的全称断言，替所有人消除疲惫，既与“不宣称全体工人的经历”相冲突，也使后面的“宇宙为我的灯鼓掌”缺少来自具体处境的支撑。",
+      "suggestion": "收缩为换班后“我”的个人经验：保留疲惫，让门口或“我的灯”成为有限的明亮，不用“所有人”作普遍承诺。",
+      "tradeoff": "会损失原句直接、宏阔的祝愿感，以及“从此没有疲惫”的强烈宣言效果。"
+    },
+    "usage": {
+      "prompt_tokens": 289,
+      "completion_tokens": 687,
+      "total_tokens": 976,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 528
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 289
+    },
+    "source": "model_self_review",
+    "quality_verified": false
+  },
+  "revision": {
+    "title": "换班后的清晨",
+    "lines": [
+      "厂门口的夜班卡还在口袋里发烫",
+      "我把它翻过来，背面沾着机油",
+      "天亮得像刚擦过的窗",
+      "早点摊的蒸汽把路分成两半",
+      "一半是回宿舍的脚印",
+      "一半是来接班的人影",
+      "我把安全帽夹在腋下",
+      "头顶那盏灯还亮着，替我",
+      "多看了一会儿车间",
+      "风从袖口钻进来",
+      "我打了一个哈欠",
+      "天没有因此暗下去"
+    ]
+  },
+  "issues": [],
+  "revision_usage": {
+    "prompt_tokens": 625,
+    "completion_tokens": 384,
+    "total_tokens": 1009,
+    "prompt_tokens_details": {
+      "cached_tokens": 128
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 279
+    },
+    "prompt_cache_hit_tokens": 128,
+    "prompt_cache_miss_tokens": 497
+  },
+  "quality_verified": false,
+  "comparison": {
+    "assessment": {
+      "choice": "b",
+      "quote_a": "我站在工厂门口，\n我的梦想是最美的梦想，\n所有人从此没有疲惫，\n宇宙为我的灯鼓掌。",
+      "quote_b": "厂门口的夜班卡还在口袋里发烫\n我把它翻过来，背面沾着机油\n天亮得像刚擦过的窗\n早点摊的蒸汽把路分成两半\n一半是回宿舍的脚印\n一半是来接班的人影\n我把安全帽夹在腋下\n头顶那盏灯还亮着，替我\n多看了一会儿车间\n风从袖口钻进来\n我打了一个哈欠\n天没有因此暗下去",
+      "reason": "B更贴合“换班后的清晨”：夜班卡、机油、早点摊蒸汽、回宿舍与接班的人影、安全帽、未灭的灯和哈欠，都落在具体个人经验上，且让明亮的天色与身体的疲惫并存。A篇幅短而抽象，“所有人从此没有疲惫”替全体工人代言，且“宇宙为我的灯鼓掌”把个人清晨推向宏大祝愿，和换班后的具体时刻、疲惫感及限定视角联系较弱。B的代价是较长的日常铺陈，但结构从厂门口到路上再到头顶灯与天色，关系更连贯，取舍上选B。"
+    },
+    "usage": {
+      "prompt_tokens": 356,
+      "completion_tokens": 574,
+      "total_tokens": 930,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 306
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 356
+    },
+    "source": "model_self_review",
+    "quality_verified": false
+  }
+}

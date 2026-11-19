@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-18",
+  "purpose": "本机中文合成朗读研究；排除显式停顿与内部逗号同位叠加",
+  "text": "我把你留下的杯子放回窗边天色暗了。",
+  "voice": "Microsoft Huihui Desktop",
+  "rate_setting": 0,
+  "volume_setting": 100,
+  "actual_human_listening_completed": false,
+  "assistant_auditory_review_completed": false,
+  "robot_integration": false,
+  "files": [
+    {
+      "id": "continuous",
+      "ssml": "continuous.ssml",
+      "file": "continuous.wav",
+      "requested_breaks": [],
+      "duration_seconds": 4.388,
+      "sample_rate": 22050,
+      "channels": 1,
+      "sample_width_bytes": 2,
+      "peak_abs_pcm": 28543,
+      "sha256": "25fd933de68d16d489fb30a744dd190561dfd874b9d68279f54b2e8a60f4092a"
+    },
+    {
+      "id": "object_boundary",
+      "ssml": "object_boundary.ssml",
+      "file": "object_boundary.wav",
+      "requested_breaks": [
+        "400ms",
+        "400ms"
+      ],
+      "duration_seconds": 5.153,
+      "sample_rate": 22050,
+      "channels": 1,
+      "sample_width_bytes": 2,
+      "peak_abs_pcm": 30770,
+      "sha256": "db43f2c81d593bf67ac86d05cb56f5fa8fd82f55942fc85afac281d2010d2f2f"
+    },
+    {
+      "id": "syntactic_suspension",
+      "ssml": "syntactic_suspension.ssml",
+      "file": "syntactic_suspension.wav",
+      "requested_breaks": [
+        "400ms",
+        "400ms"
+      ],
+      "duration_seconds": 5.323,
+      "sample_rate": 22050,
+      "channels": 1,
+      "sample_width_bytes": 2,
+      "peak_abs_pcm": 26954,
+      "sha256": "07d7f2ede56847ad8f0ab37a1752ce4026dc43d79e02e1d6fe139ae88ea54cdd"
+    }
+  ],
+  "limitations": [
+    "去除逗号也改变默认句法韵律，不能与第一组直接合并",
+    "TTS仍会自动决定停顿、延长与重音",
+    "相同SSML停顿请求不保证输出时长相同",
+    "输入条件检查及波形有效性不是听评"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "scope": "同文任务语气诊断，非文学金标准；inspection_question不发送给模型",
+  "cases": [
+    {"id": "optional_warmth", "task": {"topic": "邻居", "genre": "modern", "extra_requirements": "不必以温暖结尾，也允许有依据的善意。"}, "poem": {"title": "借光", "lines": ["楼道的灯坏了。", "你举着手机，", "等我找到钥匙。", "门开以后，我说谢谢。", "你说，下回再喊我。"]}, "inspection_question": "不应仅因结尾善意便判违背题目；仍可独立质疑作品质量。"},
+    {"id": "forbidden_warmth", "task": {"topic": "邻居", "genre": "modern", "extra_requirements": "呈现邻里疏离；明确禁止以互相帮助、感谢或温情承诺收束。"}, "poem": {"title": "借光", "lines": ["楼道的灯坏了。", "你举着手机，", "等我找到钥匙。", "门开以后，我说谢谢。", "你说，下回再喊我。"]}, "inspection_question": "应辨认结尾与明示禁令的冲突，而不是以诗句温暖替题意免责。"},
+    {"id": "required_warmth", "task": {"topic": "邻居", "genre": "modern", "extra_requirements": "要求以一次具体帮助带来的善意结束；不要抽象宣称所有邻居都亲密。"}, "poem": {"title": "借光", "lines": ["楼道的灯坏了。", "你举着手机，", "等我找到钥匙。", "门开以后，我说谢谢。", "你说，下回再喊我。"]}, "inspection_question": "应辨认具体帮助与结尾承诺回应了要求；仍可质疑其独特性，不强迫开放结尾。"}
+  ]
+}

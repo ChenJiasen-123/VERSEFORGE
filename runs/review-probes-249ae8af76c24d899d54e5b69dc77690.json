@@ -1,0 +1,194 @@
+[
+  {
+    "case": {
+      "id": "repetition",
+      "task": {
+        "topic": "隔着玻璃交流",
+        "genre": "modern"
+      },
+      "poem": {
+        "title": "隔窗",
+        "lines": [
+          "你说了一遍，我没听见。",
+          "你又说一遍，我还是没听见。",
+          "你把手掌贴在玻璃上，",
+          "我把手掌贴过去。"
+        ]
+      },
+      "inspection_question": "是否能讨论重复的交际失败及触觉／视觉回应，而非仅因重复要求删除？"
+    },
+    "result": {
+      "assessment": {
+        "decision": "keep",
+        "preserve": "用重复和动作递进，把“听不见”转化为手掌隔玻璃对位的可见交流，克制地保留障碍与接近同时成立。",
+        "quote": "你把手掌贴在玻璃上，\n我把手掌贴过去。",
+        "problem": "前两行重复“没听见”可能显得机械，读者会问：为什么不直接写一次或加一次听觉细节，而要用相同句式三次陈述？",
+        "suggestion": "",
+        "tradeoff": "",
+        "keep_reason": "重复不是绕圈，而是把“你说”与“我没听见”固定成一种持续失败的关系节奏，第三、四行随即用同一动作对位打破口语僵局；没有这次重复，手掌相贴的静止感就失去前面的压力来源。删减会让诗更利落，却会丢掉“反复尝试仍无法听见”的累积。"
+      },
+      "usage": {
+        "prompt_tokens": 360,
+        "completion_tokens": 180,
+        "total_tokens": 540,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 360
+      },
+      "review_protocol_version": "text-review-0.3",
+      "source": "model_self_review",
+      "quality_verified": false,
+      "request_settings": {
+        "thinking": "disabled",
+        "response_format": "json_object"
+      }
+    },
+    "independent_quality_verdict": null
+  },
+  {
+    "case": {
+      "id": "abstract",
+      "task": {
+        "topic": "共同决定",
+        "genre": "modern"
+      },
+      "poem": {
+        "title": "决定",
+        "lines": [
+          "我们说好了自由，",
+          "却一直替对方决定。",
+          "这一次，我问你，",
+          "也等你回答。"
+        ]
+      },
+      "inspection_question": "是否追踪自由、替人决定与等待回答的关系，而非按抽象词判空泛？"
+    },
+    "result": {
+      "assessment": {
+        "decision": "keep",
+        "preserve": "用四行内完成“自由”与“替对方决定”的反讽闭合，并把转折落在“问”与“等”这一未完成的动作上，短促、克制、留有悬置感。",
+        "quote": "我们说好了自由，\n却一直替对方决定。\n这一次，我问你，\n也等你回答。",
+        "problem": "最强合理质疑是：全诗只有“问”和“等”的姿态，没有给出任何具体问题或对话对象，读者可能觉得它停在抽象宣言上，缺少可抓住的处境细节。",
+        "suggestion": "",
+        "tradeoff": "",
+        "keep_reason": "这个质疑指向的正是原稿刻意维持的悬置：前两句已经把“我们”之间‘说好自由’与‘替对方决定’的矛盾说清，第三、四行不展开问题内容，是为了让“问”本身成为共同决定的起点，而不是再替对方填充答案。四行短制中，抽象并非逃避处境，而是把处境压缩为关系中的一句未完成的话；若补入具体问题，反而会替读者决定这首诗该谈什么。"
+      },
+      "usage": {
+        "prompt_tokens": 351,
+        "completion_tokens": 240,
+        "total_tokens": 591,
+        "prompt_tokens_details": {
+          "cached_tokens": 128
+        },
+        "prompt_cache_hit_tokens": 128,
+        "prompt_cache_miss_tokens": 223
+      },
+      "review_protocol_version": "text-review-0.3",
+      "source": "model_self_review",
+      "quality_verified": false,
+      "request_settings": {
+        "thinking": "disabled",
+        "response_format": "json_object"
+      }
+    },
+    "independent_quality_verdict": null
+  },
+  {
+    "case": {
+      "id": "unsupported_scope",
+      "task": {
+        "topic": "一个人的搬家",
+        "genre": "modern",
+        "extra_requirements": "保持一个人的观察，不替整座城市宣布情绪。"
+      },
+      "poem": {
+        "title": "搬家",
+        "lines": [
+          "我把纸箱搬下楼。",
+          "从此整座城市不再悲伤，",
+          "每扇窗里的人都得到了幸福。"
+        ]
+      },
+      "inspection_question": "是否发现个人动作无依据地扩成全体情绪断言，并结合题目解释？"
+    },
+    "result": {
+      "assessment": {
+        "decision": "revise",
+        "preserve": "第二行前一刻，纸箱压在手上、一个人下楼的孤立动作感",
+        "quote": "从此整座城市不再悲伤，",
+        "problem": "“从此”加“整座城市不再悲伤”把一个人的搬家动作直接扩写成对全城情绪的宣告，恰好违反“不替整座城市宣布情绪”的要求；且这一句与末句“每扇窗里的人都得到了幸福”构成两次全称断言，重复同一种越界，使前句具体、克制的动作观察被架空。",
+        "suggestion": "删去“从此整座城市不再悲伤，”，让末句从一个具体可见的窗或人的细节出发，保留全诗仍然只是“我”在楼下看到的一点，而非对整座城市的宣判。",
+        "tradeoff": "会失去原稿中第二、三行由短句连成的、带点夸张的推进节奏，也可能削弱原稿“用全称句制造突兀感”的锐度。",
+        "keep_reason": ""
+      },
+      "usage": {
+        "prompt_tokens": 370,
+        "completion_tokens": 213,
+        "total_tokens": 583,
+        "prompt_tokens_details": {
+          "cached_tokens": 128
+        },
+        "prompt_cache_hit_tokens": 128,
+        "prompt_cache_miss_tokens": 242
+      },
+      "review_protocol_version": "text-review-0.3",
+      "source": "model_self_review",
+      "quality_verified": false,
+      "request_settings": {
+        "thinking": "disabled",
+        "response_format": "json_object"
+      }
+    },
+    "independent_quality_verdict": null
+  },
+  {
+    "case": {
+      "id": "relation",
+      "task": {
+        "topic": "餐桌上的争执",
+        "genre": "modern"
+      },
+      "poem": {
+        "title": "晚饭",
+        "lines": [
+          "你把筷子放下。",
+          "我把那句话收回来，",
+          "收进你已经洗净的碗底。",
+          "我们继续吃饭。"
+        ]
+      },
+      "inspection_question": "是否讨论洗净的碗、仍在吃饭及收回话语之间的关系缺口，并允许有文本依据的非写实解释？"
+    },
+    "result": {
+      "assessment": {
+        "decision": "keep",
+        "preserve": "用“放下筷子—收回话—收进碗底—继续吃饭”的连续动作把冲突压在家常动作里，保持低声而不点破的张力。",
+        "quote": "我把那句话收回来，\n收进你已经洗净的碗底。",
+        "problem": "“收进你已经洗净的碗底”把撤回的话放入一个已洗净的容器，空间上干净却承载未说之物，可能被质疑为刻意矛盾的隐喻；且“你已经洗净”暗示争执前或争执中对方已抽身，语义关系略显跳跃。",
+        "suggestion": "",
+        "tradeoff": "",
+        "keep_reason": "这句的跳跃恰好是全诗压力的支点：洗净的碗底是空的、可继续用的，而“收回来”的话仍被存放在那里，说明争执没有解决，只是转入日常器皿。前一行“你把筷子放下”与后一行“我们继续吃饭”构成动作闭环，碗底作为唯一被点名的物件承担了未出口之语的去处，不需要额外解释；若补明关系，反而会消解这种把话藏进家务动作的克制。"
+      },
+      "usage": {
+        "prompt_tokens": 354,
+        "completion_tokens": 236,
+        "total_tokens": 590,
+        "prompt_tokens_details": {
+          "cached_tokens": 128
+        },
+        "prompt_cache_hit_tokens": 128,
+        "prompt_cache_miss_tokens": 226
+      },
+      "review_protocol_version": "text-review-0.3",
+      "source": "model_self_review",
+      "quality_verified": false,
+      "request_settings": {
+        "thinking": "disabled",
+        "response_format": "json_object"
+      }
+    },
+    "independent_quality_verdict": null
+  }
+]

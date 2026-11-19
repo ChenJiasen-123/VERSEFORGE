@@ -128,15 +128,14 @@ SYSTEM = """你是诗词比赛创作者。根据用户给定任务写出原创�
 
 MODERN_AESTHETIC = """
 现代诗审美实验规则（不覆盖题目硬要求）：
-围绕可感知的经验和意象关系组织作品，让情绪或理解在全诗中发展。
-声音可柔和也可激烈，句子可短也可长；停顿、长短变化应服务意义，不强制整齐。
-若用重复，让它形成有意的回环、压力或变化；不要为了诗感机械添加叠词。
-分行应形成语义呼吸、延宕或强调，不随机切开词语；允许有意跨行。
+先发现这次经验里值得写的关系，而不只把题意正确地铺开。让人、物、动作或声音之间发生一点属于此刻的变化。
+语言可以冒一点有根据的险：让熟悉的经验被重新认出，让抽象的感受获得能经历的形态，或让日常关系出现准确而意外的角度。
+一句话若能使读者回看前文、突然意识到自己的某种经验，值得留住并让全诗支撑它；不是每首必须有金句，也不要求结尾突然反转。
+声音可柔和也可激烈，句子可短也可长；重复、长短和分行参与关系的发展、语气或延宕，允许有意跨行。
+故事可以很小，也可以没有显式故事；抽象、直陈、诙谐或奇想都可以准确，不统一写成安静的物件观察。
 不为押韵扭曲语序或添加空泛填词，不要求每行都押韵。
-结尾应完成全诗的运动，避免无依据的拔高，也不强制用安静或反转结尾。
-修订只改真正影响表达或硬条件的部分，保留有效意象与声音结构。
-审美修订优先在原有篇幅与结构内解决指出的问题，不把局部修改默认变成整首重写。
-若必须扩写，新增内容须对该问题有必要作用；不以更多职业道具、景物或句子代替更准确的关系。
+修订时保护已有的独特关系与声音，不把成立的陌生表达磨成稳妥的同义解释。只改真正影响表达或硬条件的部分，局部问题优先在原篇幅内解决。
+新奇须有全诗支持，不靠随机拟人、堆比喻或先造漂亮句再补道具；不能复刻参考作品的物件、数字、动作链或结尾模板。
 不模仿名家标志性诗句，不输出构思过程、审美分数或质量保证。
 仍严格按既定JSON协议只输出标题和正文。
 """
@@ -266,7 +265,7 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
                 record['failure_code'] = failure_code(exc)
             comparisons.append(record)
     return {"task": asdict(task), "model": client.model,
-            "prompt_version": {'modern': 'modern-aesthetic-0.3', 'qijue': 'qijue-aesthetic-0.1', 'wujue': 'wujue-aesthetic-0.1', 'ci': 'ci-aesthetic-0.1'}[task.genre] if aesthetic else "1",
+            "prompt_version": {'modern': 'modern-aesthetic-0.4', 'qijue': 'qijue-aesthetic-0.1', 'wujue': 'wujue-aesthetic-0.1', 'ci': 'ci-aesthetic-0.1'}[task.genre] if aesthetic else "1",
             "aesthetic_experiment": aesthetic,
             "revision_scope": revision_scope,
             "mode": "mock" if client.mock else "live",

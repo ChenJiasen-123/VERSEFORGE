@@ -10,11 +10,13 @@ from poetry_agent.context_review import apply_review
 def review_files(run_path, ledger_path, output_path):
     run_bytes, ledger_bytes = run_path.read_bytes(), ledger_path.read_bytes()
     run, ledger = json.loads(run_bytes), json.loads(ledger_bytes)
-    if run.get('task', {}).get('genre') != 'qijue' or not run['task'].get('qijue_pattern'):
-        raise ValueError('当前入口仅复核已指定基本谱的七绝运行')
+    genre = run.get('task', {}).get('genre')
+    profile_field = {'qijue': 'qijue_pattern', 'wujue': 'wujue_pattern'}.get(genre)
+    if not profile_field or not run['task'].get(profile_field):
+        raise ValueError('当前入口仅复核已指定基本谱的五言律绝或七绝运行')
     if not run.get('poem'):
         raise ValueError('运行记录没有有效作品')
-    result = apply_review(run['poem'], run['task']['qijue_pattern'], ledger)
+    result = apply_review(run['poem'], run['task'][profile_field], ledger, genre=genre)
     result.update(source_run=str(run_path), source_run_sha256=hashlib.sha256(run_bytes).hexdigest(),
                   reading_ledger=str(ledger_path), reading_ledger_sha256=hashlib.sha256(ledger_bytes).hexdigest())
     with output_path.open('x', encoding='utf-8') as stream:
@@ -26,7 +28,7 @@ def main():
     for stream in (sys.stdout, sys.stderr):
         if hasattr(stream, 'reconfigure'):
             stream.reconfigure(encoding='utf-8')
-    parser = argparse.ArgumentParser(description='离线复核指定七绝基本谱，不调用模型')
+    parser = argparse.ArgumentParser(description='离线复核指定五言律绝或七绝基本谱，不调用模型')
     parser.add_argument('--run', required=True, type=Path)
     parser.add_argument('--ledger', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)

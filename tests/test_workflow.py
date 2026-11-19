@@ -93,7 +93,7 @@ class WorkflowTests(unittest.TestCase):
             result = compose(Task("雨"), client, aesthetic=True)
         self.assertIn("不为押韵扭曲语序", call.call_args.args[0])
         self.assertEqual(client.calls, 1)
-        self.assertEqual(result["prompt_version"], "modern-aesthetic-0.3")
+        self.assertEqual(result["prompt_version"], "modern-aesthetic-0.4")
 
     def test_review_drives_revision_and_preserves_hard_constraints(self):
         critique = json.dumps(dict(decision='revise', preserve='等待', quote='灯',

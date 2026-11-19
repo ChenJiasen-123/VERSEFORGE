@@ -11,9 +11,9 @@ def review_files(run_path, ledger_path, output_path):
     run_bytes, ledger_bytes = run_path.read_bytes(), ledger_path.read_bytes()
     run, ledger = json.loads(run_bytes), json.loads(ledger_bytes)
     genre = run.get('task', {}).get('genre')
-    profile_field = {'qijue': 'qijue_pattern', 'wujue': 'wujue_pattern'}.get(genre)
+    profile_field = {'qijue': 'qijue_pattern', 'wujue': 'wujue_pattern', 'ci': 'ci_profile'}.get(genre)
     if not profile_field or not run['task'].get(profile_field):
-        raise ValueError('当前入口仅复核已指定基本谱的五言律绝或七绝运行')
+        raise ValueError('当前入口仅复核已指定基本谱或词谱体的运行')
     if not run.get('poem'):
         raise ValueError('运行记录没有有效作品')
     result = apply_review(run['poem'], run['task'][profile_field], ledger, genre=genre)
@@ -28,7 +28,7 @@ def main():
     for stream in (sys.stdout, sys.stderr):
         if hasattr(stream, 'reconfigure'):
             stream.reconfigure(encoding='utf-8')
-    parser = argparse.ArgumentParser(description='离线复核指定五言律绝或七绝基本谱，不调用模型')
+    parser = argparse.ArgumentParser(description='离线复核指定五言律绝、七绝或词谱体，不调用模型')
     parser.add_argument('--run', required=True, type=Path)
     parser.add_argument('--ledger', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)

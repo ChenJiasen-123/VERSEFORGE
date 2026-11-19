@@ -55,13 +55,13 @@ python main.py --topic 雨后小城 --genre ci --ci-profile baixiang_yijiangnan_
 
 ## 结果与证据
 
-逐字语境复核可离线执行：`python review_meter.py --run 运行记录.json --ledger 读音复核表.json --output 新报告.json`。复核表须绑定正文校验值、字位、义项、声韵、出处与理由；诗稿改动会拒绝旧表。输出记录输入文件校验值，不覆盖已有文件，不调用API。仅支持指定基本谱七绝；复核人提供的字书判断不是程序独立认证。
+逐字语境复核可离线执行：`python review_meter.py --run 运行记录.json --ledger 读音复核表.json --output 新报告.json`。复核表须绑定正文校验值、字位、义项、声韵、出处与理由；诗稿改动会拒绝旧表。输出记录输入文件校验值，不覆盖已有文件，不调用API。支持指定基本谱五绝、七绝及当前指定词谱；五绝与词的核音表须显式声明genre。词韵另填ci_rhyme_part与ci_rhyme_source，不由平水韵名自动推部。复核人提供的字书判断不是程序独立认证。
 
 每次创作保存 `runs/<run_id>.json`，包括原题、候选、审读、比较、用量和耗时，不含请求头或 API 密钥。多稿另有 candidate_runs／candidate_selection。
 
 constraints_passed 只表示已实现条件未发现失败，不认证文学质量、原创性或全部格律。needs_review 表示仍有已记录问题。退出码0／2／1分别为当前条件通过／待复核／运行错误。
 
-七绝的 prosody、词的 ci_evidence 分别保留有限检查结果；外层格律状态仍待核。人工语境复核另存文件，不能把原稿的复核结论直接转给修订稿。
+五绝、七绝的 prosody 与词的 ci_evidence 分别保留有限检查结果；外层格律状态仍待核。具名语境复核另存文件，不能把原稿的复核结论直接转给修订稿。作品集中的忆江南已有[限定读法的复核记录](runs/ci-rain-town-context-report.json)，不将它代替原始自动报告。
 
 `.env`及`runs/`在忽略列表内。历史独立朗读工具与训练准备脚本保留，但不属于当前阶段工作，也未完成参数训练。旧 `--speak` 仅打印模拟文本，不连接机器人。
 

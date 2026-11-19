@@ -13,13 +13,13 @@ def lexicon():
     return result, data['source']
 
 
-def rhyme_evidence(lines, profile):
+def rhyme_evidence(lines, profile, contextual_readings=None):
     data, source = lexicon()
     positions = [(i-1, profile['line_lengths'][i-1]-1) for i in profile['rhyme_lines_1based']]
     tones = [['X'] * width for width in profile['line_lengths']]
     for i, j in positions:
         tones[i][j] = profile['rhyme_tone']
-    report = validate(lines, [''.join(row) for row in tones], positions, data, source)
+    report = validate(lines, [''.join(row) for row in tones], positions, data, source, contextual_readings)
     report['findings'] = [f for f in report['findings'] if f.get('kind') in ('shape', 'rhyme')
                           or (f.get('line', 0)-1, f.get('character', 0)-1) in positions]
     report['scope'] = 'named_ci_rhyme_feet_against_cilin_web_main_table'

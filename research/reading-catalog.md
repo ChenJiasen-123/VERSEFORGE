@@ -54,6 +54,8 @@
 | 讯问 | 网页所呈正文10行全文，未核印本 | [reading-notes-40.md](reading-notes-40.md) | [来源](https://www.shiren.org/xlib/xd/zgsg/haizi.htm) |
 | 五月的麦地 | 网页所呈正文13行全文，未核印本 | [reading-notes-40.md](reading-notes-40.md) | [来源](https://www.shiren.org/xlib/xd/zgsg/haizi.htm) |
 
+| 太阳（诗剧所选一幕） | 舞台说明及十个编号单元通读，不等于全剧；与随后其他节选分开 | [reading-notes-43.md](reading-notes-43.md) | [来源](https://www.shiren.org/xlib/xd/zgsg/haizi.htm) |
+
 ## 席慕蓉
 
 | 作品／单元 | 实际范围 | 阅读笔记 | 文本来源 |
@@ -147,4 +149,3 @@
 - 单篇读得较浅时，先补具体位置、反解和声音假设；不要仅因已有一个标题就认定研究充分。
 - 版本影响语义、发话边界或分行时，优先核对；没有读到的完整文本不由目录与摘要补齐。
 - 朗读、听者反馈与参数训练另行记录，本目录不为它们提供完成证据。
-

@@ -1,0 +1,79 @@
+const $ = id => document.getElementById(id);
+const state = {csrf: null, busy: false, poem: null, job: null, poll: null, configured: false};
+const samples = {
+ object: '题画绝句：为一件日常器物题诗\n要求：五绝或七绝一首，须在诗题中标注所题器物；诗中不得出现该器物的名称，只能写其形、声、用、痕。',
+ future: '写给十年后的自己，但那时AI已替你回信\n要求：写一首诗，不超过30行；诗中包含你写给十年后自己的一句话和一个自动回复/系统提示的片段（可以是短信、邮件退信、AI助手提醒），两者不得互相解释。'
+};
+const phases = {queued:'已排队，正在等候创作', planning:'正在辨认要求，展开不同构思', writing:'正在写作', checking:'正在核对题目要求', revising:'正在调整与要求冲突的部分'};
+async function api(path, options = {}) {
+ const response = await fetch(path, {...options, headers: {'Content-Type':'application/json', ...(state.csrf ? {'X-CSRF-Token':state.csrf} : {}), ...(options.headers || {})}});
+ const data = await response.json();
+ if (!response.ok) throw new Error(data.error || '本地服务暂时没有回应。');
+ return data;
+}
+function count() {$('input-count').textContent = `${$('prompt').value.length} 字`;}
+function setBusy(busy, phase = '') {
+ state.busy = busy; $('generate').disabled = busy || !state.configured;
+ $('again').disabled = busy || !state.poem || !state.configured;
+ $('progress').hidden = !busy; $('progress-text').textContent = phases[phase] || '正在创作';
+ $('generate').textContent = busy ? '创作中，请稍候' : '生成一版作品';
+}
+function error(message) {$('error').textContent=message; $('error').hidden=!message;}
+function list(id, rows) {
+ $(id).replaceChildren(...(rows.length ? rows : ['无特别指定。']).map(text => {const node=document.createElement('li');node.textContent=text;return node;}));
+}
+function render(job) {
+ const result=job.result;
+ if (!result || result.status==='unsupported') {state.poem=null;$('poem').hidden=true;$('empty').hidden=false;$('understanding').hidden=true;$('copy').disabled=$('download').disabled=$('again').disabled=true;error(result?.message || job.error || '没有得到作品。');return;}
+ state.poem=result.poem; state.job=job.id;
+ $('empty').hidden=true; $('poem').hidden=false;
+ $('poem-title').textContent=result.poem.title;
+ $('poem-lines').replaceChildren(...result.poem.lines.map(text => {const p=document.createElement('p');p.textContent=text;return p;}));
+ $('copy').disabled=false; $('download').disabled=false; $('again').disabled=state.busy || !state.configured;
+ $('saved').textContent='已保存至本机';
+ const brief=result.brief;
+ if (brief) {
+  $('understanding').hidden=false;list('requirements',brief.requirements || []);list('optional-examples',brief.examples || []);
+  $('direction').textContent=brief.directions?.[brief.selected_direction] || '';
+ }
+ const checks=result.checks || {};
+ const pending=(checks.final_hard_issues?.length || 0)>0 || checks.revision_semantics_rechecked===false;
+ $('result-note').hidden=!pending;
+ $('result-note').textContent=pending?'这版已生成。部分题目要求仍需确认，可展开题目理解或再换一个构思。':'';
+}
+async function history() {
+ const rows=await api('/api/jobs');
+ for (const target of ['history','mobile-history']) {
+  $(target).replaceChildren();
+  if (!rows.length) {const p=document.createElement('p');p.className='muted small';p.textContent='第一首诗，正等着一个题目。';$(target).append(p);}
+  for (const row of rows) {
+   const button=document.createElement('button');button.type='button';button.className='history-item';
+   const title=document.createElement('strong');title.textContent=row.title || row.prompt.split('\n')[0].slice(0,42);
+   const meta=document.createElement('span');meta.textContent=new Date(row.created*1000).toLocaleString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+' · '+(row.status==='completed'?'已保存':row.status==='failed'?'未完成':'创作中');
+   button.append(title,meta);button.addEventListener('click',async()=>{if(state.busy)return;error('');try {const job=await api('/api/jobs/'+row.id);$('prompt').value=job.prompt;$('genre').value=job.request?.genre || 'auto';$('preference').value=job.request?.preference || '';count();if(job.status==='completed')render(job);else if(job.status==='failed')error(job.error);else {state.job=job.id;setBusy(true,job.status);poll(job.id);}}catch(e){error(e.message);}});$(target).append(button);
+  }
+ }
+}
+async function poll(id) {
+ try {
+  const job=await api('/api/jobs/'+id);
+  if(job.status==='completed' || job.status==='failed') {setBusy(false);if(job.status==='completed')render(job);else error(job.error);await history();return;}
+  setBusy(true,job.status);state.poll=setTimeout(()=>poll(id),1200);
+ }catch(e){setBusy(false);error(e.message+' 作品记录保留在本机，刷新后可继续查看。');}
+}
+async function generate(previous = null) {
+ if(state.busy)return;
+ if(!$('compose-form').reportValidity())return;
+ error('');setBusy(true,'queued');$('saved').textContent='';
+ try {const job=await api('/api/jobs',{method:'POST',body:JSON.stringify({prompt:$('prompt').value,genre:$('genre').value,preference:$('preference').value,previous})});state.job=job.id;await history();await poll(job.id);}
+ catch(e){setBusy(false);error(e.message);}
+}
+function plainText() {return state.poem ? state.poem.title+'\n\n'+state.poem.lines.join('\n') : '';}
+$('compose-form').addEventListener('submit',e=>{e.preventDefault();generate();});
+$('again').addEventListener('click',()=>generate(state.poem));
+$('prompt').addEventListener('input',count);
+document.querySelectorAll('[data-example]').forEach(button=>button.addEventListener('click',()=>{if(state.busy)return;$('prompt').value=samples[button.dataset.example];count();$('prompt').focus();}));
+$('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(plainText());$('saved').textContent='已复制作品';}catch{error('浏览器暂未允许复制，可选中文字复制，或下载文字。');}});
+$('download').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([plainText()],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=state.poem.title.replace(/[<>:"/\\|?*]/g,'_')+'.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+$('new').addEventListener('click',()=>{if(state.busy)return;state.poem=null;$('prompt').value='';$('preference').value='';count();$('poem').hidden=true;$('empty').hidden=false;$('understanding').hidden=true;$('result-note').hidden=true;$('saved').textContent='';$('copy').disabled=$('download').disabled=$('again').disabled=true;error('');$('prompt').focus();});
+(async()=>{try{const session=await api('/api/session');state.csrf=session.csrf;state.configured=session.configured;$('connection').textContent=session.configured?'本地创作服务已就绪':'创作服务尚未配置';$('connection').classList.toggle('ready',session.configured);setBusy(false);await history();}catch(e){state.configured=false;setBusy(false);$('connection').textContent='本地服务未连接';error(e.message);}})();

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>VERSEFORGE · 创作台</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
+<body>
+<header><a class="brand" href="/" aria-label="VERSEFORGE 创作台"><span class="brand-mark">V</span> VERSEFORGE <span class="brand-note">创作台</span></a><span id="connection" role="status">正在连接本地服务</span></header>
+<div class="layout">
+<aside><div class="aside-title"><h2>作品记录</h2><button id="new" class="quiet" type="button">新创作</button></div><p class="muted small">保存在这台电脑，随时回来读。</p><div id="history" aria-live="polite"><p class="muted">还没有作品。</p></div></aside>
+<main>
+<div class="intro"><span class="eyebrow">诗歌工作室</span><h1>从命题出发，<br>把联想展开。</h1><p>保留题目的要求，寻找属于这首诗的情境。</p></div>
+<div class="workspace">
+<section class="editor" aria-labelledby="input-heading">
+<form id="compose-form">
+<div class="section-title"><h2 id="input-heading">这次写什么？</h2><span id="input-count" class="muted small">0 字</span></div>
+<label class="sr-only" for="prompt">完整样题</label><textarea id="prompt" required minlength="2" maxlength="10000" placeholder="把完整样题粘贴在这里。&#10;&#10;体裁、要求和举例都可以一起保留。"></textarea>
+<div class="examples"><span class="muted small">试填样题</span><button type="button" data-example="object">日常器物题诗</button><button type="button" data-example="future">十年后的回信</button></div>
+<div class="field"><label for="genre">体裁</label><select id="genre"><option value="auto">按样题选择</option><option value="modern">现代诗</option><option value="wujue">五言绝句</option><option value="qijue">七言绝句</option><option value="ci">词 · 忆江南</option></select></div>
+<details class="preferences"><summary>补充你的偏好 <span class="muted">可选</span></summary><label class="sr-only" for="preference">创作偏好</label><textarea id="preference" maxlength="2000" placeholder="例如：允许诙谐；不要在结尾解释情绪；想试试更有张力的口吻。"></textarea></details>
+<button id="generate" class="primary" type="submit">生成一版作品</button>
+<div id="progress" class="progress" role="status" hidden><span class="spinner"></span><span id="progress-text">正在构思</span></div>
+<p id="error" class="error" role="alert" hidden></p>
+</form>
+<details class="understanding" id="understanding" hidden><summary>这次如何理解题目</summary><h3>明确要求</h3><ul id="requirements"></ul><h3>举例与可选内容</h3><ul id="optional-examples"></ul><h3>本次构思</h3><p id="direction"></p></details>
+</section>
+<section class="reading" aria-labelledby="output-heading"><div class="section-title"><h2 id="output-heading">作品</h2><div class="actions"><button type="button" id="copy" disabled>复制</button><button type="button" id="download" disabled>下载文字</button></div></div>
+<div id="empty" class="empty"><div class="empty-stroke" aria-hidden="true">诗</div><h3>留一页，给尚未出现的诗。</h3><p>输入样题后，作品会出现在这里。</p></div>
+<article id="poem" hidden><h2 id="poem-title"></h2><div id="poem-lines"></div></article>
+<div id="result-note" class="result-note" hidden></div>
+<div class="result-footer"><span id="saved" class="muted small" aria-live="polite"></span><button type="button" id="again" class="secondary" disabled>换个构思再写</button></div>
+</section>
+</div>
+<details class="mobile-history"><summary>查看作品记录</summary><div id="mobile-history"></div></details>
+</main></div>
+<footer>VERSEFORGE <span>让语言保有发现的余地。</span></footer>
+</body></html>

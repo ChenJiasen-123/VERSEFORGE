@@ -1,0 +1,84 @@
+{
+  "source_run": "e70eafa3f2a94516a9bf1faf3dc137dc-lineation-comparison.json",
+  "a": {
+    "title": "雨后的公交站",
+    "lines": [
+      "雨停在站牌的字上，",
+      "长椅还湿着，没有人坐。",
+      "四个人站成一排，",
+      "中间隔着各自的水洼。",
+      "有人把伞收了又撑开，",
+      "水珠弹到旁边那人的鞋面，",
+      "一句不好意思停在半空，",
+      "被低头亮起的屏幕收走。",
+      "车灯从街角推过来，",
+      "水面上的路线图晃了晃，散掉。"
+    ]
+  },
+  "b": {
+    "title": "雨后的公交站",
+    "lines": [
+      "雨停在站牌的字上，",
+      "长椅还湿着，没有人坐。",
+      "四个人站成一排，中间隔着各自的水洼。",
+      "有人把伞收了又撑开，",
+      "水珠弹到旁边那人的鞋面，",
+      "一句不好意思",
+      "停在半空，",
+      "被低头亮起的屏幕收走。",
+      "车灯从街角推过来，",
+      "水面上的路线图晃了晃，散掉。"
+    ]
+  },
+  "scope": "whole_lineation_plans_not_single_boundary_effect",
+  "quality_verified": false,
+  "comparison": {
+    "assessment": {
+      "choice": "a",
+      "quote_a": "一句不好意思停在半空，",
+      "quote_b": "一句不好意思",
+      "reason": "两稿字词与标点相同，差异只在两处分行。A把“一句不好意思停在半空”保留在同一行，句法完整，歉意悬置的动作和长度落在同一行内，承接下一行“被屏幕收走”时因果链清楚：道歉停在半空，然后被收走。B将“一句不好意思”单独成行，“停在半空”另起一行，短行虽可强调“不好意思”这一对象，但“停在半空”被切到下一行，读者先在行末得到“不好意思”而缺谓语，意义重心偏向道歉的名目，而非悬置状态；随后“被低头亮起的屏幕收走”接在“停在半空”之后，与A的承接相近，但前一处断句造成的悬置已被分行本身承担，反而削弱“停在半空”作为动作描述的独立力度。另一处差异是A断在“四个人站成一排，”之后，B把“中间隔着各自的水洼”并回同一行。B的长行使“站成一排”与“各自的水洼”直接对照，间隔感更连贯；A把间隔条件另起一行，也有强调作用，但“中间隔着”需要回看上一行才能落实主语。两处相比，B第一处断句对道歉句的句法与重心有较明显损失，A整体更稳。A的长椅、水洼、伞、屏幕等有效部分未损失，B也不是扩写，只是分行调整；不存在惯常道具或无支撑总结的新增。故取A。"
+    },
+    "usage": {
+      "prompt_tokens": 936,
+      "completion_tokens": 350,
+      "total_tokens": 1286,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 680
+    },
+    "lineation_difference": {
+      "applicable": true,
+      "same_wording_and_punctuation": true,
+      "a_line_count": 10,
+      "b_line_count": 10,
+      "changed_boundaries": [
+        {
+          "character_offset": 28,
+          "break_in_a": true,
+          "break_in_b": false,
+          "before": "有人坐。四个人站成一排，",
+          "after": "中间隔着各自的水洼。有人"
+        },
+        {
+          "character_offset": 66,
+          "break_in_a": false,
+          "break_in_b": true,
+          "before": "那人的鞋面，一句不好意思",
+          "after": "停在半空，被低头亮起的屏"
+        }
+      ],
+      "truncated": false,
+      "scope": "literal_boundaries_not_predicted_pauses_or_quality",
+      "empty_lines_present": false
+    },
+    "source": "model_self_review",
+    "quality_verified": false,
+    "request_settings": {
+      "thinking": "disabled",
+      "response_format": "json_object"
+    }
+  }
+}

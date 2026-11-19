@@ -2,6 +2,31 @@
 import unicodedata
 
 
+def compare_lineation(a, b):
+    """Locate changed boundaries only when wording and punctuation are identical."""
+    if ''.join(a) != ''.join(b):
+        return {'applicable': False, 'reason': 'different_character_streams'}
+    text = ''.join(a)
+    def boundaries(lines):
+        offset, positions = 0, []
+        for line in lines[:-1]:
+            offset += len(line)
+            positions.append(offset)
+        return positions
+    a_offsets, b_offsets = boundaries(a), boundaries(b)
+    changed = sorted(set(a_offsets) ^ set(b_offsets))
+    return {'applicable': True, 'same_wording_and_punctuation': True,
+            'a_line_count': len(a), 'b_line_count': len(b),
+            'changed_boundaries': [
+                {'character_offset': pos, 'break_in_a': pos in a_offsets,
+                 'break_in_b': pos in b_offsets,
+                 'before': text[max(0, pos - 12):pos], 'after': text[pos:pos + 12]}
+                for pos in changed[:24]],
+            'truncated': len(changed) > 24,
+            'scope': 'literal_boundaries_not_predicted_pauses_or_quality',
+            'empty_lines_present': any(not line for line in a + b)}
+
+
 def inspect_structure(lines):
     lengths, endings, phrases = [], [], {}
     for index, line in enumerate(lines, 1):

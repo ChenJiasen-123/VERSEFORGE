@@ -65,7 +65,13 @@ def main():
             print("- " + issue)
         print("提示：程序检查范围有限，作品仍需审校。")
         if result.get('prosody'):
-            print('格律状态：待核；韵脚归部证据已写入运行记录 prosody 字段。')
+            basic = result['prosody'].get('basic_target_check')
+            if basic:
+                label = {'pass': '所选基本谱与当前字表规则通过',
+                         'failed': '发现明确冲突', 'unknown': '存在待核音义或缺字'}.get(basic['status'], '待核')
+                print('指定基本谱检查：' + label + '；不等于完整合律认证。')
+            else:
+                print('格律状态：未指定基本谱；仅记录归部证据。')
         print(f"运行记录：{path}")
         if args.speak and result["poem"]:
             if result["status"] == "constraints_passed":

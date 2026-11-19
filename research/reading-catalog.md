@@ -51,6 +51,8 @@
 | 明天醒来我会在哪一只鞋子里 | 网页两篇全文；麦子熟了仅复读不新增 | [reading-notes-26.md](reading-notes-26.md) | [来源](https://www.shiren.org/xlib/xd/zgsg/haizi.htm) |
 | 四姐妹 | 网页转录全文 | [reading-notes-35.md](reading-notes-35.md) | [来源](https://www.shiren.org/xlib/xd/zgsg/haizi.htm) |
 | 月光 | 指定题名网页全文，非同页《月》 | [reading-notes-37.md](reading-notes-37.md) | [来源](https://www.shiren.org/xlib/xd/zgsg/haizi.htm) |
+| 讯问 | 网页所呈正文10行全文，未核印本 | [reading-notes-40.md](reading-notes-40.md) | [来源](https://www.shiren.org/xlib/xd/zgsg/haizi.htm) |
+| 五月的麦地 | 网页所呈正文13行全文，未核印本 | [reading-notes-40.md](reading-notes-40.md) | [来源](https://www.shiren.org/xlib/xd/zgsg/haizi.htm) |
 
 ## 席慕蓉
 

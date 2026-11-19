@@ -4,7 +4,7 @@ import json
 import re
 import time
 from dataclasses import asdict, dataclass, field
-from .aesthetics import review, compare, failure_code
+from .aesthetics import review, compare_bidirectional as compare, failure_code
 from .rhyme_data import qijue_evidence
 from .qijue_profiles import specification
 from .ci import specification as ci_specification, check_shape as check_ci_shape, evidence as ci_evidence

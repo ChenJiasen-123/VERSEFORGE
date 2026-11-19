@@ -112,10 +112,11 @@ class WorkflowTests(unittest.TestCase):
         critique = review_output(dict(decision='revise', preserve='等待', quote='灯',
                                    problem='关系不明', suggestion='明确位置', tradeoff='减少开放性'))
         comparison = json.dumps(dict(choice='b', quote_a='灯', quote_b='灯在门外', reason='位置使等待对象更明确，损失开放性'))
-        client = SequenceClient([output(['灯']), critique, output(['灯在门外']), comparison])
+        reverse = json.dumps(dict(choice='a', quote_a='灯在门外', quote_b='灯', reason='换序后仍选修订稿'))
+        client = SequenceClient([output(['灯']), critique, output(['灯在门外']), comparison, reverse])
         client.mock = False
         result = compose(Task('等待', required_words=['灯']), client, max_revisions=1, aesthetic=True, revision_scope='rewrite')
-        self.assertEqual(client.calls, 4)
+        self.assertEqual(client.calls, 5)
         self.assertEqual(result['poem']['lines'], ['灯在门外'])
         self.assertFalse(result['history'][0]['aesthetic_review']['quality_verified'])
         self.assertEqual(result['comparisons'][0]['comparison_relation'], 'revision')
@@ -125,7 +126,9 @@ class WorkflowTests(unittest.TestCase):
                                    problem='关系不明', suggestion='明确位置', tradeoff='减少开放性'))
         for decision in ('a', 'tie', 'invalid'):
             comparison = json.dumps(dict(choice=decision, quote_a='灯', quote_b='灯在门外', reason='新稿说明过多'))
-            client = SequenceClient([output(['灯']), critique, output(['灯在门外']), comparison])
+            reverse = json.dumps(dict(choice={'a': 'b', 'tie': 'tie', 'invalid': 'invalid'}[decision],
+                                      quote_a='灯在门外', quote_b='灯', reason='换序后保留原稿或弃权'))
+            client = SequenceClient([output(['灯']), critique, output(['灯在门外']), comparison, reverse])
             client.mock = False
             result = compose(Task('等待'), client, max_revisions=1, aesthetic=True, revision_scope='rewrite')
             self.assertEqual(result['poem']['lines'], ['灯'])

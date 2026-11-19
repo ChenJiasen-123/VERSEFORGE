@@ -1,0 +1,429 @@
+{
+  "input": {
+    "id": "repeated_request",
+    "task": {
+      "genre": "modern",
+      "topic": "孩子第一次独自买东西"
+    },
+    "a": {
+      "title": "零钱",
+      "lines": [
+        "再数一次",
+        "她说",
+        "再数一次",
+        "硬币还是那些硬币",
+        "她的手已经不再攥着我的手"
+      ]
+    },
+    "b": {
+      "title": "零钱",
+      "lines": [
+        "再数一次她说再数一次",
+        "硬币还是那些硬币",
+        "她的手已经不再攥着我的手"
+      ]
+    }
+  },
+  "result": {
+    "assessment": {
+      "choice": "tie",
+      "reason": "正反序判断未达成一致或未完成；本次不据此替换当前候选，不表示两稿等优。"
+    },
+    "orders": [
+      {
+        "reversed": false,
+        "review": {
+          "assessment": {
+            "choice": "a",
+            "quote_a": "她说",
+            "quote_b": "再数一次她说再数一次",
+            "reason": "A 把“她说”单列一行，使两次“再数一次”分别是她说出的话，指令与复述之间有清楚的停顿：孩子犹豫、请求确认，母亲或叙述者把这一刻放慢。下一行“硬币还是那些硬币”才作为她数后的判断出现。随后“她的手已经不再攥着我的手”在时间上与“已不再”呼应，让第一次独自买东西的分离感落在动作变化上。B 把“再数一次她说再数一次”压在同一行，虽然更紧凑，却让重复的归属和说话动作黏连，少了 A 中“她说”作为插入语造成的迟疑与确认；代价是 B 更像概述而非现场。A 的分行让“她说”参与全篇的亲子关系和第一次独立的情绪，而不仅是排版差异。"
+          },
+          "usage": {
+            "prompt_tokens": 1845,
+            "completion_tokens": 193,
+            "total_tokens": 2038,
+            "prompt_tokens_details": {
+              "cached_tokens": 768
+            },
+            "prompt_cache_hit_tokens": 768,
+            "prompt_cache_miss_tokens": 1077
+          },
+          "comparison_protocol_version": "text-compare-0.6",
+          "comparison_relation": "independent",
+          "earlier_candidate": null,
+          "experimental_lineation_control": false,
+          "lineation_difference": {
+            "applicable": true,
+            "same_wording_and_punctuation": true,
+            "a_line_count": 5,
+            "b_line_count": 3,
+            "changed_boundaries": [
+              {
+                "character_offset": 4,
+                "break_in_a": true,
+                "break_in_b": false,
+                "before": "再数一次",
+                "after": "她说再数一次硬币还是那些"
+              },
+              {
+                "character_offset": 6,
+                "break_in_a": true,
+                "break_in_b": false,
+                "before": "再数一次她说",
+                "after": "再数一次硬币还是那些硬币"
+              }
+            ],
+            "truncated": false,
+            "scope": "literal_boundaries_not_predicted_pauses_or_quality",
+            "empty_lines_present": false
+          },
+          "literal_repetition_evidence": {
+            "a": {
+              "items": [
+                {
+                  "fragment": "再数一次",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 1,
+                      "start_character": 1,
+                      "end_line": 1,
+                      "end_character": 4
+                    },
+                    {
+                      "start_line": 3,
+                      "start_character": 1,
+                      "end_line": 3,
+                      "end_character": 4
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                },
+                {
+                  "fragment": "的手",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 5,
+                      "start_character": 2,
+                      "end_line": 5,
+                      "end_character": 3
+                    },
+                    {
+                      "start_line": 5,
+                      "start_character": 11,
+                      "end_line": 5,
+                      "end_character": 12
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                },
+                {
+                  "fragment": "硬币",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 4,
+                      "start_character": 1,
+                      "end_line": 4,
+                      "end_character": 2
+                    },
+                    {
+                      "start_line": 4,
+                      "start_character": 7,
+                      "end_line": 4,
+                      "end_character": 8
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                }
+              ],
+              "truncated": false,
+              "scope": "literal_character_stream_with_line_breaks_removed_only",
+              "limitations": [
+                "统计2—8字连续片段，最多12项各列32个位置；可跨分行，保留空白标点；允许重叠，不等于词或句法重复",
+                "位置按原行Unicode字符从1计；次数不评价节奏或文学质量"
+              ]
+            },
+            "b": {
+              "items": [
+                {
+                  "fragment": "再数一次",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 1,
+                      "start_character": 1,
+                      "end_line": 1,
+                      "end_character": 4
+                    },
+                    {
+                      "start_line": 1,
+                      "start_character": 7,
+                      "end_line": 1,
+                      "end_character": 10
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                },
+                {
+                  "fragment": "的手",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 3,
+                      "start_character": 2,
+                      "end_line": 3,
+                      "end_character": 3
+                    },
+                    {
+                      "start_line": 3,
+                      "start_character": 11,
+                      "end_line": 3,
+                      "end_character": 12
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                },
+                {
+                  "fragment": "硬币",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 2,
+                      "start_character": 1,
+                      "end_line": 2,
+                      "end_character": 2
+                    },
+                    {
+                      "start_line": 2,
+                      "start_character": 7,
+                      "end_line": 2,
+                      "end_character": 8
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                }
+              ],
+              "truncated": false,
+              "scope": "literal_character_stream_with_line_breaks_removed_only",
+              "limitations": [
+                "统计2—8字连续片段，最多12项各列32个位置；可跨分行，保留空白标点；允许重叠，不等于词或句法重复",
+                "位置按原行Unicode字符从1计；次数不评价节奏或文学质量"
+              ]
+            }
+          },
+          "source": "model_self_review",
+          "quality_verified": false,
+          "request_settings": {
+            "thinking": "disabled",
+            "response_format": "json_object"
+          }
+        },
+        "original_choice": "a"
+      },
+      {
+        "reversed": true,
+        "review": {
+          "assessment": {
+            "choice": "a",
+            "quote_a": "再数一次她说再数一次",
+            "quote_b": "再数一次\n她说",
+            "reason": "A把“她说再数一次”压在同一行，两个“再数一次”紧挨，复数的催促像孩子反复念叨，语速与执拗融为一体；行末“硬币还是那些硬币”把数钱动作落在“还是”的重复与不变上。B将“她说”单独成行，确实制造了说话主体的短暂停顿和分离，也让“她说／再数一次”读起来更像转述，但两个“再数一次”被拆到首尾跨行，复沓的连缀感被削弱，同时“她说”单独一行在五行的短诗里占去较多结构重量，收益不足以补偿。两稿第三行都完成从数钱到放手的转换，“她的手已经不再攥着我的手”准确而意外地通过“的手”重复把数硬币的手与牵手并置；对比之下A的整行推进更紧凑，复沓与放手之间的张力更完整。"
+          },
+          "usage": {
+            "prompt_tokens": 1845,
+            "completion_tokens": 223,
+            "total_tokens": 2068,
+            "prompt_tokens_details": {
+              "cached_tokens": 768
+            },
+            "prompt_cache_hit_tokens": 768,
+            "prompt_cache_miss_tokens": 1077
+          },
+          "comparison_protocol_version": "text-compare-0.6",
+          "comparison_relation": "independent",
+          "earlier_candidate": null,
+          "experimental_lineation_control": false,
+          "lineation_difference": {
+            "applicable": true,
+            "same_wording_and_punctuation": true,
+            "a_line_count": 3,
+            "b_line_count": 5,
+            "changed_boundaries": [
+              {
+                "character_offset": 4,
+                "break_in_a": false,
+                "break_in_b": true,
+                "before": "再数一次",
+                "after": "她说再数一次硬币还是那些"
+              },
+              {
+                "character_offset": 6,
+                "break_in_a": false,
+                "break_in_b": true,
+                "before": "再数一次她说",
+                "after": "再数一次硬币还是那些硬币"
+              }
+            ],
+            "truncated": false,
+            "scope": "literal_boundaries_not_predicted_pauses_or_quality",
+            "empty_lines_present": false
+          },
+          "literal_repetition_evidence": {
+            "a": {
+              "items": [
+                {
+                  "fragment": "再数一次",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 1,
+                      "start_character": 1,
+                      "end_line": 1,
+                      "end_character": 4
+                    },
+                    {
+                      "start_line": 1,
+                      "start_character": 7,
+                      "end_line": 1,
+                      "end_character": 10
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                },
+                {
+                  "fragment": "的手",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 3,
+                      "start_character": 2,
+                      "end_line": 3,
+                      "end_character": 3
+                    },
+                    {
+                      "start_line": 3,
+                      "start_character": 11,
+                      "end_line": 3,
+                      "end_character": 12
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                },
+                {
+                  "fragment": "硬币",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 2,
+                      "start_character": 1,
+                      "end_line": 2,
+                      "end_character": 2
+                    },
+                    {
+                      "start_line": 2,
+                      "start_character": 7,
+                      "end_line": 2,
+                      "end_character": 8
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                }
+              ],
+              "truncated": false,
+              "scope": "literal_character_stream_with_line_breaks_removed_only",
+              "limitations": [
+                "统计2—8字连续片段，最多12项各列32个位置；可跨分行，保留空白标点；允许重叠，不等于词或句法重复",
+                "位置按原行Unicode字符从1计；次数不评价节奏或文学质量"
+              ]
+            },
+            "b": {
+              "items": [
+                {
+                  "fragment": "再数一次",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 1,
+                      "start_character": 1,
+                      "end_line": 1,
+                      "end_character": 4
+                    },
+                    {
+                      "start_line": 3,
+                      "start_character": 1,
+                      "end_line": 3,
+                      "end_character": 4
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                },
+                {
+                  "fragment": "的手",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 5,
+                      "start_character": 2,
+                      "end_line": 5,
+                      "end_character": 3
+                    },
+                    {
+                      "start_line": 5,
+                      "start_character": 11,
+                      "end_line": 5,
+                      "end_character": 12
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                },
+                {
+                  "fragment": "硬币",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 4,
+                      "start_character": 1,
+                      "end_line": 4,
+                      "end_character": 2
+                    },
+                    {
+                      "start_line": 4,
+                      "start_character": 7,
+                      "end_line": 4,
+                      "end_character": 8
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                }
+              ],
+              "truncated": false,
+              "scope": "literal_character_stream_with_line_breaks_removed_only",
+              "limitations": [
+                "统计2—8字连续片段，最多12项各列32个位置；可跨分行，保留空白标点；允许重叠，不等于词或句法重复",
+                "位置按原行Unicode字符从1计；次数不评价节奏或文学质量"
+              ]
+            }
+          },
+          "source": "model_self_review",
+          "quality_verified": false,
+          "request_settings": {
+            "thinking": "disabled",
+            "response_format": "json_object"
+          }
+        },
+        "original_choice": "b"
+      }
+    ],
+    "selection_status": "disagreement",
+    "order_consistent": false,
+    "comparison_relation": "independent",
+    "comparison_protocol_version": "bidirectional-text-compare-0.1",
+    "source": "bidirectional_model_self_review",
+    "quality_verified": false,
+    "elapsed_seconds": 4.672
+  },
+  "purpose": "live selection protocol smoke test, not literary quality evaluation"
+}

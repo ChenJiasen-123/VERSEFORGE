@@ -2,7 +2,7 @@
 import time
 from dataclasses import asdict
 from .core import compose
-from .aesthetics import compare, failure_code
+from .aesthetics import compare_bidirectional as compare, failure_code
 
 
 def compose_candidates(task, client, count=1, max_revisions=2, budget=120,

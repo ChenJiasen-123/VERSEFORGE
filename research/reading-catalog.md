@@ -88,6 +88,9 @@
 | 叫化活该 | 本地HTTP取得网页转录全文并通读 | [reading-notes-27.md](reading-notes-27.md) | [来源](https://xuoda.com/xdmj/xzm/zmds/28.htm) |
 | 石虎胡同七号 | 四段网页转录全文，本地HTTP取得 | [reading-notes-30.md](reading-notes-30.md) | [来源](https://xuoda.com/xdmj/xzm/zmds/26.htm) |
 | 乡村里的音籁 | 二十行网页全文 | [reading-notes-36.md](reading-notes-36.md) | [来源](https://xuoda.com/xdmj/xzm/zmds/21.htm) |
+| 拜献 | 网页转录14行全文，原刊信息待核 | [reading-notes-38.md](reading-notes-38.md) | [来源](https://zh.wikisource.org/zh-hant/拜獻) |
+| 我有一个恋爱 | 网页转录25行全文，异文注释不计正文 | [reading-notes-38.md](reading-notes-38.md) | [来源](https://zh.wikisource.org/wiki/我有一個戀愛) |
+| 残诗 | 全篇复读：呼告与回应，非新增作品 | [reading-notes-38.md](reading-notes-38.md) | [来源](https://zh.wikisource.org/zh-hans/殘詩) |
 
 ## 林徽因
 

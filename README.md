@@ -1,4 +1,4 @@
-# 诗词创作 Agent
+# VERSEFORGE · 诗词创作 Agent
 
 Python 3.11+，标准库运行，调用 DeepSeek API。当前聚焦文本审美、创作、改稿与格律；按用户最新选择，不推进参数训练或朗读开发。
 

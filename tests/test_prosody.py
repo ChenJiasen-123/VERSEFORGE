@@ -47,3 +47,6 @@ class ProsodyTests(unittest.TestCase):
         self.assertEqual(r['status'], 'failed')
         self.assertEqual(r['findings'][0]['character'], 1)
         self.assertEqual(r['findings'][-1]['status'], 'failed')
+        self.assertEqual(r['findings'][-1]['positions'], [
+            {'line': 1, 'character': 1, 'text': '甲', 'resolved_group': 'a'},
+            {'line': 1, 'character': 2, 'text': '乙', 'resolved_group': 'b'}])

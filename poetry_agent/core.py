@@ -141,6 +141,23 @@ CLASSICAL_AESTHETIC = '''
 '''
 
 
+def metrical_revision_feedback(poem, task):
+    """Carry rule evidence to repair without upgrading unresolved readings."""
+    if task.genre == 'qijue' and task.qijue_pattern:
+        report = qijue_evidence(poem['lines'], task.qijue_pattern)['basic_target_check']
+    elif task.genre == 'ci' and task.ci_profile:
+        report = ci_evidence(poem['lines'], task.ci_profile)['tone_check']
+    else:
+        return None
+    return {'status': report['status'], 'rule_source': report['rule_source'],
+            'scope': report['scope'],
+            'findings_to_review': [x for x in report['findings'] if x['status'] in ('failed', 'unknown')],
+            'confirmed_tone_positions': [
+                {'line': x['line'], 'character': x['character'], 'tone': x['actual_tone']}
+                for x in report['findings'] if x['kind'] == 'tone' and x['status'] == 'pass'],
+            'instruction': 'P为平、Z为仄。failed是所选谱与当前资料下明确不符，修改时保护其他已通过位置并兼顾诗意。unknown仅表示缺字或读音、归部未决，不等于错字，不要为消除unknown而机械换字；不得自行选择合谱读音冒充语境核验。每稿仍须重新检查；不构成完整合律认证。'}
+
+
 def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision_scope='local'):
     if revision_scope not in ('local', 'rewrite'):
         raise ValueError('revision_scope须为local或rewrite')
@@ -163,8 +180,13 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
             payload['metrical_target'] = specification(task.qijue_pattern)
         if task.ci_profile:
             payload['ci_target'] = ci_specification(task.ci_profile)
+        feedback = None
         if prior is not None:
             payload["revision"] = prior
+            if prior.get('draft'):
+                feedback = metrical_revision_feedback(prior['draft'], task)
+                if feedback is not None:
+                    payload['revision']['metrical_feedback'] = feedback
         if revision_anchor and revision_scope == 'local':
             payload['revision_limits'] = {'max_lines': len(revision_anchor['lines']),
                 'max_body_characters': sum(map(len, revision_anchor['lines'])),
@@ -187,6 +209,7 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
             poem, issues = None, [str(exc)]
         history.append({"poem": asdict(poem) if poem else None, "issues": issues,
                         "usage": response.get("usage", {}), "attempt": attempt + 1,
+                        'metrical_feedback_sent': feedback,
                         'request_settings': response.get('request_settings')})
         if poem and not issues:
             if not aesthetic or client.mock or attempt >= max_revisions:

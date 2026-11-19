@@ -62,7 +62,11 @@ def validate(lines, tones, rhyme_positions, lexicon, rule_source, contextual_rea
             findings.append(item)
     groups = [resolved.get(pos) for pos in rhyme_positions]
     rhyme_status = 'unknown' if len(groups) < 2 or None in groups else ('pass' if len(set(groups)) == 1 else 'failed')
-    findings.append({'kind': 'rhyme', 'status': rhyme_status, 'groups': groups})
+    findings.append({'kind': 'rhyme', 'status': rhyme_status, 'groups': groups,
+                     'positions': [
+                         {'line': i + 1, 'character': j + 1, 'text': lines[i][j],
+                          'resolved_group': resolved.get((i, j))}
+                         for i, j in rhyme_positions]})
     statuses = {x['status'] for x in findings}
     return {'status': 'failed' if 'failed' in statuses else ('unknown' if 'unknown' in statuses else 'pass'),
             'rule_source': rule_source, 'findings': findings, 'scope': 'supplied_rules_only'}

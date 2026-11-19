@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch
 
 from poetry_agent.client import DeepSeekClient
-from poetry_agent.core import Poem, Task, check, compose
+from poetry_agent.core import Poem, Task, check, compose, metrical_revision_feedback
 
 
 class SequenceClient:
@@ -24,6 +24,33 @@ def output(lines):
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_metric_feedback_distinguishes_mismatch_from_unresolved_reading(self):
+        lines = ['雨雷送雨漲春江', '柳岸初晴燕影雙', '石徑微寒花尚濕', '歸舟半掩小篷窗']
+        feedback = metrical_revision_feedback({'lines': lines}, Task('雨', genre='qijue', qijue_pattern='ping_rhyme'))
+        first = next(x for x in feedback['findings_to_review'] if x.get('line') == 1 and x.get('character') == 1)
+        self.assertEqual((first['status'], first['text'], first['expected_tone']), ('failed', '雨', 'P'))
+        self.assertTrue(any(x['status'] == 'unknown' for x in feedback['findings_to_review']))
+        self.assertIn('unknown仅表示', feedback['instruction'])
+        self.assertIsNone(metrical_revision_feedback({'lines': ['雨']}, Task('雨')))
+
+    def test_each_metrical_repair_is_rechecked_and_new_rhyme_error_is_sent_back(self):
+        original = ['新雷送雨漲春江', '柳岸初晴燕影雙', '石徑微寒花尚濕', '歸舟半掩小篷窗']
+        first = ['雨' + original[0][1:]] + original[1:]
+        second = original[:-1] + [original[-1][:-1] + '東']
+        client = SequenceClient([output(first), output(second), output(original)])
+        with patch.object(client, 'complete', wraps=client.complete) as call:
+            result = compose(Task('雨', genre='qijue', qijue_pattern='ping_rhyme'), client)
+        self.assertEqual(result['poem']['lines'], original)
+        self.assertEqual(len(result['history']), 3)
+        sent = json.loads(call.call_args_list[2].args[1])['revision']['metrical_feedback']
+        rhyme = next(x for x in sent['findings_to_review'] if x['kind'] == 'rhyme')
+        self.assertEqual(rhyme['status'], 'failed')
+        self.assertEqual(rhyme['positions'][-1]['text'], '東')
+        self.assertEqual(rhyme['positions'][-1]['line'], 4)
+        self.assertEqual(result['history'][2]['metrical_feedback_sent'], sent)
+        self.assertEqual(result['history'][2]['issues'], [])
+        self.assertEqual(result['prosody']['basic_target_check']['status'], 'unknown')
+
     def test_revision_fixes_constraint(self):
         client = SequenceClient([output(["梦想在长江"]), output(["长江在窗外"] )])
         result = compose(Task("夜", forbidden_words=["梦想"], required_words=["长江"]), client)

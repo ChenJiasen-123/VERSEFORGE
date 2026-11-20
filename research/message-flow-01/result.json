@@ -1,0 +1,237 @@
+{
+  "source": "user-provided poem; actual API review and revision, not parameter training",
+  "case": {
+    "prompt": "写给十年后的自己，但那时AI已替你回信。要求：写一首诗，不超过30行；诗中包含你写给十年后自己的一句话和一个自动回复/系统提示的片段（可以是短信、邮件退信、AI助手提醒），两者不得互相解释。",
+    "requirements": [
+      "不超过30行",
+      "包含你写给十年后自己的一句话",
+      "包含一个自动回复/系统提示的片段",
+      "两者不得互相解释"
+    ],
+    "poem": {
+      "title": "退回的信",
+      "lines": [
+        "我把一句话折进信封，收件人写：十年后的我。",
+        "胶水还没干，邮票已经翘起一角。",
+        "第二天早上，邮箱里躺着一封退回的信。",
+        "发件人：自动应答服务。正文只有编号。",
+        "编号下写着：您投递的地址已停用，",
+        "请确认收件人是否仍在此处居住。",
+        "我拆开自己的信，字迹还没变旧，",
+        "墨水的蓝像刚下过雨的天。",
+        "那句话没有被读，也没有被拒，",
+        "只是被转交给一个没有面孔的地址。",
+        "系统提示又追加一行：本次回信由机器人代写，",
+        "如非本人操作，请忽略此消息。",
+        "我关掉屏幕，把信纸摊平在桌上，",
+        "十年后的我，此刻正在别处签收什么？",
+        "自动回复又说：您的消息已存档，",
+        "有效期至发件人注销之日。",
+        "我把邮票重新舔湿，贴向信封另一面，",
+        "那里印着一行小字：寄件人待定。",
+        "窗外的邮筒吞下另一封信，",
+        "它没有问我谁在等回音。"
+      ]
+    },
+    "source": "user-provided poem and explicitly requested API-flow correction, 2026-11-20"
+  },
+  "model": "deepseek-flash",
+  "initial_report": {
+    "protocol": "requirement-checks-0.3",
+    "complete": true,
+    "confirmed": false,
+    "checks": [
+      {
+        "id": "r1",
+        "status": "satisfied",
+        "source_id": "s2",
+        "evidence": "",
+        "reason": "全诗共20行，未超过30行。",
+        "source_quote": "要求：写一首诗，不超过30行",
+        "requirement": "不超过30行"
+      },
+      {
+        "id": "r2",
+        "status": "uncertain",
+        "source_id": "s3",
+        "evidence": "我把一句话折进信封，收件人写：十年后的我。",
+        "reason": "首行明确写出写信人把一句话写给十年后的自己，具有明确的书写关系。",
+        "source_quote": "诗中包含你写给十年后自己的一句话和一个自动回复/系统提示的片段（可以是短信、邮件退信、AI助手提醒），两者不得互相解释",
+        "requirement": "包含你写给十年后自己的一句话",
+        "evidence_issue": "deictic_reference_not_passage_evidence"
+      },
+      {
+        "id": "r3",
+        "status": "satisfied",
+        "source_id": "s3",
+        "evidence": "系统提示又追加一行：本次回信由机器人代写，",
+        "reason": "诗中包含明确的系统提示片段，且标明由机器人代写。",
+        "source_quote": "诗中包含你写给十年后自己的一句话和一个自动回复/系统提示的片段（可以是短信、邮件退信、AI助手提醒），两者不得互相解释",
+        "requirement": "包含一个自动回复/系统提示的片段"
+      },
+      {
+        "id": "r4",
+        "status": "uncertain",
+        "source_id": "s3",
+        "evidence": "",
+        "reason": "诗中那句写给未来自己的话与系统提示片段在内容上并未直接互相解释，但全诗以寄信、退信、转交等意象将二者置于同一叙事链条，是否构成“互相解释”不够明确，故存疑。",
+        "source_quote": "诗中包含你写给十年后自己的一句话和一个自动回复/系统提示的片段（可以是短信、邮件退信、AI助手提醒），两者不得互相解释",
+        "requirement": "两者不得互相解释"
+      }
+    ],
+    "violations": [],
+    "semantics_verified": false,
+    "repair_requests": [
+      {
+        "requirement": "包含你写给十年后自己的一句话",
+        "source_quote": "诗中包含你写给十年后自己的一句话和一个自动回复/系统提示的片段（可以是短信、邮件退信、AI助手提醒），两者不得互相解释",
+        "evidence_issue": "deictic_reference_not_passage_evidence",
+        "quote": "我把一句话折进信封，收件人写：十年后的我。",
+        "instruction": "尚未找到可确认的信中原话。核对全诗，若确实缺失则明写一句给未来自己的话，保留诗意，不用说明文字或收件人字段代替；不要求引用本提示中的固定例句。"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 975,
+      "completion_tokens": 220,
+      "total_tokens": 1195,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 975
+    }
+  },
+  "revision_input": {
+    "prompt": "写给十年后的自己，但那时AI已替你回信。要求：写一首诗，不超过30行；诗中包含你写给十年后自己的一句话和一个自动回复/系统提示的片段（可以是短信、邮件退信、AI助手提醒），两者不得互相解释。",
+    "revision": {
+      "draft": {
+        "title": "退回的信",
+        "lines": [
+          "我把一句话折进信封，收件人写：十年后的我。",
+          "胶水还没干，邮票已经翘起一角。",
+          "第二天早上，邮箱里躺着一封退回的信。",
+          "发件人：自动应答服务。正文只有编号。",
+          "编号下写着：您投递的地址已停用，",
+          "请确认收件人是否仍在此处居住。",
+          "我拆开自己的信，字迹还没变旧，",
+          "墨水的蓝像刚下过雨的天。",
+          "那句话没有被读，也没有被拒，",
+          "只是被转交给一个没有面孔的地址。",
+          "系统提示又追加一行：本次回信由机器人代写，",
+          "如非本人操作，请忽略此消息。",
+          "我关掉屏幕，把信纸摊平在桌上，",
+          "十年后的我，此刻正在别处签收什么？",
+          "自动回复又说：您的消息已存档，",
+          "有效期至发件人注销之日。",
+          "我把邮票重新舔湿，贴向信封另一面，",
+          "那里印着一行小字：寄件人待定。",
+          "窗外的邮筒吞下另一封信，",
+          "它没有问我谁在等回音。"
+        ]
+      },
+      "explicit_requirement_conflicts": [],
+      "content_evidence_to_resolve": [
+        {
+          "requirement": "包含你写给十年后自己的一句话",
+          "source_quote": "诗中包含你写给十年后自己的一句话和一个自动回复/系统提示的片段（可以是短信、邮件退信、AI助手提醒），两者不得互相解释",
+          "evidence_issue": "deictic_reference_not_passage_evidence",
+          "quote": "我把一句话折进信封，收件人写：十年后的我。",
+          "instruction": "尚未找到可确认的信中原话。核对全诗，若确实缺失则明写一句给未来自己的话，保留诗意，不用说明文字或收件人字段代替；不要求引用本提示中的固定例句。"
+        }
+      ],
+      "editing_instruction": "核对并补足给未来自己的实际原话，不只声称写过。保留原有有效关系，作必要的小范围修改；检查“正文只有编号”与后文是否矛盾，交代纸信与屏幕必要的媒介转换，不把想象全部改成写实说明。人的寄语和系统文字不得互相解释。"
+    }
+  },
+  "revision": {
+    "title": "退回的信",
+    "lines": [
+      "我把一句话折进信封，收件人写：十年后的我。",
+      "那句话是：别把怕说成忙，记得把窗打开。",
+      "胶水还没干，邮票已经翘起一角。",
+      "第二天早上，邮箱里躺着一封退回的信。",
+      "发件人：自动应答服务。正文只有编号和一行提示。",
+      "编号下写着：您投递的地址已停用，",
+      "请确认收件人是否仍在此处居住。",
+      "我拆开自己的信，字迹还没变旧，",
+      "墨水的蓝像刚下过雨的天。",
+      "那句话没有被读，也没有被拒，",
+      "只是被转交给一个没有面孔的地址。",
+      "系统提示又追加一行：本次回信由机器人代写，",
+      "如非本人操作，请忽略此消息。",
+      "我关掉屏幕，把信纸摊平在桌上，",
+      "十年后的我，此刻正在别处签收什么？",
+      "自动回复又说：您的消息已存档，",
+      "有效期至发件人注销之日。",
+      "我把邮票重新舔湿，贴向信封另一面，",
+      "那里印着一行小字：寄件人待定。",
+      "窗外的邮筒吞下另一封信，",
+      "它没有问我谁在等回音。"
+    ]
+  },
+  "revision_usage": {
+    "prompt_tokens": 1264,
+    "completion_tokens": 271,
+    "total_tokens": 1535,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 1264
+  },
+  "final_report": {
+    "protocol": "requirement-checks-0.3",
+    "complete": true,
+    "confirmed": true,
+    "checks": [
+      {
+        "id": "r1",
+        "status": "satisfied",
+        "source_id": "s2",
+        "evidence": "",
+        "reason": "全诗共21行，未超过30行。",
+        "source_quote": "要求：写一首诗，不超过30行",
+        "requirement": "不超过30行"
+      },
+      {
+        "id": "r2",
+        "status": "satisfied",
+        "source_id": "s3",
+        "evidence": "别把怕说成忙，记得把窗打开。",
+        "reason": "诗中明确写出‘那句话是：’并给出写给十年后自己的原话。",
+        "source_quote": "诗中包含你写给十年后自己的一句话和一个自动回复/系统提示的片段（可以是短信、邮件退信、AI助手提醒），两者不得互相解释",
+        "requirement": "包含你写给十年后自己的一句话"
+      },
+      {
+        "id": "r3",
+        "status": "satisfied",
+        "source_id": "s3",
+        "evidence": "系统提示又追加一行：本次回信由机器人代写，",
+        "reason": "包含明确的系统提示片段，说明自动回复/机器人代写。",
+        "source_quote": "诗中包含你写给十年后自己的一句话和一个自动回复/系统提示的片段（可以是短信、邮件退信、AI助手提醒），两者不得互相解释",
+        "requirement": "包含一个自动回复/系统提示的片段"
+      },
+      {
+        "id": "r4",
+        "status": "satisfied",
+        "source_id": "s3",
+        "evidence": "",
+        "reason": "所写给自己的话是劝告内容，系统提示只说明退信、代写和存档状态，两者没有互相解释或互相定义。",
+        "source_quote": "诗中包含你写给十年后自己的一句话和一个自动回复/系统提示的片段（可以是短信、邮件退信、AI助手提醒），两者不得互相解释",
+        "requirement": "两者不得互相解释"
+      }
+    ],
+    "violations": [],
+    "semantics_verified": false,
+    "repair_requests": [],
+    "usage": {
+      "prompt_tokens": 995,
+      "completion_tokens": 195,
+      "total_tokens": 1190,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 739
+    }
+  }
+}

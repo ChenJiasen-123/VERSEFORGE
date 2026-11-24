@@ -6,9 +6,10 @@ from .aesthetics import review,compare_bidirectional,failure_code
 from .core import SYSTEM,MODERN_AESTHETIC,CLASSICAL_AESTHETIC,Poem,check,_metrical_target_and_report
 from .requirement_checks import safe_review
 from .editor_selection import select_revision,compliance_repair_priority
+from .proofreading import proofread
 
 
-def edit_once(prompt,poem,task,requirements,client):
+def edit_once(prompt,poem,task,requirements,client,*,proofread_text=False):
     result={'original':poem,'poem':poem,'drafts':[poem],'adopted':False,
             'protocol':'independent-editor-0.1','quality_verified':False}
     upstream=client
@@ -23,18 +24,28 @@ def edit_once(prompt,poem,task,requirements,client):
     # Review the text against the user prompt, not the writer's rationale.
     review_task={'topic':prompt,'genre':task.genre,'max_lines':task.max_lines}
     try:
+        copy_issues=[]
+        if proofread_text and task.genre=='modern':
+            result['proofreading']=proofread(poem,client)
+            copy_issues=result['proofreading']['issues']
         original_meter=_metrical_target_and_report(poem,task) if task.genre!='modern' else None
         if original_meter is not None:result['original_meter']=original_meter[1]
         result['original_requirements']=safe_review(prompt,poem,requirements,client)
-        result['review']=review(poem,review_task,client,60)
+        if copy_issues:
+            result['review']={'assessment':{'decision':'revise','preserve':'原有正文语义与语言关系',
+                'problem':'独立校对提出文字问题，先作最小修复并复核。','suggestion':'仅处理copyediting_suggestions，不扩写。',
+                'tradeoff':'避免连带改变原有文字。'},'source':'copyediting_priority_not_literary_review'}
+        else:
+            result['review']=review(poem,review_task,client,60)
         known_conflicts=bool(result['original_requirements'].get('violations') or result['original_requirements'].get('repair_requests')
                              or (original_meter and original_meter[1]['status']=='failed'))
-        if result['review']['assessment']['decision']=='keep' and not known_conflicts:
+        if result['review']['assessment']['decision']=='keep' and not known_conflicts and not copy_issues:
             result['status']='no_revision_requested'
             return result
         payload={'task':asdict(task),'revision':{'draft':poem,'editor':result['review']['assessment'],
             'instruction':'处理最重要的问题，保护已成立的语言、声音和全篇关系；不要为了顺滑把陌生表达改成说明。遵守原题全部硬要求。'},'original_prompt':prompt}
         payload['revision']['original_requirement_report']=result['original_requirements']
+        payload['revision']['copyediting_suggestions']=copy_issues
         if task.genre != 'modern':
             initial_meter=original_meter
             if initial_meter is not None:
@@ -57,6 +68,18 @@ def edit_once(prompt,poem,task,requirements,client):
         if result['hard_issues'] or not result['requirements']['confirmed']:
             result['status']='revision_constraints_unconfirmed'
             return result
+        if proofread_text and task.genre=='modern':
+            result['revision_proofreading']=proofread(revised,client)
+            if result['revision_proofreading']['issues']:
+                result['status']='revision_copyediting_unresolved'
+                return result
+            # A punctuation-only repair need not compete aesthetically with a typo.
+            import re
+            letters=lambda p:re.sub(r'[^\w]','',''.join(p['lines']))
+            if copy_issues and poem['title']==revised['title'] and letters(poem)==letters(revised):
+                result['poem']=revised;result['adopted']=True
+                result['status']='copyedit_repair_selected'
+                return result
         if compliance_repair_priority(result['original_requirements'],result['requirements'],result['hard_issues']):
             result['poem']=revised;result['adopted']=True
             result['status']='compliance_repair_selected'
@@ -93,7 +116,7 @@ def edit_rounds(prompt,poem,task,requirements,client,*,max_rounds=3,max_calls=18
         if calls>=max_calls or time.monotonic()-started>=budget_seconds:
             stop='budget_exhausted';break
         current_task=replace(task,extra_requirements=task.extra_requirements+feedback)
-        row=edit_once(prompt,selected,current_task,requirements,BudgetClient())
+        row=edit_once(prompt,selected,current_task,requirements,BudgetClient(),proofread_text=True)
         rounds.append(row);drafts.extend(row['drafts'][1:])
         if row['adopted']:
             selected=row['poem']

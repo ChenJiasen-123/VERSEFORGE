@@ -1,0 +1,50 @@
+{
+  "poem": {
+    "title": "获奖感言练习",
+    "lines": [
+      "微波炉转了第二圈，我清清嗓子，",
+      ":“谢谢大家——”，勺子碰着碗沿，",
+      "没有人停下手里的活来接这句话。",
+      "窗上的水汽把厨房抹成毛玻璃，",
+      "我对着那层白说：“感谢我的家人。”",
+      "话音落进剩饭里，像一粒没热透的米。",
+      "空罐头瓶立在灶台边，瓶口朝上，",
+      "我把手按上去，凉的，正好一握。",
+      "我又念了一遍，这次慢些，",
+      "让每个字都够时间飘到客厅，",
+      "落在父亲的报纸上，母亲的针线里，",
+      "然后关火，端碗，坐下吃这顿没有掌声的饭。"
+    ]
+  },
+  "model": "deepseek-flash",
+  "result": {
+    "issues": [
+      {
+        "line": 2,
+        "quote": ":“谢谢大家——”，勺子碰着碗沿，",
+        "reason": "行首残留半角冒号，且全角冒号与半角冒号重复粘贴",
+        "suggestion": "删除行首半角冒号，改为“：“谢谢大家——”，勺子碰着碗沿，”"
+      }
+    ],
+    "response": {
+      "content": "{\"issues\":[{\"line\":2,\"quote\":\":“谢谢大家——”，勺子碰着碗沿，\",\"reason\":\"行首残留半角冒号，且全角冒号与半角冒号重复粘贴\",\"suggestion\":\"删除行首半角冒号，改为“：“谢谢大家——”，勺子碰着碗沿，”\"}]}",
+      "usage": {
+        "prompt_tokens": 308,
+        "completion_tokens": 72,
+        "total_tokens": 380,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 308
+      },
+      "request_settings": {
+        "max_tokens": 2048,
+        "response_format": "json_object",
+        "thinking": "disabled"
+      }
+    },
+    "quality_verified": false,
+    "protocol": "copyedit-0.1"
+  }
+}

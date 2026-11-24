@@ -8,6 +8,12 @@ class Client:
         return {'content':'{"title":"新","lines":["新的一行"]}'}
 
 class EditorTests(unittest.TestCase):
+    @patch('poetry_agent.editor.proofread',side_effect=[{'issues':[{'quote':':','reason':'残留','suggestion':'删去'}]},{'issues':[]}])
+    @patch('poetry_agent.editor.safe_review',return_value={'complete':True,'confirmed':True})
+    @patch('poetry_agent.editor.review',return_value={'assessment':{'decision':'keep'}})
+    def test_punctuation_only_repair_rechecked_without_human_selection(self,review,requirements,copyedit):
+        r=edit_once('题',{'title':'新','lines':[':新的一行']},Task('诗','modern',30),[],Client(),proofread_text=True)
+        self.assertEqual(r['status'],'copyedit_repair_selected');self.assertTrue(r['adopted'])
     @patch('poetry_agent.editor._metrical_target_and_report',side_effect=[({}, {'status':'failed'}),({}, {'status':'pass'})])
     @patch('poetry_agent.editor.safe_review',return_value={'complete':True,'confirmed':True})
     @patch('poetry_agent.editor.review',return_value={'assessment':{'decision':'keep'}})

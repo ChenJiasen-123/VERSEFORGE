@@ -24,6 +24,16 @@ def copy_inputs(root):
 
 
 class AestheticExampleTests(unittest.TestCase):
+    def test_relation_mode_does_not_expose_original_fragments(self):
+        class Capture(MockClient):
+            def complete(self,system,user,timeout):
+                self.payload=json.loads(user)
+                return super().complete(system,user,timeout)
+        client=Capture()
+        result=compose(Task('题'),client,aesthetic=True,use_examples=True,example_relations_only=True,max_revisions=0)
+        self.assertNotIn('examples',client.payload['positive_examples'])
+        self.assertIn('principles',client.payload['positive_examples'])
+        self.assertEqual(result['aesthetic_examples']['exposure'],'relation_analysis_without_original_fragments')
     def test_fragments_keep_user_words_separate_from_editor_analysis(self):
         payload, meta = load_examples()
         self.assertEqual(len(payload['examples']), 3)

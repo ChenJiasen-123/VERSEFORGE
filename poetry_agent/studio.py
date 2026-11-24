@@ -115,6 +115,8 @@ def run_studio(prompt, hint='auto', preference='', previous=None, progress=lambd
             kwargs['max_tokens'] = 8192 if task.genre != 'modern' else 4096
             return client.complete(system, user, **kwargs)
     run = compose(task, Writer(), max_revisions=0, budget=100, aesthetic=True,
+                  use_examples=task.genre=='modern',
+                  example_relations_only=True,
                   generation_thinking='enabled' if task.genre != 'modern' else 'disabled')
     if not run['poem']:
         raise ValueError('没有得到有效作品')
@@ -162,6 +164,7 @@ def run_studio(prompt, hint='auto', preference='', previous=None, progress=lambd
             final_report = next(row for row in reversed(editorial['rounds']) if row['adopted'])['requirements']
     return {'status': 'completed', 'protocol': STUDIO_PROTOCOL, 'poem': poem, 'brief': brief, 'drafts': drafts,
             'editorial': editorial,
+            'generation_examples':run.get('aesthetic_examples'),
             'task': asdict(task), 'model': client.model, 'checks': {'initial_hard_issues': run['issues'],
                 'initial_requirement_conflicts': verified, 'final_hard_issues': check(Poem(**poem), task),
                 'initial_requirement_report': initial_report, 'final_requirement_report': final_report,

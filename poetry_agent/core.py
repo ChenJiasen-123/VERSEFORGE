@@ -161,6 +161,7 @@ MODERN_AESTHETIC = """
 寄语、请求和承诺应由这次处境产生，不靠一句可换到任何诗里的生活忠告完成任务；不要求补写背景说明，可用当下的动作或关系赋予它分量。
 故事可以很小，也可以没有显式故事；抽象、直陈、诙谐或奇想都可以准确，不统一写成安静的物件观察。
 热烈的呼告、公开的宣告与轻声私语都可成立。多个比喻须推动处境变化，不让每个物件轮流注解同一种情绪；也不强制删掉有作用的反复与声势。
+多人面对同一件事或听见同一声音时，不自动赋予相同感受或彼此理解，也不为反转强排对立；让不同处境通过动作、说话或等待显出，允许其中一方的内心保持未知。
 不为押韵扭曲语序或添加空泛填词，不要求每行都押韵。
 修订时保护已有的独特关系与声音，不把成立的陌生表达磨成稳妥的同义解释。只改真正影响表达或硬条件的部分，局部问题优先在原篇幅内解决。
 新奇须有全诗支持，不靠随机拟人、堆比喻或先造漂亮句再补道具；不能复刻参考作品的物件、数字、动作链或结尾模板。
@@ -228,7 +229,7 @@ def metrical_revision_feedback(poem, task):
             'instruction': 'P为平、Z为仄。failed是所选谱与当前资料下明确不符，修改时保护其他已通过位置并兼顾诗意。unknown仅表示缺字或读音、归部未决，不等于错字，不要为消除unknown而机械换字；不得自行选择合谱读音冒充语境核验。每稿仍须重新检查；不构成完整合律认证。'}
 
 
-def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision_scope='local', *, use_examples=False, generation_thinking=None):
+def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision_scope='local', *, use_examples=False, generation_thinking=None, example_relations_only=False):
     if revision_scope not in ('local', 'rewrite'):
         raise ValueError('revision_scope须为local或rewrite')
     if type(max_revisions) is not int or not 0 <= max_revisions <= 2:
@@ -240,6 +241,12 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
     if generation_thinking not in (None, 'enabled', 'disabled'):
         raise ValueError('生成思考模式须为enabled、disabled或不指定')
     examples, examples_metadata = load_examples() if use_examples else (None, None)
+    if examples is not None and example_relations_only:
+        examples={'instruction':'学习关系的作用，不复刻数字、道具、动作链或结尾结构。',
+                  'principles':['让动作的后果获得可经历的形态，而非用物件代换抽象名词。',
+                                '幽默可来自经验和自我评价错位，不必靠拟人或反转。',
+                                '声音可以参与邀请、等待和选择，不能只作气氛装饰。']}
+        examples_metadata={**examples_metadata,'exposure':'relation_analysis_without_original_fragments'}
     extra = MODERN_AESTHETIC if task.genre == 'modern' else CLASSICAL_AESTHETIC
     system = SYSTEM + extra if aesthetic else SYSTEM
     started = time.monotonic()

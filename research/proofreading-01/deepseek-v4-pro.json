@@ -1,0 +1,50 @@
+{
+  "poem": {
+    "title": "获奖感言练习",
+    "lines": [
+      "微波炉转了第二圈，我清清嗓子，",
+      ":“谢谢大家——”，勺子碰着碗沿，",
+      "没有人停下手里的活来接这句话。",
+      "窗上的水汽把厨房抹成毛玻璃，",
+      "我对着那层白说：“感谢我的家人。”",
+      "话音落进剩饭里，像一粒没热透的米。",
+      "空罐头瓶立在灶台边，瓶口朝上，",
+      "我把手按上去，凉的，正好一握。",
+      "我又念了一遍，这次慢些，",
+      "让每个字都够时间飘到客厅，",
+      "落在父亲的报纸上，母亲的针线里，",
+      "然后关火，端碗，坐下吃这顿没有掌声的饭。"
+    ]
+  },
+  "model": "deepseek-v4-pro",
+  "result": {
+    "issues": [
+      {
+        "line": 2,
+        "quote": ":“谢谢大家——”，勺子碰着碗沿，",
+        "reason": "行首出现疑似残留的英文冒号（:），建议删除或统一为中文冒号。",
+        "suggestion": "删除行首冒号，改为“谢谢大家——”，勺子碰着碗沿，"
+      }
+    ],
+    "response": {
+      "content": "{\n  \"issues\": [\n    {\n      \"line\": 2,\n      \"quote\": \":“谢谢大家——”，勺子碰着碗沿，\",\n      \"reason\": \"行首出现疑似残留的英文冒号（:），建议删除或统一为中文冒号。\",\n      \"suggestion\": \"删除行首冒号，改为“谢谢大家——”，勺子碰着碗沿，\"\n    }\n  ]\n}",
+      "usage": {
+        "prompt_tokens": 305,
+        "completion_tokens": 89,
+        "total_tokens": 394,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 305
+      },
+      "request_settings": {
+        "max_tokens": 2048,
+        "response_format": "json_object",
+        "thinking": "disabled"
+      }
+    },
+    "quality_verified": false,
+    "protocol": "copyedit-0.1"
+  }
+}

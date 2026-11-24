@@ -65,8 +65,9 @@ class Studio:
             phase = state
             self.update(identity, state)
         try:
+            options = {'independent_editor': True} if self.runner is run_studio else {}
             result = self.runner(data['prompt'], data['genre'], data['preference'], data.get('previous'),
-                                 progress=progress)
+                                 progress=progress, **options)
             self.update(identity, 'completed', result)
         except Exception as error:
             code = failure_code(error)

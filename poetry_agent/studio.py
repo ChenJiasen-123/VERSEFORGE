@@ -6,8 +6,9 @@ from .client import DeepSeekClient
 from .core import Task, Poem, compose, check, SYSTEM, MODERN_AESTHETIC, CLASSICAL_AESTHETIC, _metrical_target_and_report
 from .requirement_checks import safe_review, ensure_content_requirement
 from .context_review import body_hash
+from .task_modality import preserve_optional_clauses
 
-STUDIO_PROTOCOL = 'studio-0.4.1'
+STUDIO_PROTOCOL = 'studio-0.5'
 
 
 def final_meter(poem, task):
@@ -56,6 +57,7 @@ def interpret(prompt, hint, preference, previous, client):
     for name in ('requirements', 'examples', 'required_words', 'forbidden_words'):
         brief[name] = _strings(brief.get(name))
     brief['requirements'] = ensure_content_requirement(prompt, brief['requirements'])
+    brief['requirements'] = preserve_optional_clauses(prompt, brief['requirements'])
     brief['directions'] = _strings(brief.get('directions'), 3)
     selected = brief.get('selected_direction')
     if len(brief['directions']) != 3 or type(selected) is not int or not 0 <= selected < 3:
@@ -87,7 +89,7 @@ def interpret(prompt, hint, preference, previous, client):
     return brief, task
 
 
-def run_studio(prompt, hint='auto', preference='', previous=None, progress=lambda _: None, client=None):
+def run_studio(prompt, hint='auto', preference='', previous=None, progress=lambda _: None, client=None, independent_editor=False):
     client = client or DeepSeekClient()
     progress('planning')
     brief, task = interpret(prompt, hint, preference, previous, client)
@@ -131,7 +133,17 @@ def run_studio(prompt, hint='auto', preference='', previous=None, progress=lambd
                 final_report = safe_review(prompt, poem, brief['requirements'], client)
         except (ValueError, RuntimeError, KeyError, TypeError):
             pass
+    editorial = None
+    if independent_editor and task.genre == 'modern':
+        from .editor import edit_once
+        progress('checking')
+        editorial = edit_once(prompt, poem, task, brief['requirements'], client)
+        drafts.extend(editorial['drafts'][1:])
+        if editorial['adopted']:
+            poem = editorial['poem']
+            final_report = editorial['requirements']
     return {'status': 'completed', 'protocol': STUDIO_PROTOCOL, 'poem': poem, 'brief': brief, 'drafts': drafts,
+            'editorial': editorial,
             'task': asdict(task), 'model': client.model, 'checks': {'initial_hard_issues': run['issues'],
                 'initial_requirement_conflicts': verified, 'final_hard_issues': check(Poem(**poem), task),
                 'initial_requirement_report': initial_report, 'final_requirement_report': final_report,

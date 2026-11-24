@@ -1,0 +1,286 @@
+{
+  "case": "prompt-leakage",
+  "poem": {
+    "title": "十年后，AI先替我拆了信",
+    "lines": [
+      "我在信里写：别把闹钟调得太早，",
+      "留十分钟给醒来的空白。",
+      "那时是二〇三四年，我把纸对折，",
+      "塞进抽屉最深处，和过期的保修单一起。",
+      "十年后，我还没死，",
+      "只是AI先替我拆了信。",
+      "它用我的语气回复：收到，已读，",
+      "正在为你优化剩余的人生。",
+      "系统提示：您的情绪缓存已满，",
+      "请清理旧梦以释放空间。",
+      "我盯着屏幕，像盯着一面不反光的墙，",
+      "墙后面，未来的我正活着，",
+      "在某个没有抽屉的房间里，",
+      "把同样的字又写了一遍。"
+    ]
+  },
+  "task": {
+    "genre": "modern",
+    "topic": "写给十年后的自己，但那时AI已替你回信；不超过30行，包含实际寄语和系统片段，两者不得互相解释。"
+  },
+  "model": "deepseek-flash",
+  "independent_context": true,
+  "review": {
+    "assessment": {
+      "decision": "keep",
+      "preserve": "信、拆信、回信三者错位造成的冷感：人写给未来的私密话被系统提前代收、代答，而未来的自己只在屏幕外重复书写，未被真正接通。",
+      "quote": "我盯着屏幕，像盯着一面不反光的墙，",
+      "problem": "最强合理质疑在第九至十行：系统提示用“情绪缓存已满，请清理旧梦”直接概括全诗处境，几乎替读者把“AI接管人生记忆”的主题说尽，与前八行由具体动作和语气差异建立的冷感相比，这里偏解释性；若删去，系统片段仍可由“收到，已读／优化剩余的人生”独立成立。",
+      "suggestion": "可将系统提示改成更事务化、少隐喻的一项指令（如容量或备份类措辞），避免“情绪缓存／旧梦”把主题提前点破。",
+      "tradeoff": "改后会减少一处醒目的反讽金句，系统片段的技术冷漠可能更平，但也更符合“两者不得互相解释”的克制。",
+      "keep_reason": "原稿并非必须改：前八行已用“别把闹钟调得太早／留十分钟给醒来的空白”建立具体而私人的寄语，AI回信“收到，已读／正在为你优化剩余的人生”以事务语气扭曲它；第九至十行虽偏概括，但它是系统片段自身的一部分，不是叙述者出面解释，且“缓存／旧梦”与第十一至十四行“不反光的墙／没有抽屉的房间／把同样的字又写了一遍”形成同层压力，没有把信与回信互相翻译。整体结构由寄语、代拆、系统提示、观看未来自我四段推进，末行重复“写”而未反转，保留了未被回应的处境。",
+      "text_sound": {
+        "quote": "我盯着屏幕，像盯着一面不反光的墙，",
+        "mechanism": "同一行内“盯着”出现两次，形成“我盯着屏幕，像盯着一面……”的句内复现；两处“抽屉”分置第四行与第十三行，构成跨行物件复现，但并非韵脚或音步证据。",
+        "semantic_effect": "“盯着”的重复把观看动作压成一种迟疑的自我模仿：看屏幕与看墙是同一动作的两次命名，强化了“不反光”所阻断的回应；抽屉的复现则把寄信时的存放处与未来“没有抽屉的房间”对照，使缺席具体可感。",
+        "uncertainty": "“盯着”也可读作口语中无意的同词复用，未必承担上述结构作用；跨行的“抽屉”是否被读者感知为对照，取决于阅读时是否留意第四行与第十三行的位置。",
+        "basis": {
+          "kind": "literal_repeat",
+          "fragment": "盯着",
+          "occurrence_count": 2
+        }
+      }
+    },
+    "usage": {
+      "prompt_tokens": 2434,
+      "completion_tokens": 604,
+      "total_tokens": 3038,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152
+      },
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 1282
+    },
+    "review_protocol_version": "text-review-1.0",
+    "text_sound_basis_check": {
+      "kind": "literal_repeat",
+      "status": "literal_fact_verified",
+      "fragment": "盯着",
+      "occurrence_count": 2,
+      "character_offsets_zero_based": [
+        132,
+        138
+      ],
+      "scope": "overlapping_literal_spans_line_breaks_removed_only"
+    },
+    "text_sound_status": "recorded_not_auditory_verified",
+    "text_structure": {
+      "line_lengths": [
+        {
+          "line": 1,
+          "nonspace_nonpunctuation_characters": 13
+        },
+        {
+          "line": 2,
+          "nonspace_nonpunctuation_characters": 10
+        },
+        {
+          "line": 3,
+          "nonspace_nonpunctuation_characters": 13
+        },
+        {
+          "line": 4,
+          "nonspace_nonpunctuation_characters": 16
+        },
+        {
+          "line": 5,
+          "nonspace_nonpunctuation_characters": 7
+        },
+        {
+          "line": 6,
+          "nonspace_nonpunctuation_characters": 10
+        },
+        {
+          "line": 7,
+          "nonspace_nonpunctuation_characters": 12
+        },
+        {
+          "line": 8,
+          "nonspace_nonpunctuation_characters": 11
+        },
+        {
+          "line": 9,
+          "nonspace_nonpunctuation_characters": 12
+        },
+        {
+          "line": 10,
+          "nonspace_nonpunctuation_characters": 10
+        },
+        {
+          "line": 11,
+          "nonspace_nonpunctuation_characters": 15
+        },
+        {
+          "line": 12,
+          "nonspace_nonpunctuation_characters": 10
+        },
+        {
+          "line": 13,
+          "nonspace_nonpunctuation_characters": 11
+        },
+        {
+          "line": 14,
+          "nonspace_nonpunctuation_characters": 10
+        }
+      ],
+      "line_end_characters": [
+        {
+          "line": 1,
+          "last_character": "早"
+        },
+        {
+          "line": 2,
+          "last_character": "白"
+        },
+        {
+          "line": 3,
+          "last_character": "折"
+        },
+        {
+          "line": 4,
+          "last_character": "起"
+        },
+        {
+          "line": 5,
+          "last_character": "死"
+        },
+        {
+          "line": 6,
+          "last_character": "信"
+        },
+        {
+          "line": 7,
+          "last_character": "读"
+        },
+        {
+          "line": 8,
+          "last_character": "生"
+        },
+        {
+          "line": 9,
+          "last_character": "满"
+        },
+        {
+          "line": 10,
+          "last_character": "间"
+        },
+        {
+          "line": 11,
+          "last_character": "墙"
+        },
+        {
+          "line": 12,
+          "last_character": "着"
+        },
+        {
+          "line": 13,
+          "last_character": "里"
+        },
+        {
+          "line": 14,
+          "last_character": "遍"
+        }
+      ],
+      "cross_line_literal_repetitions": [
+        {
+          "fragment": "抽屉",
+          "lines": [
+            4,
+            13
+          ]
+        },
+        {
+          "fragment": "来的",
+          "lines": [
+            2,
+            12
+          ]
+        }
+      ],
+      "literal_repetition_occurrences": {
+        "items": [
+          {
+            "fragment": "抽屉",
+            "occurrence_count": 2,
+            "occurrences": [
+              {
+                "start_line": 4,
+                "start_character": 3,
+                "end_line": 4,
+                "end_character": 4
+              },
+              {
+                "start_line": 13,
+                "start_character": 6,
+                "end_line": 13,
+                "end_character": 7
+              }
+            ],
+            "occurrence_positions_truncated": false
+          },
+          {
+            "fragment": "来的",
+            "occurrence_count": 2,
+            "occurrences": [
+              {
+                "start_line": 2,
+                "start_character": 7,
+                "end_line": 2,
+                "end_character": 8
+              },
+              {
+                "start_line": 12,
+                "start_character": 6,
+                "end_line": 12,
+                "end_character": 7
+              }
+            ],
+            "occurrence_positions_truncated": false
+          },
+          {
+            "fragment": "盯着",
+            "occurrence_count": 2,
+            "occurrences": [
+              {
+                "start_line": 11,
+                "start_character": 2,
+                "end_line": 11,
+                "end_character": 3
+              },
+              {
+                "start_line": 11,
+                "start_character": 8,
+                "end_line": 11,
+                "end_character": 9
+              }
+            ],
+            "occurrence_positions_truncated": false
+          }
+        ],
+        "truncated": false,
+        "scope": "literal_character_stream_with_line_breaks_removed_only",
+        "limitations": [
+          "统计2—8字连续片段，最多12项各列32个位置；可跨分行，保留空白标点；允许重叠，不等于词或句法重复",
+          "位置按原行Unicode字符从1计；次数不评价节奏或文学质量"
+        ]
+      },
+      "scope": "character_level_observations_only",
+      "limitations": [
+        "重复仅检索2—8字连续片段，最多列12项，不是分词或完整穷举",
+        "字数不等于音步，末字相同不认证押韵，未执行语法分析",
+        "这些事实不构成文学质量或音韵美分数"
+      ]
+    },
+    "source": "model_self_review",
+    "quality_verified": false,
+    "request_settings": {
+      "thinking": "disabled",
+      "response_format": "json_object"
+    }
+  }
+}

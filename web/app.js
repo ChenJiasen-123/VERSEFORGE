@@ -68,6 +68,12 @@ function render(job) {
  $('result-note').textContent=pending?'这版已生成。部分题目要求仍需确认，可展开题目理解或再换一个构思。':'';
  if(parallelPending) $('result-note').textContent+=' 律诗中间两联的对仗仍需人工核对。';
  if(meterPending) $('result-note').textContent+=' 平仄或押韵仍需核对，可展开逐项结果查看。';
+ const editorial=result.editorial;
+ if(editorial){
+  const notices={revision_selected:'独立审稿后采用了修订稿，仍可自行判断文字。',no_revision_requested:'独立审稿未建议修改。',revision_constraints_unconfirmed:'修订稿的题目要求尚未确认，保留编辑前版本。',revision_still_needs_editing:'修订稿仍有待修改之处，保留编辑前版本。',original_retained:'比较未支持替换，保留编辑前版本。',editor_incomplete:'独立审稿未完整完成，保留编辑前版本。'};
+  $('result-note').hidden=false;
+  $('result-note').textContent+=' '+(notices[editorial.status] || '独立审稿结果已记录。');
+ }
 }
 async function history() {
  const rows=await api('/api/jobs');

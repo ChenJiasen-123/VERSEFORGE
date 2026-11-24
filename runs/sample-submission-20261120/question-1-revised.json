@@ -1,0 +1,68 @@
+{
+  "poem": {
+    "title": "题白瓷杯",
+    "lines": [
+      "素面圆身晓色中",
+      "注泉细响未曾穷",
+      "旧磕浅痕犹暖指",
+      "晨来递到掌心同"
+    ]
+  },
+  "review": {
+    "protocol": "requirement-checks-0.3",
+    "complete": true,
+    "confirmed": false,
+    "checks": [
+      {
+        "id": "r1",
+        "status": "satisfied",
+        "source_id": "s3",
+        "evidence": "素面圆身晓色中",
+        "reason": "全诗四行七言，符合七绝。",
+        "source_quote": "要求：五绝或七绝一首，须在诗题中标注所题器物",
+        "requirement": "五绝或七绝一首，本题选七绝"
+      },
+      {
+        "id": "r2",
+        "status": "satisfied",
+        "source_id": "s3",
+        "evidence": "题白瓷杯",
+        "reason": "诗题中出现所题器物“白瓷杯”。",
+        "source_quote": "要求：五绝或七绝一首，须在诗题中标注所题器物",
+        "requirement": "诗题中必须标注所题器物"
+      },
+      {
+        "id": "r3",
+        "status": "satisfied",
+        "source_id": "s4",
+        "evidence": "素面圆身晓色中",
+        "reason": "全诗未见“杯”字或其名称。",
+        "source_quote": "诗中不得出现该器物的名称，只能写其形、声、用、痕",
+        "requirement": "诗中不得出现该器物的名称"
+      },
+      {
+        "id": "r4",
+        "status": "uncertain",
+        "source_id": "s4",
+        "evidence": "晨来递到掌心同",
+        "reason": "诗句主要写形、声、痕，但末句“晨来递到掌心同”涉及递送情景，是否严格限于器物的形、声、用、痕，判断不充分。",
+        "source_quote": "诗中不得出现该器物的名称，只能写其形、声、用、痕",
+        "requirement": "诗中只能写该器物的形、声、用、痕"
+      }
+    ],
+    "violations": [],
+    "semantics_verified": false,
+    "repair_requests": [],
+    "usage": {
+      "prompt_tokens": 821,
+      "completion_tokens": 195,
+      "total_tokens": 1016,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 565
+    }
+  },
+  "editor_feedback": "保留白瓷杯为器物，重写生硬的“圆姿”“指尖融”。七绝四句七字，平起首句入韵，押平水韵一东；只能写形声用痕，不出现杯瓷等器物名称。不用抽象总结。"
+}

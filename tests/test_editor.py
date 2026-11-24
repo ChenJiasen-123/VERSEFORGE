@@ -8,6 +8,11 @@ class Client:
         return {'content':'{"title":"新","lines":["新的一行"]}'}
 
 class EditorTests(unittest.TestCase):
+    def test_budget_exception_is_not_reported_as_service_outage(self):
+        class Exhausted:
+            def complete(self,*args,**kwargs):raise RuntimeError('编辑预算已用尽')
+        r=edit_once('题',{'title':'题','lines':['正文']},Task('诗'),[],Exhausted(),proofread_text=True)
+        self.assertEqual(r['failure_code'],'editor_budget_exhausted')
     @patch('poetry_agent.editor.proofread',side_effect=[{'issues':[{'quote':':','reason':'残留','suggestion':'删去'}]},{'issues':[]}])
     @patch('poetry_agent.editor.safe_review',return_value={'complete':True,'confirmed':True})
     @patch('poetry_agent.editor.review',return_value={'assessment':{'decision':'keep'}})

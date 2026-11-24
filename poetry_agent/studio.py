@@ -9,7 +9,7 @@ from .context_review import body_hash
 from .task_modality import preserve_optional_clauses
 from .meter_changes import compare_meter
 
-STUDIO_PROTOCOL = 'studio-0.6'
+STUDIO_PROTOCOL = 'studio-0.7'
 
 
 def meter_revision_guard(before_poem,after_poem,before,after):

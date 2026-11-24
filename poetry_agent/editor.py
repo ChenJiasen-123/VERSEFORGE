@@ -94,7 +94,8 @@ def edit_once(prompt,poem,task,requirements,client,*,proofread_text=False):
         result['poem']=result['selection']['poem'];result['adopted']=result['selection']['adopted']
         result['status']='revision_selected' if result['adopted'] else 'original_retained'
     except (ValueError,RuntimeError,KeyError,TypeError) as exc:
-        result['status']='editor_incomplete';result['failure_code']=failure_code(exc)
+        result['status']='editor_incomplete'
+        result['failure_code']='editor_budget_exhausted' if str(exc)=='编辑预算已用尽' else failure_code(exc)
     return result
 
 
@@ -118,6 +119,8 @@ def edit_rounds(prompt,poem,task,requirements,client,*,max_rounds=3,max_calls=18
         current_task=replace(task,extra_requirements=task.extra_requirements+feedback)
         row=edit_once(prompt,selected,current_task,requirements,BudgetClient(),proofread_text=True)
         rounds.append(row);drafts.extend(row['drafts'][1:])
+        if row.get('failure_code')=='editor_budget_exhausted':
+            stop='budget_exhausted';break
         if row['adopted']:
             selected=row['poem']
         if row['status']=='no_revision_requested':

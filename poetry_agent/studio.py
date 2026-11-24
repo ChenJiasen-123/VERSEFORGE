@@ -1,15 +1,16 @@
 """Prompt-to-poem studio: separate constraints/examples, then explore situations."""
 import json
 import re
-from dataclasses import asdict
+from dataclasses import asdict,replace
 from .client import DeepSeekClient
 from .core import Task, Poem, compose, check, SYSTEM, MODERN_AESTHETIC, CLASSICAL_AESTHETIC, _metrical_target_and_report
 from .requirement_checks import safe_review, ensure_content_requirement
 from .context_review import body_hash
 from .task_modality import preserve_optional_clauses
 from .meter_changes import compare_meter
+from .runtime_budget import BudgetedClient
 
-STUDIO_PROTOCOL = 'studio-0.7'
+STUDIO_PROTOCOL = 'studio-0.8'
 
 
 def meter_revision_guard(before_poem,after_poem,before,after):
@@ -101,8 +102,8 @@ def interpret(prompt, hint, preference, previous, client):
     return brief, task
 
 
-def run_studio(prompt, hint='auto', preference='', previous=None, progress=lambda _: None, client=None, independent_editor=False):
-    client = client or DeepSeekClient()
+def run_studio(prompt, hint='auto', preference='', previous=None, progress=lambda _: None, client=None, independent_editor=False,candidate_count=1,total_budget_seconds=240,total_max_calls=36):
+    client = BudgetedClient(client or DeepSeekClient(),total_budget_seconds,total_max_calls)
     progress('planning')
     brief, task = interpret(prompt, hint, preference, previous, client)
     if task is None:
@@ -114,11 +115,22 @@ def run_studio(prompt, hint='auto', preference='', previous=None, progress=lambd
         def complete(self, system, user, **kwargs):
             kwargs['max_tokens'] = 8192 if task.genre != 'modern' else 4096
             return client.complete(system, user, **kwargs)
-    run = compose(task, Writer(), max_revisions=0, budget=100, aesthetic=True,
+    from .candidates import compose_candidates
+    count=candidate_count if task.genre=='modern' else 1
+    tasks=[]
+    for index in range(count):
+        extra=re.sub(r'\n本次构思方向（可以自然调整，不可凌驾原题）：[^\n]*',
+                     lambda _: '\n本次构思方向（可以自然调整，不可凌驾原题）：'+brief['directions'][(brief['selected_direction']+index)%3],task.extra_requirements)
+        tasks.append(replace(task,extra_requirements=extra))
+    run = compose_candidates(task, Writer(), count=count,candidate_tasks=tasks,max_revisions=0, budget=100, aesthetic=True,
+                  comparison_task={'genre':task.genre,'topic':prompt,'max_lines':task.max_lines},
+                  candidate_evaluator=lambda p:safe_review(prompt,p,brief['requirements'],client),
                   use_examples=task.genre=='modern',
                   example_relations_only=True,
                   generation_thinking='enabled' if task.genre != 'modern' else 'disabled')
     if not run['poem']:
+        if client.summary()['exhausted']:
+            raise RuntimeError('全程模型预算已用尽')
         raise ValueError('没有得到有效作品')
     progress('checking')
     poem = run['poem']
@@ -164,7 +176,10 @@ def run_studio(prompt, hint='auto', preference='', previous=None, progress=lambd
             final_report = next(row for row in reversed(editorial['rounds']) if row['adopted'])['requirements']
     return {'status': 'completed', 'protocol': STUDIO_PROTOCOL, 'poem': poem, 'brief': brief, 'drafts': drafts,
             'editorial': editorial,
+            'runtime_budget':client.summary(),
             'generation_examples':run.get('aesthetic_examples'),
+            'candidate_runs':run.get('candidate_runs',[]),'candidate_selection':run.get('candidate_selection',[]),
+            'candidate_evaluations':run.get('candidate_evaluations',{}),
             'task': asdict(task), 'model': client.model, 'checks': {'initial_hard_issues': run['issues'],
                 'initial_requirement_conflicts': verified, 'final_hard_issues': check(Poem(**poem), task),
                 'initial_requirement_report': initial_report, 'final_requirement_report': final_report,

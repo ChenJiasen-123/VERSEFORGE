@@ -65,13 +65,14 @@ class Studio:
             phase = state
             self.update(identity, state)
         try:
-            options = {'independent_editor': True} if self.runner is run_studio else {}
+            options = {'independent_editor': True,'candidate_count':2} if self.runner is run_studio else {}
             result = self.runner(data['prompt'], data['genre'], data['preference'], data.get('previous'),
                                  progress=progress, **options)
             self.update(identity, 'completed', result)
         except Exception as error:
             code = failure_code(error)
             messages = {'output_length': '这次创作超出输出上限，请重试或缩短样题。',
+                        'workflow_budget_exhausted':'本次创作已达到总预算，未能完成初稿。',
                         'service_error': '创作服务暂时未能完成请求，请稍后再试。'}
             self.update(identity, 'failed', result={'failure_code': code, 'phase': phase},
                         error=messages.get(code, '这次题目理解或生成未完成，请重试。'))

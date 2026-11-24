@@ -95,7 +95,7 @@ def edit_once(prompt,poem,task,requirements,client,*,proofread_text=False):
         result['status']='revision_selected' if result['adopted'] else 'original_retained'
     except (ValueError,RuntimeError,KeyError,TypeError) as exc:
         result['status']='editor_incomplete'
-        result['failure_code']='editor_budget_exhausted' if str(exc)=='编辑预算已用尽' else failure_code(exc)
+        result['failure_code']='editor_budget_exhausted' if str(exc) in ('编辑预算已用尽','全程模型预算已用尽') else failure_code(exc)
     return result
 
 

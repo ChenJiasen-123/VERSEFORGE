@@ -30,6 +30,7 @@ def failure_code(error):
     if isinstance(error, json.JSONDecodeError):
         return 'invalid_json'
     message = str(error)
+    if message=='全程模型预算已用尽':return 'workflow_budget_exhausted'
     if message.startswith(('文本重复', '文本行位', '文本相邻', '文本字数', '文本声音依据', '文本声音解释')):
         return 'invalid_sound_basis'
     if message == '现代诗审读缺少文本声音分析':

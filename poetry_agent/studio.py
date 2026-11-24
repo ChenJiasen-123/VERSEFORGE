@@ -7,8 +7,20 @@ from .core import Task, Poem, compose, check, SYSTEM, MODERN_AESTHETIC, CLASSICA
 from .requirement_checks import safe_review, ensure_content_requirement
 from .context_review import body_hash
 from .task_modality import preserve_optional_clauses
+from .meter_changes import compare_meter
 
 STUDIO_PROTOCOL = 'studio-0.6'
+
+
+def meter_revision_guard(before_poem,after_poem,before,after):
+    if before is None and after is None:
+        return {'accepted':True,'scope':'no_meter_target'}
+    if before is None or after is None or before['target']!=after['target']:
+        return {'accepted':False,'reason':'meter_target_changed'}
+    transition=compare_meter(before_poem['lines'],after_poem['lines'],before['report'],after['report'])
+    accepted=bool(transition['applicable'] and not transition['new_failures']
+                  and not transition['passed_checks_lost'] and not transition['failures_now_unknown'])
+    return {'accepted':accepted,'transition':transition,'overall_meter_certified':False}
 
 
 def final_meter(poem, task):
@@ -112,10 +124,15 @@ def run_studio(prompt, hint='auto', preference='', previous=None, progress=lambd
     final_report = initial_report
     verified = initial_report['violations']
     drafts = [poem]
-    if verified or run['issues'] or initial_report.get('repair_requests'):
+    meter_guard = None
+    initial_meter = final_meter(poem,task)
+    meter_failed = bool(initial_meter and initial_meter['report']['status']=='failed')
+    if verified or run['issues'] or initial_report.get('repair_requests') or meter_failed:
         progress('revising')
         revision = {'task': asdict(task), 'revision': {'draft': poem, 'issues': run['issues'], 'explicit_requirement_conflicts': verified}}
         revision['revision']['content_evidence_to_resolve'] = initial_report.get('repair_requests', [])
+        if initial_meter:
+            revision['revision']['meter_report']=initial_meter['report']
         revision['revision']['editing_instruction'] = '先核对并补足明确要求的实际文字，不只声称写过。保留原有有效关系，作必要的小范围修改；检查“只有”等限定与后文是否矛盾，并交代必要的媒介转换，不把想象全部改成写实说明。'
         if run.get('metrical_target'):
             revision['metrical_target'] = run['metrical_target']
@@ -127,14 +144,15 @@ def run_studio(prompt, hint='auto', preference='', previous=None, progress=lambd
                                        thinking='enabled' if task.genre != 'modern' else 'disabled')
             revised = Poem.parse(response['content'])
             drafts.append(asdict(revised))
-            if len(check(revised, task)) <= len(run['issues']):
+            meter_guard = meter_revision_guard(poem,asdict(revised),initial_meter,final_meter(asdict(revised),task))
+            if len(check(revised, task)) <= len(run['issues']) and meter_guard['accepted']:
                 poem = asdict(revised)
                 progress('checking')
                 final_report = safe_review(prompt, poem, brief['requirements'], client)
         except (ValueError, RuntimeError, KeyError, TypeError):
             pass
     editorial = None
-    if independent_editor and task.genre == 'modern':
+    if independent_editor:
         from .editor import edit_rounds
         progress('checking')
         editorial = edit_rounds(prompt, poem, task, brief['requirements'], client)
@@ -147,6 +165,7 @@ def run_studio(prompt, hint='auto', preference='', previous=None, progress=lambd
             'task': asdict(task), 'model': client.model, 'checks': {'initial_hard_issues': run['issues'],
                 'initial_requirement_conflicts': verified, 'final_hard_issues': check(Poem(**poem), task),
                 'initial_requirement_report': initial_report, 'final_requirement_report': final_report,
+                'revision_meter_guard':meter_guard,
                 'final_meter': final_meter(poem, task),
                 'parallelism_status': 'unknown' if task.genre in ('wulv', 'qilv') else 'not_required_by_this_workflow',
                 'requirements_check_completed': final_report['complete'], 'requirements_confirmed': final_report['confirmed'],

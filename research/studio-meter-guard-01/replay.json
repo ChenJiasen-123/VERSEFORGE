@@ -1,0 +1,71 @@
+{
+  "source": "replay recorded actual original and revision, not new API generation",
+  "original": {
+    "title": "题白瓷杯",
+    "lines": [
+      "白瓷杯映晓光中",
+      "注水泠泠响未穷",
+      "旧磕微痕犹暖手",
+      "朝来递到指尖融"
+    ]
+  },
+  "revision": {
+    "title": "题白瓷杯",
+    "lines": [
+      "瓷辉映在晓光中",
+      "注水泠泠响未穷",
+      "旧磕微痕犹暖手",
+      "朝来递到指尖融"
+    ]
+  },
+  "guard": {
+    "accepted": true,
+    "transition": {
+      "protocol": "meter-transition-0.1",
+      "before_body_sha256": "20ac2baf2f16cafd1815c8eadead1b53b3eb3ef160041f5c58098995de070f47",
+      "after_body_sha256": "e8c2d3c1b5fb3108aa1bf4da1091997907a38cc216691ad44ef4f87fbe562a02",
+      "literary_quality_verified": false,
+      "applicable": true,
+      "fixed_failures": [
+        {
+          "check": "meter",
+          "kind": "position",
+          "before_status": "failed",
+          "after_status": "pass",
+          "line": 1,
+          "character": 1,
+          "before_text": "白",
+          "after_text": "瓷",
+          "expected_tone": "P"
+        }
+      ],
+      "remaining_failures": [],
+      "failures_now_unknown": [],
+      "new_failures": [],
+      "passed_checks_lost": [],
+      "newly_resolved_checks": [
+        {
+          "check": "meter",
+          "kind": "position",
+          "before_status": "unknown",
+          "after_status": "pass",
+          "line": 1,
+          "character": 3,
+          "before_text": "杯",
+          "after_text": "映",
+          "expected_tone": "Z"
+        }
+      ],
+      "counts": {
+        "fixed_failures": 1,
+        "remaining_failures": 0,
+        "failures_now_unknown": 0,
+        "new_failures": 0,
+        "passed_checks_lost": 0,
+        "newly_resolved_checks": 1
+      },
+      "instruction": "先核对修复是否命中原问题，兼顾新错误与已通过位置的退步。failed变unknown不算修好；unknown不等于错误。允许必要的语义重组，每稿仍查全篇；这些变化不证明诗意或完整格律。"
+    },
+    "overall_meter_certified": false
+  }
+}

@@ -8,6 +8,13 @@ class Client:
         return {'content':'{"title":"新","lines":["新的一行"]}'}
 
 class EditorTests(unittest.TestCase):
+    @patch('poetry_agent.editor._metrical_target_and_report',side_effect=[({}, {'status':'failed'}),({}, {'status':'pass'})])
+    @patch('poetry_agent.editor.safe_review',return_value={'complete':True,'confirmed':True})
+    @patch('poetry_agent.editor.review',return_value={'assessment':{'decision':'keep'}})
+    def test_failed_meter_forces_revision_despite_literary_keep(self,review,requirements,meter):
+        r=edit_once('五绝',{'title':'原','lines':['旧的一行']},Task('诗','wujue',4,wujue_pattern='ze_no_rhyme'),[],Client())
+        self.assertEqual(len(r['drafts']),2)
+        self.assertNotEqual(r['status'],'no_revision_requested')
     @patch('poetry_agent.editor.safe_review',return_value={'confirmed':True,'complete':True})
     @patch('poetry_agent.editor.review',return_value={'assessment':{'decision':'keep'}})
     def test_reviewer_cannot_see_writer_rationale_or_internal_constraints(self,review,requirements):
@@ -54,7 +61,7 @@ class EditorTests(unittest.TestCase):
     @patch('poetry_agent.editor.review',return_value={'assessment':{'decision':'revise'}})
     def test_classical_failed_meter_retains_original(self,review,meter):
         r=edit_once('五绝',{'title':'原','lines':['旧的一行']},Task('诗','wujue',4,wujue_pattern='ze_no_rhyme'),[],Client())
-        self.assertEqual(r['status'],'revision_meter_unconfirmed');self.assertFalse(r['adopted'])
+        self.assertEqual(r['status'],'revision_meter_failed');self.assertFalse(r['adopted'])
 
     def run_editor(self):
         return edit_once('写一首诗',{'title':'原','lines':['旧的一行']},Task('诗','modern',30),['写一首诗'],Client())

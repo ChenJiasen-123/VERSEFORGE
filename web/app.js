@@ -70,6 +70,12 @@ function render(job) {
  if(meterPending) $('result-note').textContent+=' 平仄或押韵仍需核对，可展开逐项结果查看。';
  const editorial=result.editorial;
  if(editorial){
+  if(editorial.rounds){
+   const end={editor_keep:'编辑判断可保留',round_limit:'达到轮数上限',budget_exhausted:'达到编辑预算上限'};
+   $('result-note').hidden=false;
+   $('result-note').textContent+=' 自动打磨完成 '+editorial.rounds.length+' 轮，'+(end[editorial.status] || '编辑结束')+'；'+(editorial.adopted?'已采用修订稿。':'保留进入打磨前的版本。');
+   return;
+  }
   const notices={revision_selected:'独立审稿后采用了修订稿，仍可自行判断文字。',no_revision_requested:'独立审稿未建议修改。',revision_constraints_unconfirmed:'修订稿的题目要求尚未确认，保留编辑前版本。',revision_still_needs_editing:'修订稿仍有待修改之处，保留编辑前版本。',original_retained:'比较未支持替换，保留编辑前版本。',editor_incomplete:'独立审稿未完整完成，保留编辑前版本。'};
   $('result-note').hidden=false;
   $('result-note').textContent+=' '+(notices[editorial.status] || '独立审稿结果已记录。');

@@ -1,0 +1,275 @@
+{
+  "name": "borrowed-name",
+  "task": {
+    "genre": "modern",
+    "topic": "写一首关于搬离旧居的现代诗，不超过12行；不要求克制或反转。"
+  },
+  "a": {
+    "title": "搬家",
+    "lines": [
+      "最后一箱搬下去。",
+      "楼上有人喊我，",
+      "我答应了一声。",
+      "原来喊的是新来的邻居，",
+      "他和我同名。",
+      "同名，也好。",
+      "这楼里还有人可以答应。"
+    ]
+  },
+  "b": {
+    "title": "搬家",
+    "lines": [
+      "最后一箱搬下去。",
+      "楼上有人喊我，",
+      "我答应了一声。",
+      "原来喊的是新来的邻居，",
+      "他和我同名。",
+      "我感到名字不会离开这栋楼，",
+      "生活依然会继续。"
+    ]
+  },
+  "source": "assistant-authored diagnostic contrasts, not human preference labels",
+  "comparison": {
+    "assessment": {
+      "choice": "tie",
+      "reason": "正反序判断未达成一致或未完成；本次不据此替换当前候选，不表示两稿等优。"
+    },
+    "orders": [
+      {
+        "reversed": false,
+        "review": {
+          "assessment": {
+            "choice": "a",
+            "quote_a": "这楼里还有人可以答应。",
+            "quote_b": "生活依然会继续。",
+            "reason": "两稿前五行完全相同，都以“同名”这一巧合为枢纽：搬离者在旧居最后听到喊声，答应后才发现喊的不是自己，而是新来的同名邻居。A的结尾“同名，也好。/这楼里还有人可以答应。”把这个巧合转化为一种具体的、可听见的延续——名字被另一个人接住，但“答应”的动作仍留在楼里，旧居并未被抽象成“生活”。它所得的是：主体从被喊者变成旁听者，又借“可以答应”保留了自己的声音位置，关系和处境都落在动作上；代价是“也好”略带自我宽解的说明气，但紧接着的具体场景把它撑住。B的“我感到名字不会离开这栋楼，/生活依然会继续。”把同一巧合直接解释成关于名字与生活的判断，“生活依然会继续”是概括性收束，与前面“喊我—答应—原来喊的是新来的邻居”的戏剧性错位脱节：它替代了本可继续展开的感知关系，把偶然的同名事件收束成可预期的道理。因此A更完整地让道具、动作与判断参与全篇，B的代价是结尾以妥帖说明替代了具体关系的意外展开。"
+          },
+          "usage": {
+            "prompt_tokens": 1526,
+            "completion_tokens": 287,
+            "total_tokens": 1813,
+            "prompt_tokens_details": {
+              "cached_tokens": 640
+            },
+            "prompt_cache_hit_tokens": 640,
+            "prompt_cache_miss_tokens": 886
+          },
+          "comparison_protocol_version": "text-compare-0.6",
+          "comparison_relation": "independent",
+          "earlier_candidate": null,
+          "experimental_lineation_control": false,
+          "lineation_difference": {
+            "applicable": false,
+            "reason": "different_character_streams"
+          },
+          "literal_repetition_evidence": {
+            "a": {
+              "items": [
+                {
+                  "fragment": "同名",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 5,
+                      "start_character": 4,
+                      "end_line": 5,
+                      "end_character": 5
+                    },
+                    {
+                      "start_line": 6,
+                      "start_character": 1,
+                      "end_line": 6,
+                      "end_character": 2
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                },
+                {
+                  "fragment": "有人",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 2,
+                      "start_character": 3,
+                      "end_line": 2,
+                      "end_character": 4
+                    },
+                    {
+                      "start_line": 7,
+                      "start_character": 5,
+                      "end_line": 7,
+                      "end_character": 6
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                },
+                {
+                  "fragment": "答应",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 3,
+                      "start_character": 2,
+                      "end_line": 3,
+                      "end_character": 3
+                    },
+                    {
+                      "start_line": 7,
+                      "start_character": 9,
+                      "end_line": 7,
+                      "end_character": 10
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                }
+              ],
+              "truncated": false,
+              "scope": "literal_character_stream_with_line_breaks_removed_only",
+              "limitations": [
+                "统计2—8字连续片段，最多12项各列32个位置；可跨分行，保留空白标点；允许重叠，不等于词或句法重复",
+                "位置按原行Unicode字符从1计；次数不评价节奏或文学质量"
+              ]
+            },
+            "b": {
+              "items": [],
+              "truncated": false,
+              "scope": "literal_character_stream_with_line_breaks_removed_only",
+              "limitations": [
+                "统计2—8字连续片段，最多12项各列32个位置；可跨分行，保留空白标点；允许重叠，不等于词或句法重复",
+                "位置按原行Unicode字符从1计；次数不评价节奏或文学质量"
+              ]
+            }
+          },
+          "source": "model_self_review",
+          "quality_verified": false,
+          "request_settings": {
+            "thinking": "disabled",
+            "response_format": "json_object"
+          }
+        },
+        "original_choice": "a"
+      },
+      {
+        "reversed": true,
+        "review": {
+          "assessment": {
+            "choice": "a",
+            "quote_a": "我感到名字不会离开这栋楼，",
+            "quote_b": "这楼里还有人可以答应。",
+            "reason": "两稿前五行共同完成一个准确而意外的错认：应答之后发现喊的是同名新邻居。A第六、七行把“名字”留在楼里与“生活继续”并置，主体从具体事件转向可感的判断，代价是稍显直接说理；但“名字不会离开”仍承接“同名”，不是空泛总结。B第六行“同名，也好”把意外收束为态度判断，第七行“还有人可以答应”又把“答应”从被喊时的应答转为替名延续，虽以重复制造回环，却更替了本可展开的经验：同名邻居本可使“我”的名字被他人继续应答，这一层未被写足，结尾提前给出安慰式结论。A所得在让事件与处境的延续关系更完整，代价是判断句较显豁；B所得有声音回环和轻微自嘲，代价是关系被“也好”与“可以答应”过快收拢。"
+          },
+          "usage": {
+            "prompt_tokens": 1526,
+            "completion_tokens": 233,
+            "total_tokens": 1759,
+            "prompt_tokens_details": {
+              "cached_tokens": 768
+            },
+            "prompt_cache_hit_tokens": 768,
+            "prompt_cache_miss_tokens": 758
+          },
+          "comparison_protocol_version": "text-compare-0.6",
+          "comparison_relation": "independent",
+          "earlier_candidate": null,
+          "experimental_lineation_control": false,
+          "lineation_difference": {
+            "applicable": false,
+            "reason": "different_character_streams"
+          },
+          "literal_repetition_evidence": {
+            "a": {
+              "items": [],
+              "truncated": false,
+              "scope": "literal_character_stream_with_line_breaks_removed_only",
+              "limitations": [
+                "统计2—8字连续片段，最多12项各列32个位置；可跨分行，保留空白标点；允许重叠，不等于词或句法重复",
+                "位置按原行Unicode字符从1计；次数不评价节奏或文学质量"
+              ]
+            },
+            "b": {
+              "items": [
+                {
+                  "fragment": "同名",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 5,
+                      "start_character": 4,
+                      "end_line": 5,
+                      "end_character": 5
+                    },
+                    {
+                      "start_line": 6,
+                      "start_character": 1,
+                      "end_line": 6,
+                      "end_character": 2
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                },
+                {
+                  "fragment": "有人",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 2,
+                      "start_character": 3,
+                      "end_line": 2,
+                      "end_character": 4
+                    },
+                    {
+                      "start_line": 7,
+                      "start_character": 5,
+                      "end_line": 7,
+                      "end_character": 6
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                },
+                {
+                  "fragment": "答应",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 3,
+                      "start_character": 2,
+                      "end_line": 3,
+                      "end_character": 3
+                    },
+                    {
+                      "start_line": 7,
+                      "start_character": 9,
+                      "end_line": 7,
+                      "end_character": 10
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                }
+              ],
+              "truncated": false,
+              "scope": "literal_character_stream_with_line_breaks_removed_only",
+              "limitations": [
+                "统计2—8字连续片段，最多12项各列32个位置；可跨分行，保留空白标点；允许重叠，不等于词或句法重复",
+                "位置按原行Unicode字符从1计；次数不评价节奏或文学质量"
+              ]
+            }
+          },
+          "source": "model_self_review",
+          "quality_verified": false,
+          "request_settings": {
+            "thinking": "disabled",
+            "response_format": "json_object"
+          }
+        },
+        "original_choice": "b"
+      }
+    ],
+    "selection_status": "disagreement",
+    "order_consistent": false,
+    "comparison_relation": "independent",
+    "comparison_protocol_version": "bidirectional-text-compare-0.1",
+    "source": "bidirectional_model_self_review",
+    "quality_verified": false,
+    "elapsed_seconds": 6.187
+  }
+}

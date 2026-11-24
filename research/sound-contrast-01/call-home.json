@@ -1,0 +1,272 @@
+{
+  "name": "call-home",
+  "task": {
+    "genre": "modern",
+    "topic": "写一首给家里打电话的现代诗，不超过12行；可以直说感情，不必用物象收尾。"
+  },
+  "a": {
+    "title": "电话",
+    "lines": [
+      "妈说，吃了。",
+      "我说，吃了。",
+      "两口锅隔着八百里，",
+      "都还没有洗。",
+      "我们又说了一会儿，",
+      "谁也不先把水龙头打开。"
+    ]
+  },
+  "b": {
+    "title": "电话",
+    "lines": [
+      "妈说吃了，我也说吃了。",
+      "我们的两口锅隔着八百里，都还没有洗。",
+      "我们又说了一会儿，谁也不先把水龙头打开。"
+    ]
+  },
+  "source": "assistant-authored diagnostic contrasts, not human preference labels",
+  "comparison": {
+    "assessment": {
+      "choice": "tie",
+      "reason": "正反序判断未达成一致或未完成；本次不据此替换当前候选，不表示两稿等优。"
+    },
+    "orders": [
+      {
+        "reversed": false,
+        "review": {
+          "assessment": {
+            "choice": "a",
+            "quote_a": "谁也不先把水龙头打开",
+            "quote_b": "谁也不先把水龙头打开",
+            "reason": "两稿核心意象和结尾相同，都靠“两口锅…没洗”和“不先开水龙头”把母子间报平安后的沉默具体化。A用分行逐句放慢对话：“妈说，吃了。”与“我说，吃了。”分置两行，主语的轮换和停顿更清楚，像电话两端各守一句，随后“两口锅”才把两人的日常并置，末句的僵持因此更有来由。B把前两句合成一行，语流更顺，却削弱了“她说/我说”的往返感和短暂沉默，使后文“又说了一会儿”与“不先开水龙头”的对照少了一层声音上的准备。两稿结尾都不靠物象升华，而是让未打开的水龙头承担关系中的迟疑；A的分行让这一动作的悬置更可感。代价是A更碎、更慢，B则更连贯但少一点电话对话的停顿质地，故取A。"
+          },
+          "usage": {
+            "prompt_tokens": 1506,
+            "completion_tokens": 230,
+            "total_tokens": 1736,
+            "prompt_tokens_details": {
+              "cached_tokens": 640
+            },
+            "prompt_cache_hit_tokens": 640,
+            "prompt_cache_miss_tokens": 866
+          },
+          "comparison_protocol_version": "text-compare-0.6",
+          "comparison_relation": "independent",
+          "earlier_candidate": null,
+          "experimental_lineation_control": false,
+          "lineation_difference": {
+            "applicable": false,
+            "reason": "different_character_streams"
+          },
+          "literal_repetition_evidence": {
+            "a": {
+              "items": [
+                {
+                  "fragment": "吃了",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 1,
+                      "start_character": 4,
+                      "end_line": 1,
+                      "end_character": 5
+                    },
+                    {
+                      "start_line": 2,
+                      "start_character": 4,
+                      "end_line": 2,
+                      "end_character": 5
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                }
+              ],
+              "truncated": false,
+              "scope": "literal_character_stream_with_line_breaks_removed_only",
+              "limitations": [
+                "统计2—8字连续片段，最多12项各列32个位置；可跨分行，保留空白标点；允许重叠，不等于词或句法重复",
+                "位置按原行Unicode字符从1计；次数不评价节奏或文学质量"
+              ]
+            },
+            "b": {
+              "items": [
+                {
+                  "fragment": "说吃了",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 1,
+                      "start_character": 2,
+                      "end_line": 1,
+                      "end_character": 4
+                    },
+                    {
+                      "start_line": 1,
+                      "start_character": 8,
+                      "end_line": 1,
+                      "end_character": 10
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                },
+                {
+                  "fragment": "我们",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 2,
+                      "start_character": 1,
+                      "end_line": 2,
+                      "end_character": 2
+                    },
+                    {
+                      "start_line": 3,
+                      "start_character": 1,
+                      "end_line": 3,
+                      "end_character": 2
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                }
+              ],
+              "truncated": false,
+              "scope": "literal_character_stream_with_line_breaks_removed_only",
+              "limitations": [
+                "统计2—8字连续片段，最多12项各列32个位置；可跨分行，保留空白标点；允许重叠，不等于词或句法重复",
+                "位置按原行Unicode字符从1计；次数不评价节奏或文学质量"
+              ]
+            }
+          },
+          "source": "model_self_review",
+          "quality_verified": false,
+          "request_settings": {
+            "thinking": "disabled",
+            "response_format": "json_object"
+          }
+        },
+        "original_choice": "a"
+      },
+      {
+        "reversed": true,
+        "review": {
+          "assessment": {
+            "choice": "a",
+            "quote_a": "妈说吃了，我也说吃了。",
+            "quote_b": "妈说，吃了。",
+            "reason": "A把两句话压在同一行、同一句法里，母子对答几乎叠成同一声，紧接着“我们的两口锅”把这种重合推成共同处境，末行的“谁也不先”也顺着同一口气收住，全篇紧密、克制，代价是分行较少、呼吸较急。B拆成短行，逐句停顿更清楚，母子对答的分离感略强，但“吃了”被分行强调后，反而把交流中的相互照应拆成两个独立应答，后文“两口锅”“谁也不先”的共同性来得稍弱。A的压缩更准确地让熟悉经验被认出：问候里重复的“吃了”与未洗的锅、未开的水龙头组成一种不直说的牵挂。"
+          },
+          "usage": {
+            "prompt_tokens": 1506,
+            "completion_tokens": 186,
+            "total_tokens": 1692,
+            "prompt_tokens_details": {
+              "cached_tokens": 640
+            },
+            "prompt_cache_hit_tokens": 640,
+            "prompt_cache_miss_tokens": 866
+          },
+          "comparison_protocol_version": "text-compare-0.6",
+          "comparison_relation": "independent",
+          "earlier_candidate": null,
+          "experimental_lineation_control": false,
+          "lineation_difference": {
+            "applicable": false,
+            "reason": "different_character_streams"
+          },
+          "literal_repetition_evidence": {
+            "a": {
+              "items": [
+                {
+                  "fragment": "说吃了",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 1,
+                      "start_character": 2,
+                      "end_line": 1,
+                      "end_character": 4
+                    },
+                    {
+                      "start_line": 1,
+                      "start_character": 8,
+                      "end_line": 1,
+                      "end_character": 10
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                },
+                {
+                  "fragment": "我们",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 2,
+                      "start_character": 1,
+                      "end_line": 2,
+                      "end_character": 2
+                    },
+                    {
+                      "start_line": 3,
+                      "start_character": 1,
+                      "end_line": 3,
+                      "end_character": 2
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                }
+              ],
+              "truncated": false,
+              "scope": "literal_character_stream_with_line_breaks_removed_only",
+              "limitations": [
+                "统计2—8字连续片段，最多12项各列32个位置；可跨分行，保留空白标点；允许重叠，不等于词或句法重复",
+                "位置按原行Unicode字符从1计；次数不评价节奏或文学质量"
+              ]
+            },
+            "b": {
+              "items": [
+                {
+                  "fragment": "吃了",
+                  "occurrence_count": 2,
+                  "occurrences": [
+                    {
+                      "start_line": 1,
+                      "start_character": 4,
+                      "end_line": 1,
+                      "end_character": 5
+                    },
+                    {
+                      "start_line": 2,
+                      "start_character": 4,
+                      "end_line": 2,
+                      "end_character": 5
+                    }
+                  ],
+                  "occurrence_positions_truncated": false
+                }
+              ],
+              "truncated": false,
+              "scope": "literal_character_stream_with_line_breaks_removed_only",
+              "limitations": [
+                "统计2—8字连续片段，最多12项各列32个位置；可跨分行，保留空白标点；允许重叠，不等于词或句法重复",
+                "位置按原行Unicode字符从1计；次数不评价节奏或文学质量"
+              ]
+            }
+          },
+          "source": "model_self_review",
+          "quality_verified": false,
+          "request_settings": {
+            "thinking": "disabled",
+            "response_format": "json_object"
+          }
+        },
+        "original_choice": "b"
+      }
+    ],
+    "selection_status": "disagreement",
+    "order_consistent": false,
+    "comparison_relation": "independent",
+    "comparison_protocol_version": "bidirectional-text-compare-0.1",
+    "source": "bidirectional_model_self_review",
+    "quality_verified": false,
+    "elapsed_seconds": 5.5
+  }
+}

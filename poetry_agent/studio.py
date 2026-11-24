@@ -8,7 +8,7 @@ from .requirement_checks import safe_review, ensure_content_requirement
 from .context_review import body_hash
 from .task_modality import preserve_optional_clauses
 
-STUDIO_PROTOCOL = 'studio-0.5'
+STUDIO_PROTOCOL = 'studio-0.6'
 
 
 def final_meter(poem, task):
@@ -135,13 +135,13 @@ def run_studio(prompt, hint='auto', preference='', previous=None, progress=lambd
             pass
     editorial = None
     if independent_editor and task.genre == 'modern':
-        from .editor import edit_once
+        from .editor import edit_rounds
         progress('checking')
-        editorial = edit_once(prompt, poem, task, brief['requirements'], client)
+        editorial = edit_rounds(prompt, poem, task, brief['requirements'], client)
         drafts.extend(editorial['drafts'][1:])
         if editorial['adopted']:
             poem = editorial['poem']
-            final_report = editorial['requirements']
+            final_report = next(row for row in reversed(editorial['rounds']) if row['adopted'])['requirements']
     return {'status': 'completed', 'protocol': STUDIO_PROTOCOL, 'poem': poem, 'brief': brief, 'drafts': drafts,
             'editorial': editorial,
             'task': asdict(task), 'model': client.model, 'checks': {'initial_hard_issues': run['issues'],

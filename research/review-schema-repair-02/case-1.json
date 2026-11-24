@@ -1,0 +1,65 @@
+{
+  "source": "same recorded failed reviews; new actual API missing-field patches",
+  "failed_review": {
+    "content": "{\"decision\": \"revise\", \"preserve\": \"侧幕物件逐件收束、把“空出的那一格”与剩余调度并置，让收拾动作同时像替对方走完位置；袋子和门边标签朝外的收束可保留。\", \"quote\": \"两个人的名字挨着，却不同行。\", \"problem\": \"全诗最重的关系落点靠场记上“名字挨着，却不同行”承担，但前文只建立了“我”替“你”站位、归位、收物，并未提供两人之间“并置却分开”的纸面依据；“不同行”既指排版分行，又暗含不同路，读法未被具体动作支撑，像临时追加的点题。其余物件收束清楚，但这一处让结尾的语义压力主要压在比喻上。\", \"suggestion\": \"删去“不同行”的双关压迫，改成只写场记上可核对的状态，例如两人的名字被一条横线或先后顺序隔开；或把“不同行”换成与前面“那一格”“剩下的调度”直接呼应的具体空间关系，让关系落点由已写出的动作承担。\", \"tradeoff\": \"会失去“名字挨着却不同行”这句现成的警句感，也会让关系不再由一句双关收束；换来的是场记、调度与收拾动作之间更可追踪的因果。\", \"keep_reason\": \"\", \"text_sound\": {\"quote\": \"台口的风从幕布缝里漏进来，\", \"mechanism\": \"首行“台口”与第十三行“台口的风”形成跨行字面复现；第二行罗列“水杯、护膝和外套”，第十至十二行逐件回写，物件名称重复出现。\", \"semantic_effect\": \"复现使收拾动作从清点变成逐件处理，台口再次出现时把开头的停留与结尾的离开接在同一空间里。\", \"uncertainty\": \"“台口”两处可读作空间回环，也可只当场景自然重提；物件重复是叙事清单，不必升格为声音节奏。\"}}",
+    "usage": {
+      "prompt_tokens": 3309,
+      "completion_tokens": 464,
+      "total_tokens": 3773,
+      "prompt_tokens_details": {
+        "cached_tokens": 3072
+      },
+      "prompt_cache_hit_tokens": 3072,
+      "prompt_cache_miss_tokens": 237
+    },
+    "request_settings": {
+      "max_tokens": 4096,
+      "response_format": "json_object",
+      "thinking": "disabled"
+    }
+  },
+  "poem": {
+    "title": "收场",
+    "lines": [
+      "灯一排排熄下去，我留在台口，",
+      "把你散在侧幕的水杯、护膝和外套",
+      "收进那只贴着你名字的袋子里。",
+      "你走时脚步很轻，像刚穿过一段独白，",
+      "没惊动谁，也没等我说完那句“再走一遍”。",
+      "我替你把第四把椅子归位，",
+      "那是你开场前站过的地方，",
+      "我方才站在你空出的那一格，",
+      "走完你剩下的调度，脚下的胶带还温。",
+      "水杯里剩半圈凉水，我拧紧盖，",
+      "护膝的松紧带折成你常用的弧度，",
+      "外套袖口翻出，像你还没伸手。",
+      "台口的风从幕布缝里漏进来，",
+      "吹动贴在侧台的场记，那上面",
+      "两个人的名字挨着，却不同行。",
+      "我把袋子放在门边，标签朝外，",
+      "关最后一盏灯时，没回头。"
+    ]
+  },
+  "prompt": "写一首不超过18行的现代诗：一次排练结束后，一个人留下来替另一个人收拾。不限定两人的关系；不要求感动、克制或反转。",
+  "patch_responses": [
+    {
+      "content": "{\"sound_basis\": [{\"kind\": \"literal_repeat\", \"fragment\": \"台口\", \"occurrence_count\": 2}]}",
+      "usage": {
+        "prompt_tokens": 835,
+        "completion_tokens": 31,
+        "total_tokens": 866,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 835
+      },
+      "request_settings": {
+        "max_tokens": 2048,
+        "response_format": "json_object",
+        "thinking": "disabled"
+      }
+    }
+  ],
+  "failure_code": "invalid_sound_basis"
+}

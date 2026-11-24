@@ -6,6 +6,7 @@ from functools import lru_cache
 from .prosody import Reading, validate
 from .glyphs import with_glyph_candidates
 from .qijue_profiles import specification
+from .variant_notes import variant_note
 
 
 @lru_cache(maxsize=1)
@@ -29,6 +30,7 @@ def lookup_excerpt(character):
             (r.tone, r.rhyme) for r in lexicon.get(character, ())})], 'source': data['source'],
         'glyph_evidence': lexicon.glyph_evidence.get(character),
         'reading_resolved': False, 'coverage': 'partial',
+        'supplemental_variant_note': variant_note(character),
         'limitations': data['limitations']}
 
 

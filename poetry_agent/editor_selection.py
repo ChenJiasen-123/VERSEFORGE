@@ -1,5 +1,10 @@
 """Conservative revision selection; model consensus is not quality proof."""
 
+def compliance_repair_priority(before,after,hard_issues):
+    """Only a confirmed repair outranks aesthetic preference, never mere uncertainty."""
+    known_problem=bool(before.get('violations') or before.get('repair_requests'))
+    return bool(known_problem and after.get('complete') and after.get('confirmed') and not hard_issues)
+
 def select_revision(original, revised, *, hard_issues, requirements, literary_review, comparison):
     reasons=[]
     if hard_issues:
@@ -16,4 +21,4 @@ def select_revision(original, revised, *, hard_issues, requirements, literary_re
     adopted=not reasons
     return {'poem':revised if adopted else original,'adopted':adopted,
             'reasons':reasons,'selection_protocol':'editor-selection-0.1',
-            'quality_verified':False,'requires_human_review':True}
+            'quality_verified':False,'requires_human_review':False}

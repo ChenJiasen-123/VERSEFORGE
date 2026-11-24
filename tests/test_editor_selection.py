@@ -1,7 +1,14 @@
 import unittest
-from poetry_agent.editor_selection import select_revision
+from poetry_agent.editor_selection import select_revision,compliance_repair_priority
 
 class SelectionTests(unittest.TestCase):
+    def test_confirmed_compliance_repair_outranks_old_violation(self):
+        before={'violations':[{'problem':'缺少原话'}]}
+        after={'complete':True,'confirmed':True}
+        self.assertTrue(compliance_repair_priority(before,after,[]))
+        self.assertFalse(compliance_repair_priority(before,after,['too_long']))
+        self.assertFalse(compliance_repair_priority(before,{'complete':True,'confirmed':False},[]))
+        self.assertFalse(compliance_repair_priority({'confirmed':False},after,[]))
     def run_selection(self,**updates):
         args={'hard_issues':[], 'requirements':{'complete':True,'confirmed':True},
               'literary_review':{'assessment':{'decision':'keep'}},
@@ -28,4 +35,4 @@ class SelectionTests(unittest.TestCase):
     def test_complete_evidence_can_select_without_certifying_quality(self):
         r=self.run_selection()
         self.assertTrue(r['adopted']);self.assertFalse(r['quality_verified'])
-        self.assertTrue(r['requires_human_review'])
+        self.assertFalse(r['requires_human_review'])

@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from poetry_agent.editor import edit_once
+from poetry_agent.editor import edit_once,edit_rounds
 from poetry_agent.core import Task
 
 class Client:
@@ -8,6 +8,54 @@ class Client:
         return {'content':'{"title":"新","lines":["新的一行"]}'}
 
 class EditorTests(unittest.TestCase):
+    @patch('poetry_agent.editor.safe_review',return_value={'confirmed':True,'complete':True})
+    @patch('poetry_agent.editor.review',return_value={'assessment':{'decision':'keep'}})
+    def test_reviewer_cannot_see_writer_rationale_or_internal_constraints(self,review,requirements):
+        edit_once('允许温暖，不必解释',{'title':'原','lines':['正文']},
+                  Task('内部摘要','modern',20,extra_requirements='选定方向：一律冷峻'),[],Client())
+        t=review.call_args.args[1]
+        self.assertEqual(t['topic'],'允许温暖，不必解释')
+        self.assertNotIn('extra_requirements',t)
+    @patch('poetry_agent.editor.safe_review',side_effect=[{'confirmed':False,'violations':[{'problem':'缺少原话'}]}, {'confirmed':True,'complete':True}])
+    @patch('poetry_agent.editor.review',return_value={'assessment':{'decision':'keep'}})
+    def test_known_violation_forces_repair_even_when_literary_reviewer_keeps(self,review,requirements):
+        r=self.run_editor()
+        self.assertTrue(r['adopted']);self.assertEqual(r['status'],'compliance_repair_selected')
+
+    def test_call_budget_is_enforced_across_rounds(self):
+        class BrokenClient:
+            def __init__(self): self.calls=0
+            def complete(self,*args,**kwargs):
+                self.calls+=1
+                raise RuntimeError('service failure')
+        c=BrokenClient()
+        r=edit_rounds('题',{'title':'原','lines':['原文']},Task('诗'),[],c,max_calls=1)
+        self.assertEqual(c.calls,1);self.assertEqual(r['calls'],1)
+        self.assertEqual(r['status'],'budget_exhausted')
+
+    @patch('poetry_agent.editor.edit_once')
+    def test_multiple_rounds_carry_feedback_without_human_selection(self,edit):
+        old={'title':'原','lines':['原文']};new={'title':'新','lines':['新文']}
+        edit.side_effect=[{'status':'original_retained','adopted':False,'poem':old,'drafts':[old,new]},
+                          {'status':'revision_selected','adopted':True,'poem':new,'drafts':[old,new]},
+                          {'status':'no_revision_requested','adopted':False,'poem':new,'drafts':[new]}]
+        r=edit_rounds('题',old,Task('诗'),[],Client())
+        self.assertEqual(r['poem'],new);self.assertEqual(len(r['rounds']),3)
+        self.assertIn('上轮自动编辑记录',edit.call_args_list[1].args[2].extra_requirements)
+
+    @patch('poetry_agent.editor._metrical_target_and_report',side_effect=[({}, {'status':'pass'}),({}, {'status':'unknown'})])
+    @patch('poetry_agent.editor.review',return_value={'assessment':{'decision':'revise'}})
+    def test_classical_unknown_meter_retains_original(self,review,meter):
+        r=edit_once('五绝',{'title':'原','lines':['旧的一行']},Task('诗','wujue',4,wujue_pattern='ze_no_rhyme'),[],Client())
+        self.assertEqual(r['status'],'revision_meter_unconfirmed')
+        self.assertFalse(r['adopted']);self.assertEqual(r['poem']['title'],'原')
+
+    @patch('poetry_agent.editor._metrical_target_and_report',side_effect=[({}, {'status':'pass'}),({}, {'status':'failed'})])
+    @patch('poetry_agent.editor.review',return_value={'assessment':{'decision':'revise'}})
+    def test_classical_failed_meter_retains_original(self,review,meter):
+        r=edit_once('五绝',{'title':'原','lines':['旧的一行']},Task('诗','wujue',4,wujue_pattern='ze_no_rhyme'),[],Client())
+        self.assertEqual(r['status'],'revision_meter_unconfirmed');self.assertFalse(r['adopted'])
+
     def run_editor(self):
         return edit_once('写一首诗',{'title':'原','lines':['旧的一行']},Task('诗','modern',30),['写一首诗'],Client())
 

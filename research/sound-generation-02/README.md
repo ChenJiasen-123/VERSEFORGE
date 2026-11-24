@@ -1,0 +1,9 @@
+# 同题完整无人生成复测02
+
+同一排练收场题重新生成，不是固定原稿AB实验。最终《两把椅子》18行，题意核对confirmed=true；多轮编辑9次调用、36.656秒，以round_limit结束。轮次分别editor_incomplete/invalid_sound_basis、editor_incomplete/invalid_json、revision_still_needs_editing，未采用改稿。
+
+因此不能声称补丁降低总体失败率：初稿、响应和调用路径不同，且仍有两轮失败。缺字段协议修复只覆盖已指定结构缺项，不接受非法JSON或错误声音事实。原始响应保留在result.json内供分析。
+
+原稿大量比喻与显式回忆造成情绪较满，“椅子老去”“幕布深处有人落台词”的关系仍需核对，不因系统完成就认证音韵美。全自动路径不要求人工选择；editor_selection.requires_human_review已设false，quality_verified仍为false，216项程序测试通过。没有人工质量认证不等于添加人工操作环节。
+
+下一步应针对实际非法JSON和声音依据错误分类处理，保持总预算，不以无限重试绕过校验；同时控制生成时比喻累叠，避免把每句写成情绪说明。

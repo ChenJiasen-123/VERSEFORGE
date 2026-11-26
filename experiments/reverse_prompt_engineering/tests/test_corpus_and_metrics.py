@@ -159,11 +159,20 @@ class StanzaBreakTests(unittest.TestCase):
             def complete(self, system, user, timeout=90, max_tokens=1200, thinking=None, temperature=None):
                 content = _json.dumps({
                     "title": "测试",
-                    "lines": ["第一行", "第二行", "", "第三行", "第四行"],
+                    "lines": [
+                        "第一行", "第二行", "第三行", "第四行", "",
+                        "第五行", "第六行", "第七行", "第八行", "",
+                        "第九行", "第十行", "第十一行", "第十二行",
+                    ],
                 }, ensure_ascii=False)
                 return {"content": content, "usage": {}, "request_settings": {"mock": True}}
 
-        data = {"title": "测试", "lines": ["第一行", "第二行", "", "第三行", "第四行"]}
+        lines = [
+            "第一行", "第二行", "第三行", "第四行", "",
+            "第五行", "第六行", "第七行", "第八行", "",
+            "第九行", "第十行", "第十一行", "第十二行",
+        ]
+        data = {"title": "测试", "lines": lines}
         self.assertEqual(validate_generation(data), [])
         cfg = load_config(CONFIG)
         topic = cfg["topics"]["optimization"][0]
@@ -172,8 +181,8 @@ class StanzaBreakTests(unittest.TestCase):
             llm = LLM(BlankLineClient(), Budget(10, 100000), LLMCache(tmp / "c.jsonl"), JsonlLedger(tmp / "l.jsonl"))
             gen = generate_poem(llm, cfg, "写现代诗。", topic, cache_variant="stanza-test")
         self.assertTrue(gen["ok"], gen.get("form_issues"))
-        self.assertEqual(gen["lines"], ["第一行", "第二行", "第三行", "第四行"])
-        self.assertEqual(gen["raw_lines"], ["第一行", "第二行", "", "第三行", "第四行"])
+        self.assertEqual(gen["lines"], [line for line in lines if line])
+        self.assertEqual(gen["raw_lines"], lines)
         self.assertIn("\n\n", gen["text"])
         self.assertTrue(gen["form_ok"], gen["form_issues"])
 

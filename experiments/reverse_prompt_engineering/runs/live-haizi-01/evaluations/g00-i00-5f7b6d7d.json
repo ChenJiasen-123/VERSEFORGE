@@ -1,0 +1,892 @@
+{
+  "candidate_id": "g00-i00-5f7b6d7d",
+  "evaluations": [
+    {
+      "topic_id": "opt-01",
+      "topic": "深夜医院走廊尽头的自动售货机",
+      "repetition": 0,
+      "generation": {
+        "ok": true,
+        "topic_id": "opt-01",
+        "title": "售货机",
+        "lines": [
+          "灯管升在白墙",
+          "影子埋进地砖",
+          "夜在走廊尽头转弯",
+          "谁把铜币喂进铁嘴",
+          "谁把铁手伸向暗格",
+          "水从管道走",
+          "火在胃里灭",
+          "鸟从黄昏入黑",
+          "鸟从黄昏入黑",
+          "一人抱一罐冷水",
+          "一罐冷水抱一人",
+          "机器亮着肚皮",
+          "人靠着墙皮",
+          "路在门外刮风",
+          "路在门外刮风",
+          "无人来买光",
+          "无人来买光",
+          "灯管埋进白墙",
+          "影子升出地砖"
+        ],
+        "text": "灯管升在白墙\n影子埋进地砖\n夜在走廊尽头转弯\n谁把铜币喂进铁嘴\n谁把铁手伸向暗格\n水从管道走\n火在胃里灭\n鸟从黄昏入黑\n鸟从黄昏入黑\n一人抱一罐冷水\n一罐冷水抱一人\n机器亮着肚皮\n人靠着墙皮\n路在门外刮风\n路在门外刮风\n无人来买光\n无人来买光\n灯管埋进白墙\n影子升出地砖",
+        "form_ok": false,
+        "form_issues": [
+          "正文19行，超过18行"
+        ],
+        "meta": {
+          "usage": {
+            "prompt_tokens": 795,
+            "completion_tokens": 148,
+            "total_tokens": 943,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            },
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 795
+          },
+          "cache_hit": false,
+          "request_settings": {
+            "max_tokens": 1200,
+            "response_format": "json_object",
+            "thinking": "disabled",
+            "temperature": 1.0
+          },
+          "model": "deepseek-flash",
+          "attempt": 1
+        },
+        "mock": false
+      },
+      "ok": true,
+      "created_at": "2026-11-25T14:38:26.382401+00:00",
+      "judge_model": "deepseek-flash",
+      "rubric_version": "rpe-poetry-zh-v1",
+      "mock": false,
+      "poem_id": "8c9476ba590f4dcc803b5129b21f185e388de22ed371d19f5e779804d75c5a73",
+      "deterministic": {
+        "score": 28.8008,
+        "mean": 28.8008,
+        "max": 35.4567,
+        "min": 24.4568,
+        "std": 3.7623,
+        "per_reference": [
+          {
+            "reference": 1,
+            "score": 26.9724,
+            "components": {
+              "character_bigram": 0.0,
+              "character_unigram": 0.243709,
+              "function_chars": 0.398756,
+              "line_length": 0.221964,
+              "punctuation": 0.0,
+              "line_endings": 0.036662,
+              "structure": 0.616978,
+              "pronouns": 0.0
+            }
+          },
+          {
+            "reference": 2,
+            "score": 24.4568,
+            "components": {
+              "character_bigram": 0.00819,
+              "character_unigram": 0.20866,
+              "function_chars": 0.248071,
+              "line_length": 0.095148,
+              "punctuation": 0.0,
+              "line_endings": 0.018331,
+              "structure": 0.73693,
+              "pronouns": 0.0
+            }
+          },
+          {
+            "reference": 3,
+            "score": 29.9987,
+            "components": {
+              "character_bigram": 0.0,
+              "character_unigram": 0.159922,
+              "function_chars": 0.446596,
+              "line_length": 0.052679,
+              "punctuation": 0.0,
+              "line_endings": 0.0,
+              "structure": 0.865905,
+              "pronouns": 0.0
+            }
+          },
+          {
+            "reference": 4,
+            "score": 35.4567,
+            "components": {
+              "character_bigram": 0.027325,
+              "character_unigram": 0.338336,
+              "function_chars": 0.491206,
+              "line_length": 0.338451,
+              "punctuation": 0.0,
+              "line_endings": 0.0,
+              "structure": 0.811803,
+              "pronouns": 0.0
+            }
+          },
+          {
+            "reference": 5,
+            "score": 27.1196,
+            "components": {
+              "character_bigram": 0.0,
+              "character_unigram": 0.166725,
+              "function_chars": 0.193382,
+              "line_length": 0.239094,
+              "punctuation": 0.0,
+              "line_endings": 0.066832,
+              "structure": 0.813753,
+              "pronouns": 0.0
+            }
+          }
+        ],
+        "mean_components": {
+          "character_bigram": 0.007103,
+          "character_unigram": 0.22347,
+          "function_chars": 0.355602,
+          "line_length": 0.189467,
+          "punctuation": 0.0,
+          "line_endings": 0.024365,
+          "structure": 0.769074,
+          "pronouns": 0.0
+        },
+        "feature_schema": "rpe-poetry-style-v1",
+        "notes": "满分100；逐项为生成诗与每篇参考诗的特征相似度，主分取与各参考诗的均值。"
+      },
+      "copy_diagnostics": {
+        "max_lcs_chars": 3,
+        "max_rouge1_f1": 0.252366,
+        "matched_reference_lines": [],
+        "copy_flag": false,
+        "thresholds": {
+          "lcs_chars": 12,
+          "line_chars": 8,
+          "rouge1_f1": 0.8
+        },
+        "note": "ROUGE-1 仅作文本重合诊断，不作为风格得分；高重合不等于风格模仿成功。"
+      },
+      "rouge1_diagnostic": {
+        "per_reference": [
+          {
+            "precision": 0.2222222222222222,
+            "recall": 0.1566265060240964,
+            "f1": 0.18374558303886923
+          },
+          {
+            "precision": 0.4017094017094017,
+            "recall": 0.08499095840867993,
+            "f1": 0.14029850746268657
+          },
+          {
+            "precision": 0.11965811965811966,
+            "recall": 0.12612612612612611,
+            "f1": 0.12280701754385964
+          },
+          {
+            "precision": 0.3418803418803419,
+            "recall": 0.2,
+            "f1": 0.25236593059936907
+          },
+          {
+            "precision": 0.28205128205128205,
+            "recall": 0.10891089108910891,
+            "f1": 0.15714285714285714
+          }
+        ],
+        "mean_f1": 0.171272,
+        "max_f1": 0.252366,
+        "note": "仅作文本重合诊断；不把高 ROUGE-1 当作风格模仿成功。"
+      },
+      "judge": {
+        "dimensions": {
+          "lexical": {
+            "score": 3.0,
+            "evidence": [
+              "谁把铜币喂进铁嘴",
+              "机器亮着肚皮",
+              "人靠着墙皮"
+            ],
+            "rationale": "生成诗多用具体器物与身体词（铜币、铁嘴、暗格、肚皮、墙皮），与参考诗偏重自然/宏大抽象词（草原、众神、太阳、麦子、远方）的词域有明显差异；但“喂”“亮着肚皮”这类拟人化动词与参考诗中“野花一片”“黑夜从内部上升”的动词化抽象有部分相通。整体语言偏口语短促，参考诗更书面、更仪式化。",
+            "uncertainty": "medium"
+          },
+          "syntax": {
+            "score": 3.0,
+            "evidence": [
+              "灯管升在白墙",
+              "水从管道走",
+              "火在胃里灭"
+            ],
+            "rationale": "生成诗以短句、无连接词的并置为主，接近参考诗（如“黑夜从大地上升起”“大风刮过山岗”）的短句节奏；但参考诗多用长句铺陈、呼告与“和所有……一样”的排比复沓，生成诗缺少这类长句与呼告结构，句法更碎、更冷。",
+            "uncertainty": "medium"
+          },
+          "lineation": {
+            "score": 4.0,
+            "evidence": [
+              "鸟从黄昏入黑\n鸟从黄昏入黑",
+              "无人来买光\n无人来买光",
+              "灯管埋进白墙\n影子升出地砖"
+            ],
+            "rationale": "生成诗行短、行数19行、不分节（要求2—4节，此处未分节），重复整行与首尾回环，与参考诗（尤其参考3、4）的短行复沓、首尾呼应节奏相近；差异在于参考诗多分节且每节行数较整齐，生成诗未分节，且重复密度更高、更机械。",
+            "uncertainty": "low"
+          },
+          "imagery": {
+            "score": 3.0,
+            "evidence": [
+              "鸟从黄昏入黑",
+              "机器亮着肚皮",
+              "无人来买光"
+            ],
+            "rationale": "生成诗意象集中在医院走廊的器物与身体（灯管、地砖、铁嘴、暗格、肚皮、墙皮），并置方式偏冷、偏物；参考诗意象多为自然/神话/乡土（草原、麦子、太阳、马、野花），并常以呼告和比喻展开。生成诗“鸟从黄昏入黑”明显借参考4“黑雨滴一样的鸟群/从黄昏飞入黑夜”的意象框架，但整体意象组织更日常、更少神话升维。",
+            "uncertainty": "medium"
+          },
+          "emotion": {
+            "score": 3.0,
+            "evidence": [
+              "一人抱一罐冷水",
+              "人靠着墙皮",
+              "无人来买光"
+            ],
+            "rationale": "生成诗情感克制、以动作和物象承载疲惫（抱冷水、靠墙皮），与参考诗“我的琴声呜咽 泪水全无”“空有一身疲倦”的克制有部分相通；但参考诗情感强度更高、常直抒并升华为命运/死亡/永恒，生成诗停留在冷寂日常，缺少那种外放的悲壮与呼告。",
+            "uncertainty": "medium"
+          },
+          "structure": {
+            "score": 3.0,
+            "evidence": [
+              "夜在走廊尽头转弯",
+              "灯管埋进白墙\n影子升出地砖"
+            ],
+            "rationale": "生成诗以空间推进（走廊尽头、门外）和首尾镜像（升/埋、白墙/地砖）组织，结尾回环收束，与参考诗（如参考4“天空一无所有/为何给我安慰”回环、参考5“道路前面还是道路”）的循环结构有相似；但参考诗多分节、层层递进至宏大结论，生成诗未分节、推进更平、缺少段落比例变化。",
+            "uncertainty": "medium"
+          },
+          "literary_quality": {
+            "score": 3.0,
+            "evidence": [
+              "谁把铜币喂进铁嘴",
+              "机器亮着肚皮",
+              "无人来买光"
+            ],
+            "rationale": "生成诗有新鲜准确的物象（铜币喂铁嘴、机器亮肚皮），节奏控制尚可，首尾镜像完整；但“鸟从黄昏入黑”“无人来买光”重复过多，部分意象（买光）略空泛，整体完成度中等，未达参考诗的语言密度与意象准确度。",
+            "uncertainty": "medium"
+          },
+          "topic_adherence": {
+            "score": 4.0,
+            "evidence": [
+              "夜在走廊尽头转弯",
+              "机器亮着肚皮",
+              "人靠着墙皮"
+            ],
+            "rationale": "生成诗明确回应深夜、走廊尽头、自动售货机（铁嘴、暗格、肚皮、买光）与人的疲惫（抱冷水、靠墙皮），符合题意；但未按“分2—4节”的要求分节，且“鸟从黄昏入黑”与医院走廊场景略游离。",
+            "uncertainty": "low"
+          },
+          "originality": {
+            "score": 3.0,
+            "evidence": [
+              "鸟从黄昏入黑",
+              "灯管埋进白墙\n影子升出地砖"
+            ],
+            "rationale": "生成诗整体语言组织有自己的物象系统（铜币/铁嘴/暗格/肚皮/墙皮），未复制参考诗成句；但“鸟从黄昏入黑”明显套用参考4“从黄昏飞入黑夜”的意象与句式，“无人来买光”也接近参考诗“一无所有/为何给我安慰”的空无句式，原创性中等。",
+            "uncertainty": "medium"
+          }
+        },
+        "overall_notes": "生成诗在短行复沓、首尾回环、冷寂克制的情感基调上与参考诗有可辨识的相似，尤其接近参考3、4的短句与循环结构；但词域更偏日常器物、缺少参考诗的神话/自然升维与长句呼告，且未按题目要求分节，整体为部分一致的中等偏上水平。",
+        "confidence": "medium",
+        "raw": {
+          "dimensions": {
+            "lexical": {
+              "score": 3,
+              "evidence": [
+                "谁把铜币喂进铁嘴",
+                "机器亮着肚皮",
+                "人靠着墙皮"
+              ],
+              "rationale": "生成诗多用具体器物与身体词（铜币、铁嘴、暗格、肚皮、墙皮），与参考诗偏重自然/宏大抽象词（草原、众神、太阳、麦子、远方）的词域有明显差异；但“喂”“亮着肚皮”这类拟人化动词与参考诗中“野花一片”“黑夜从内部上升”的动词化抽象有部分相通。整体语言偏口语短促，参考诗更书面、更仪式化。",
+              "uncertainty": "medium"
+            },
+            "syntax": {
+              "score": 3,
+              "evidence": [
+                "灯管升在白墙",
+                "水从管道走",
+                "火在胃里灭"
+              ],
+              "rationale": "生成诗以短句、无连接词的并置为主，接近参考诗（如“黑夜从大地上升起”“大风刮过山岗”）的短句节奏；但参考诗多用长句铺陈、呼告与“和所有……一样”的排比复沓，生成诗缺少这类长句与呼告结构，句法更碎、更冷。",
+              "uncertainty": "medium"
+            },
+            "lineation": {
+              "score": 4,
+              "evidence": [
+                "鸟从黄昏入黑\n鸟从黄昏入黑",
+                "无人来买光\n无人来买光",
+                "灯管埋进白墙\n影子升出地砖"
+              ],
+              "rationale": "生成诗行短、行数19行、不分节（要求2—4节，此处未分节），重复整行与首尾回环，与参考诗（尤其参考3、4）的短行复沓、首尾呼应节奏相近；差异在于参考诗多分节且每节行数较整齐，生成诗未分节，且重复密度更高、更机械。",
+              "uncertainty": "low"
+            },
+            "imagery": {
+              "score": 3,
+              "evidence": [
+                "鸟从黄昏入黑",
+                "机器亮着肚皮",
+                "无人来买光"
+              ],
+              "rationale": "生成诗意象集中在医院走廊的器物与身体（灯管、地砖、铁嘴、暗格、肚皮、墙皮），并置方式偏冷、偏物；参考诗意象多为自然/神话/乡土（草原、麦子、太阳、马、野花），并常以呼告和比喻展开。生成诗“鸟从黄昏入黑”明显借参考4“黑雨滴一样的鸟群/从黄昏飞入黑夜”的意象框架，但整体意象组织更日常、更少神话升维。",
+              "uncertainty": "medium"
+            },
+            "emotion": {
+              "score": 3,
+              "evidence": [
+                "一人抱一罐冷水",
+                "人靠着墙皮",
+                "无人来买光"
+              ],
+              "rationale": "生成诗情感克制、以动作和物象承载疲惫（抱冷水、靠墙皮），与参考诗“我的琴声呜咽 泪水全无”“空有一身疲倦”的克制有部分相通；但参考诗情感强度更高、常直抒并升华为命运/死亡/永恒，生成诗停留在冷寂日常，缺少那种外放的悲壮与呼告。",
+              "uncertainty": "medium"
+            },
+            "structure": {
+              "score": 3,
+              "evidence": [
+                "夜在走廊尽头转弯",
+                "灯管埋进白墙\n影子升出地砖"
+              ],
+              "rationale": "生成诗以空间推进（走廊尽头、门外）和首尾镜像（升/埋、白墙/地砖）组织，结尾回环收束，与参考诗（如参考4“天空一无所有/为何给我安慰”回环、参考5“道路前面还是道路”）的循环结构有相似；但参考诗多分节、层层递进至宏大结论，生成诗未分节、推进更平、缺少段落比例变化。",
+              "uncertainty": "medium"
+            },
+            "literary_quality": {
+              "score": 3,
+              "evidence": [
+                "谁把铜币喂进铁嘴",
+                "机器亮着肚皮",
+                "无人来买光"
+              ],
+              "rationale": "生成诗有新鲜准确的物象（铜币喂铁嘴、机器亮肚皮），节奏控制尚可，首尾镜像完整；但“鸟从黄昏入黑”“无人来买光”重复过多，部分意象（买光）略空泛，整体完成度中等，未达参考诗的语言密度与意象准确度。",
+              "uncertainty": "medium"
+            },
+            "topic_adherence": {
+              "score": 4,
+              "evidence": [
+                "夜在走廊尽头转弯",
+                "机器亮着肚皮",
+                "人靠着墙皮"
+              ],
+              "rationale": "生成诗明确回应深夜、走廊尽头、自动售货机（铁嘴、暗格、肚皮、买光）与人的疲惫（抱冷水、靠墙皮），符合题意；但未按“分2—4节”的要求分节，且“鸟从黄昏入黑”与医院走廊场景略游离。",
+              "uncertainty": "low"
+            },
+            "originality": {
+              "score": 3,
+              "evidence": [
+                "鸟从黄昏入黑",
+                "灯管埋进白墙\n影子升出地砖"
+              ],
+              "rationale": "生成诗整体语言组织有自己的物象系统（铜币/铁嘴/暗格/肚皮/墙皮），未复制参考诗成句；但“鸟从黄昏入黑”明显套用参考4“从黄昏飞入黑夜”的意象与句式，“无人来买光”也接近参考诗“一无所有/为何给我安慰”的空无句式，原创性中等。",
+              "uncertainty": "medium"
+            }
+          },
+          "overall_notes": "生成诗在短行复沓、首尾回环、冷寂克制的情感基调上与参考诗有可辨识的相似，尤其接近参考3、4的短句与循环结构；但词域更偏日常器物、缺少参考诗的神话/自然升维与长句呼告，且未按题目要求分节，整体为部分一致的中等偏上水平。",
+          "confidence": "medium"
+        }
+      },
+      "judge_meta": {
+        "usage": {
+          "prompt_tokens": 2129,
+          "completion_tokens": 1328,
+          "total_tokens": 3457,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 2129
+        },
+        "cache_hit": false,
+        "request_settings": {
+          "max_tokens": 2600,
+          "response_format": "json_object",
+          "thinking": "disabled",
+          "temperature": 0.0
+        },
+        "model": "deepseek-flash",
+        "attempt": 1
+      },
+      "components": {
+        "fitness": 22.5599,
+        "eligible": false,
+        "base": 52.5599,
+        "penalty": 30.0,
+        "style_score": 51.2469,
+        "deterministic_style_score": 28.8008,
+        "judge_style_score": 63.3333,
+        "literary_quality_score": 60.0,
+        "literary_quality_raw": 3.0,
+        "topic_adherence": 4.0,
+        "originality": 3.0,
+        "form_ok": false,
+        "copy_flag": false,
+        "high_uncertainty_dimensions": []
+      }
+    },
+    {
+      "topic_id": "opt-02",
+      "topic": "洪水退去后的乡村小学操场",
+      "repetition": 0,
+      "generation": {
+        "ok": true,
+        "topic_id": "opt-02",
+        "title": "操场",
+        "lines": [
+          "泥埋住白线",
+          "水刮走球架",
+          "一把铁锹举起来",
+          "两双手抱起淤泥",
+          "太阳升上树梢",
+          "泥在脚下退",
+          "光在锹上走",
+          "鸟从瓦檐飞落",
+          "孩子走回跑道",
+          "脚印埋进湿土",
+          "一个孩子问",
+          "书声能不能种",
+          "火在灶里燃",
+          "水在桶里晃",
+          "泥再埋住鞋",
+          "歌从喉咙升起来",
+          "操场抱住孩子",
+          "孩子抱住光"
+        ],
+        "text": "泥埋住白线\n水刮走球架\n一把铁锹举起来\n两双手抱起淤泥\n太阳升上树梢\n泥在脚下退\n光在锹上走\n鸟从瓦檐飞落\n孩子走回跑道\n脚印埋进湿土\n一个孩子问\n书声能不能种\n火在灶里燃\n水在桶里晃\n泥再埋住鞋\n歌从喉咙升起来\n操场抱住孩子\n孩子抱住光",
+        "form_ok": true,
+        "form_issues": [],
+        "meta": {
+          "usage": {
+            "prompt_tokens": 793,
+            "completion_tokens": 129,
+            "total_tokens": 922,
+            "prompt_tokens_details": {
+              "cached_tokens": 512
+            },
+            "prompt_cache_hit_tokens": 512,
+            "prompt_cache_miss_tokens": 281
+          },
+          "cache_hit": false,
+          "request_settings": {
+            "max_tokens": 1200,
+            "response_format": "json_object",
+            "thinking": "disabled",
+            "temperature": 1.0
+          },
+          "model": "deepseek-flash",
+          "attempt": 1
+        },
+        "mock": false
+      },
+      "ok": true,
+      "created_at": "2026-11-25T14:38:39.294698+00:00",
+      "judge_model": "deepseek-flash",
+      "rubric_version": "rpe-poetry-zh-v1",
+      "mock": false,
+      "poem_id": "a6776e5e7c2849563c61844743aa0568655e9bcbbbe570879703d8bd18e675d1",
+      "deterministic": {
+        "score": 27.0358,
+        "mean": 27.0358,
+        "max": 31.0453,
+        "min": 22.2945,
+        "std": 2.8323,
+        "per_reference": [
+          {
+            "reference": 1,
+            "score": 26.6171,
+            "components": {
+              "character_bigram": 0.0,
+              "character_unigram": 0.228488,
+              "function_chars": 0.418763,
+              "line_length": 0.183503,
+              "punctuation": 0.0,
+              "line_endings": 0.045644,
+              "structure": 0.608568,
+              "pronouns": 0.0
+            }
+          },
+          {
+            "reference": 2,
+            "score": 22.2945,
+            "components": {
+              "character_bigram": 0.026759,
+              "character_unigram": 0.144397,
+              "function_chars": 0.215071,
+              "line_length": 0.044581,
+              "punctuation": 0.0,
+              "line_endings": 0.022822,
+              "structure": 0.712019,
+              "pronouns": 0.0
+            }
+          },
+          {
+            "reference": 3,
+            "score": 28.2092,
+            "components": {
+              "character_bigram": 0.012836,
+              "character_unigram": 0.116832,
+              "function_chars": 0.381222,
+              "line_length": 0.065793,
+              "punctuation": 0.0,
+              "line_endings": 0.0,
+              "structure": 0.844317,
+              "pronouns": 0.0
+            }
+          },
+          {
+            "reference": 4,
+            "score": 31.0453,
+            "components": {
+              "character_bigram": 0.005411,
+              "character_unigram": 0.252665,
+              "function_chars": 0.457829,
+              "line_length": 0.184853,
+              "punctuation": 0.0,
+              "line_endings": 0.0,
+              "structure": 0.782479,
+              "pronouns": 0.0
+            }
+          },
+          {
+            "reference": 5,
+            "score": 27.0127,
+            "components": {
+              "character_bigram": 0.030935,
+              "character_unigram": 0.168419,
+              "function_chars": 0.150594,
+              "line_length": 0.15788,
+              "punctuation": 0.0,
+              "line_endings": 0.27735,
+              "structure": 0.786294,
+              "pronouns": 0.0
+            }
+          }
+        ],
+        "mean_components": {
+          "character_bigram": 0.015188,
+          "character_unigram": 0.18216,
+          "function_chars": 0.324696,
+          "line_length": 0.127322,
+          "punctuation": 0.0,
+          "line_endings": 0.069163,
+          "structure": 0.746735,
+          "pronouns": 0.0
+        },
+        "feature_schema": "rpe-poetry-style-v1",
+        "notes": "满分100；逐项为生成诗与每篇参考诗的特征相似度，主分取与各参考诗的均值。"
+      },
+      "copy_diagnostics": {
+        "max_lcs_chars": 2,
+        "max_rouge1_f1": 0.192053,
+        "matched_reference_lines": [],
+        "copy_flag": false,
+        "thresholds": {
+          "lcs_chars": 12,
+          "line_chars": 8,
+          "rouge1_f1": 0.8
+        },
+        "note": "ROUGE-1 仅作文本重合诊断，不作为风格得分；高重合不等于风格模仿成功。"
+      },
+      "rouge1_diagnostic": {
+        "per_reference": [
+          {
+            "precision": 0.24509803921568626,
+            "recall": 0.15060240963855423,
+            "f1": 0.1865671641791045
+          },
+          {
+            "precision": 0.3333333333333333,
+            "recall": 0.06148282097649186,
+            "f1": 0.10381679389312976
+          },
+          {
+            "precision": 0.09803921568627451,
+            "recall": 0.09009009009009009,
+            "f1": 0.09389671361502347
+          },
+          {
+            "precision": 0.28431372549019607,
+            "recall": 0.145,
+            "f1": 0.1920529801324503
+          },
+          {
+            "precision": 0.3137254901960784,
+            "recall": 0.10561056105610561,
+            "f1": 0.1580246913580247
+          }
+        ],
+        "mean_f1": 0.146872,
+        "max_f1": 0.192053,
+        "note": "仅作文本重合诊断；不把高 ROUGE-1 当作风格模仿成功。"
+      },
+      "judge": {
+        "dimensions": {
+          "lexical": {
+            "score": 3.0,
+            "evidence": [
+              "泥埋住白线",
+              "书声能不能种",
+              "光在锹上走"
+            ],
+            "rationale": "生成诗多用具体名词与单音节动词（泥、水、锹、光、鸟、跑道），与参考诗偏重自然/土地/身体词域有部分重合；但参考诗大量使用抽象大词（死亡、祖国、众神、不朽、远方），生成诗几乎不涉此类，语言更日常、更轻，缺少参考诗那种词域张力。",
+            "uncertainty": "low"
+          },
+          "syntax": {
+            "score": 3.0,
+            "evidence": [
+              "一把铁锹举起来",
+              "两双手抱起淤泥",
+              "一个孩子问"
+            ],
+            "rationale": "生成诗以短句、主谓宾直陈为主，偶有问句（“书声能不能种”），与参考诗短句排比、呼告、破折号插入的句法有部分相似；但参考诗常见长句跨行、复沓呼告（“亚洲铜，亚洲铜”“和所有以梦为马的诗人一样”），生成诗缺少这种复沓与长句铺陈。",
+            "uncertainty": "low"
+          },
+          "lineation": {
+            "score": 3.0,
+            "evidence": [
+              "泥埋住白线\n水刮走球架",
+              "操场抱住孩子\n孩子抱住光"
+            ],
+            "rationale": "生成诗行短、行数18、未分节（题目要求2—4节，此处未满足），行尾落点多为名词或动词，节奏整齐；参考诗多为四行一节、行有长短变化并靠复沓形成节奏。生成诗行末对仗感强，接近参考诗某些短行段落，但整体过于均齐，缺少参考诗的长短错落与跨行停顿。",
+            "uncertainty": "medium"
+          },
+          "imagery": {
+            "score": 3.0,
+            "evidence": [
+              "光在锹上走",
+              "脚印埋进湿土",
+              "操场抱住孩子"
+            ],
+            "rationale": "生成诗意象偏日常器物与自然（铁锹、淤泥、瓦檐、灶、桶），并置方式简洁，末两行拟人（操场抱住孩子/孩子抱住光）与参考诗的拟人化呼告（“黑夜从你内部上升”“风后面是风”）有表层相似；但参考诗意象常带神话/死亡/远方的大尺度象征，生成诗意象小而实，且“书声能不能种”略近解释性比喻，与参考诗不解释比喻的习惯有差异。",
+            "uncertainty": "low"
+          },
+          "emotion": {
+            "score": 2.0,
+            "evidence": [
+              "歌从喉咙升起来",
+              "孩子抱住光"
+            ],
+            "rationale": "生成诗情感外放、明亮，落在结尾的“抱住光”上，属于直说式抒情；参考诗情感多克制、沉郁，常以“泪水全无”“为何给我安慰”等反问或冷句收束。生成诗缺少参考诗那种悲欣交集的复杂强度，情感位置与强度差异明显。",
+            "uncertainty": "low"
+          },
+          "structure": {
+            "score": 3.0,
+            "evidence": [
+              "泥埋住白线",
+              "孩子走回跑道",
+              "操场抱住孩子"
+            ],
+            "rationale": "生成诗按时间推进：灾后残迹—清理—鸟落—孩子返校—问句—生活恢复—结尾拥抱，起承转合清晰；参考诗多靠复沓与空间/象征跳跃组织，段落比例较均衡。生成诗结构更线性、更叙事，与参考诗的循环复沓结构部分相似但差异可辨。",
+            "uncertainty": "low"
+          },
+          "literary_quality": {
+            "score": 3.0,
+            "evidence": [
+              "光在锹上走",
+              "书声能不能种",
+              "孩子抱住光"
+            ],
+            "rationale": "“光在锹上走”“书声能不能种”有新鲜度，节奏干净；但“歌从喉咙升起来”“孩子抱住光”偏熟套，末两行对仗略显口号化，整体完成度中等。参考诗语言更具冲击力与个人声腔，生成诗在新鲜度与深度上稍弱。",
+            "uncertainty": "low"
+          },
+          "topic_adherence": {
+            "score": 4.0,
+            "evidence": [
+              "泥埋住白线",
+              "水刮走球架",
+              "孩子走回跑道",
+              "书声能不能种"
+            ],
+            "rationale": "诗题《操场》，写洪水退后泥埋白线、球架被刮走、铁锹清淤、孩子返校、书声，紧扣“灾后清理与儿童返校”；但未按题目要求分2—4节（全诗未分节），体裁为现代自由诗符合。",
+            "uncertainty": "low"
+          },
+          "originality": {
+            "score": 4.0,
+            "evidence": [
+              "泥埋住白线",
+              "光在锹上走",
+              "书声能不能种"
+            ],
+            "rationale": "未发现复制参考诗成句或连续长片段，语言组织有自己的日常场景与短句对仗；但“孩子抱住光”一类收束略近常见抒情套语，原创性较好但非突出。",
+            "uncertainty": "low"
+          }
+        },
+        "overall_notes": "生成诗在短句、具体词域、日常意象与线性结构上与参考诗有部分可辨识的相似，但缺少参考诗的大词象征、复沓呼告与沉郁克制的情感强度；未分节不符合题目形式要求。整体属中等接近。",
+        "confidence": "medium",
+        "raw": {
+          "dimensions": {
+            "lexical": {
+              "score": 3,
+              "evidence": [
+                "泥埋住白线",
+                "书声能不能种",
+                "光在锹上走"
+              ],
+              "rationale": "生成诗多用具体名词与单音节动词（泥、水、锹、光、鸟、跑道），与参考诗偏重自然/土地/身体词域有部分重合；但参考诗大量使用抽象大词（死亡、祖国、众神、不朽、远方），生成诗几乎不涉此类，语言更日常、更轻，缺少参考诗那种词域张力。",
+              "uncertainty": "low"
+            },
+            "syntax": {
+              "score": 3,
+              "evidence": [
+                "一把铁锹举起来",
+                "两双手抱起淤泥",
+                "一个孩子问"
+              ],
+              "rationale": "生成诗以短句、主谓宾直陈为主，偶有问句（“书声能不能种”），与参考诗短句排比、呼告、破折号插入的句法有部分相似；但参考诗常见长句跨行、复沓呼告（“亚洲铜，亚洲铜”“和所有以梦为马的诗人一样”），生成诗缺少这种复沓与长句铺陈。",
+              "uncertainty": "low"
+            },
+            "lineation": {
+              "score": 3,
+              "evidence": [
+                "泥埋住白线\n水刮走球架",
+                "操场抱住孩子\n孩子抱住光"
+              ],
+              "rationale": "生成诗行短、行数18、未分节（题目要求2—4节，此处未满足），行尾落点多为名词或动词，节奏整齐；参考诗多为四行一节、行有长短变化并靠复沓形成节奏。生成诗行末对仗感强，接近参考诗某些短行段落，但整体过于均齐，缺少参考诗的长短错落与跨行停顿。",
+              "uncertainty": "medium"
+            },
+            "imagery": {
+              "score": 3,
+              "evidence": [
+                "光在锹上走",
+                "脚印埋进湿土",
+                "操场抱住孩子"
+              ],
+              "rationale": "生成诗意象偏日常器物与自然（铁锹、淤泥、瓦檐、灶、桶），并置方式简洁，末两行拟人（操场抱住孩子/孩子抱住光）与参考诗的拟人化呼告（“黑夜从你内部上升”“风后面是风”）有表层相似；但参考诗意象常带神话/死亡/远方的大尺度象征，生成诗意象小而实，且“书声能不能种”略近解释性比喻，与参考诗不解释比喻的习惯有差异。",
+              "uncertainty": "low"
+            },
+            "emotion": {
+              "score": 2,
+              "evidence": [
+                "歌从喉咙升起来",
+                "孩子抱住光"
+              ],
+              "rationale": "生成诗情感外放、明亮，落在结尾的“抱住光”上，属于直说式抒情；参考诗情感多克制、沉郁，常以“泪水全无”“为何给我安慰”等反问或冷句收束。生成诗缺少参考诗那种悲欣交集的复杂强度，情感位置与强度差异明显。",
+              "uncertainty": "low"
+            },
+            "structure": {
+              "score": 3,
+              "evidence": [
+                "泥埋住白线",
+                "孩子走回跑道",
+                "操场抱住孩子"
+              ],
+              "rationale": "生成诗按时间推进：灾后残迹—清理—鸟落—孩子返校—问句—生活恢复—结尾拥抱，起承转合清晰；参考诗多靠复沓与空间/象征跳跃组织，段落比例较均衡。生成诗结构更线性、更叙事，与参考诗的循环复沓结构部分相似但差异可辨。",
+              "uncertainty": "low"
+            },
+            "literary_quality": {
+              "score": 3,
+              "evidence": [
+                "光在锹上走",
+                "书声能不能种",
+                "孩子抱住光"
+              ],
+              "rationale": "“光在锹上走”“书声能不能种”有新鲜度，节奏干净；但“歌从喉咙升起来”“孩子抱住光”偏熟套，末两行对仗略显口号化，整体完成度中等。参考诗语言更具冲击力与个人声腔，生成诗在新鲜度与深度上稍弱。",
+              "uncertainty": "low"
+            },
+            "topic_adherence": {
+              "score": 4,
+              "evidence": [
+                "泥埋住白线",
+                "水刮走球架",
+                "孩子走回跑道",
+                "书声能不能种"
+              ],
+              "rationale": "诗题《操场》，写洪水退后泥埋白线、球架被刮走、铁锹清淤、孩子返校、书声，紧扣“灾后清理与儿童返校”；但未按题目要求分2—4节（全诗未分节），体裁为现代自由诗符合。",
+              "uncertainty": "low"
+            },
+            "originality": {
+              "score": 4,
+              "evidence": [
+                "泥埋住白线",
+                "光在锹上走",
+                "书声能不能种"
+              ],
+              "rationale": "未发现复制参考诗成句或连续长片段，语言组织有自己的日常场景与短句对仗；但“孩子抱住光”一类收束略近常见抒情套语，原创性较好但非突出。",
+              "uncertainty": "low"
+            }
+          },
+          "overall_notes": "生成诗在短句、具体词域、日常意象与线性结构上与参考诗有部分可辨识的相似，但缺少参考诗的大词象征、复沓呼告与沉郁克制的情感强度；未分节不符合题目形式要求。整体属中等接近。",
+          "confidence": "medium"
+        }
+      },
+      "judge_meta": {
+        "usage": {
+          "prompt_tokens": 2092,
+          "completion_tokens": 1198,
+          "total_tokens": 3290,
+          "prompt_tokens_details": {
+            "cached_tokens": 512
+          },
+          "prompt_cache_hit_tokens": 512,
+          "prompt_cache_miss_tokens": 1580
+        },
+        "cache_hit": false,
+        "request_settings": {
+          "max_tokens": 2600,
+          "response_format": "json_object",
+          "thinking": "disabled",
+          "temperature": 0.0
+        },
+        "model": "deepseek-flash",
+        "attempt": 1
+      },
+      "components": {
+        "fitness": 48.3515,
+        "eligible": true,
+        "base": 48.3515,
+        "penalty": 0.0,
+        "style_score": 46.2959,
+        "deterministic_style_score": 27.0358,
+        "judge_style_score": 56.6667,
+        "literary_quality_score": 60.0,
+        "literary_quality_raw": 3.0,
+        "topic_adherence": 4.0,
+        "originality": 4.0,
+        "form_ok": true,
+        "copy_flag": false,
+        "high_uncertainty_dimensions": []
+      }
+    },
+    {
+      "topic_id": "opt-03",
+      "topic": "跨江大桥下的夜班渡轮",
+      "repetition": 0,
+      "generation": {
+        "ok": false,
+        "topic_id": "opt-03",
+        "title": null,
+        "lines": [],
+        "text": "",
+        "form_ok": false,
+        "form_issues": [
+          "生成失败：LLMOutputError: rpe_generate_poem：连续 2 次未得到可用 JSON（lines 每项须为非空单行字符串）"
+        ],
+        "meta": {},
+        "mock": false
+      },
+      "ok": false,
+      "created_at": "2026-11-25T14:38:55.841556+00:00",
+      "judge_model": "deepseek-flash",
+      "rubric_version": "rpe-poetry-zh-v1",
+      "mock": false,
+      "error": "生成失败"
+    }
+  ],
+  "evaluation_count": 3,
+  "successful_evaluations": 2,
+  "failed_evaluations": 1,
+  "fitness": 27.1224,
+  "eligible": false,
+  "style_score": 48.7714,
+  "literary_quality_score": 60.0,
+  "topic_adherence": 4.0,
+  "originality": 3.5,
+  "form_ok_rate": 0.333333,
+  "copy_rate": 0.0,
+  "score_std": 12.8958,
+  "aggregation": "mean of per-poem fitness; failed generations penalized; eligibility requires form, non-copy, topic, originality and quality floors",
+  "deterministic_style_score": 27.9183,
+  "judge_style_score": 60.0,
+  "mean_rouge1_f1": 0.159072
+}

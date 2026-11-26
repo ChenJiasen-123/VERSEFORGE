@@ -1,0 +1,702 @@
+{
+  "run_id": "live-haizi-02",
+  "mode": "live",
+  "is_mock": false,
+  "created_at": "2026-11-25T14:45:28.897726+00:00",
+  "updated_at": "2026-11-25T15:28:36.521882+00:00",
+  "status": "completed",
+  "config": {
+    "experiment": {
+      "name": "haizi-rpe-ga",
+      "seed": 20251125,
+      "output_root": "experiments/reverse_prompt_engineering/runs",
+      "language": "zh",
+      "notes": "原型实验：5首参考诗、种群5、5代；参数未经验证，不代表最佳设置。"
+    },
+    "corpus": {
+      "path": "var/haizi/corpus.jsonl",
+      "id_prefix": "haizi-",
+      "reference_split": "train",
+      "reference_count": 5,
+      "reference_poem_ids": [],
+      "reference_order": "core_rank",
+      "held_out_split": "held_out",
+      "held_out_count": 5,
+      "held_out_poem_ids": [],
+      "exclude_flags": [
+        "is_fragment",
+        "is_duplicate",
+        "misattributed",
+        "is_translation"
+      ],
+      "target_name": "海子",
+      "target_aliases": [],
+      "exclude_target_name_in_auto_selection": true,
+      "max_reference_chars": 1200,
+      "max_held_out_chars": 1200
+    },
+    "topics": {
+      "optimization": [
+        {
+          "id": "opt-01",
+          "topic": "深夜医院走廊尽头的自动售货机",
+          "genre": "modern",
+          "max_lines": 20,
+          "requirements": "12—20行，分2—4节；每节1—6行；写深夜、机器与人的疲惫；不得出现任何诗人姓名。"
+        },
+        {
+          "id": "opt-02",
+          "topic": "洪水退去后的乡村小学操场",
+          "genre": "modern",
+          "max_lines": 20,
+          "requirements": "12—20行，分2—4节；每节1—6行；写灾后清理与儿童返校；不得出现任何诗人姓名。"
+        },
+        {
+          "id": "opt-03",
+          "topic": "跨江大桥下的夜班渡轮",
+          "genre": "modern",
+          "max_lines": 20,
+          "requirements": "12—20行，分2—4节；每节1—6行；写夜班工人、江水与城市灯光；不得出现任何诗人姓名。"
+        }
+      ],
+      "test": [
+        {
+          "id": "test-01",
+          "topic": "搬家日留下的空房间",
+          "genre": "modern",
+          "max_lines": 20,
+          "requirements": "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+        },
+        {
+          "id": "test-02",
+          "topic": "山顶气象站停电的夜晚",
+          "genre": "modern",
+          "max_lines": 20,
+          "requirements": "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+        },
+        {
+          "id": "test-03",
+          "topic": "旧火车站行李寄存处的雨伞",
+          "genre": "modern",
+          "max_lines": 20,
+          "requirements": "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+        },
+        {
+          "id": "test-04",
+          "topic": "城市天台上的小型菜园",
+          "genre": "modern",
+          "max_lines": 20,
+          "requirements": "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+        },
+        {
+          "id": "test-05",
+          "topic": "河滩上被风吹走的帐篷",
+          "genre": "modern",
+          "max_lines": 20,
+          "requirements": "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+        }
+      ]
+    },
+    "generation": {
+      "repetitions": 1,
+      "temperature": 1.0,
+      "max_tokens": 1200,
+      "thinking": "disabled",
+      "default_genre": "modern",
+      "default_max_lines": 20,
+      "default_requirements": "12—20行，分2—4节；每节1—6行；使用现代汉语；不得出现任何诗人姓名。"
+    },
+    "population": {
+      "size": 5,
+      "generations": 5,
+      "initialization_mode": "independent",
+      "init_temperature": 1.0,
+      "init_max_tokens": 1400,
+      "mutation_temperature": 0.8,
+      "mutation_max_tokens": 2000,
+      "analysis_temperature": 0.2,
+      "analysis_max_tokens": 4000,
+      "thinking": "disabled",
+      "min_prompt_chars": 120,
+      "max_prompt_chars": 1400,
+      "max_prompt_repair_attempts": 1,
+      "patience": 2,
+      "min_improvement": 0.25
+    },
+    "evaluation": {
+      "judge_model": null,
+      "judge_temperature": 0.0,
+      "judge_max_tokens": 2600,
+      "judge_thinking": "disabled",
+      "rubric_version": "rpe-poetry-zh-v1",
+      "deterministic_style_weight": 0.35,
+      "judge_style_weight": 0.65,
+      "quality_weight": 0.15,
+      "topic_threshold": 3.0,
+      "originality_threshold": 3.0,
+      "quality_floor": 2.0,
+      "form_penalty": 30.0,
+      "topic_penalty_scale": 15.0,
+      "originality_penalty_scale": 15.0,
+      "quality_penalty_scale": 15.0,
+      "copy_penalty": 30.0,
+      "copy_lcs_chars": 12,
+      "copy_line_chars": 8,
+      "copy_rouge1_cap": 0.8,
+      "confirmation_top_k": 2,
+      "confirmation_repetitions": 1,
+      "judge_evidence_required": true
+    },
+    "prompt_rules": {
+      "max_reference_ngram": 12,
+      "warn_reference_ngram": 8,
+      "max_vague_phrases": 2,
+      "min_instruction_units": 3,
+      "forbidden_dependency_phrases": [
+        "参考上面",
+        "参考上述",
+        "上述作品",
+        "以上作品",
+        "这些诗",
+        "前文",
+        "上面这些",
+        "所给作品",
+        "给出的诗",
+        "参考作品",
+        "参考诗",
+        "上述",
+        "上面",
+        "这些作品",
+        "原作",
+        "旧作"
+      ],
+      "vague_phrases": [
+        "富有诗意",
+        "意境深远",
+        "意境优美",
+        "语言优美",
+        "文采斐然",
+        "情感真挚",
+        "风格独特",
+        "别具一格",
+        "引人入胜",
+        "浑然天成",
+        "耐人寻味",
+        "独具匠心",
+        "诗意盎然",
+        "跃然纸上"
+      ]
+    },
+    "budget": {
+      "max_api_calls": 400,
+      "max_total_tokens": 1400000,
+      "request_timeout": 90,
+      "max_parse_retries": 2,
+      "price_per_million_input": null,
+      "price_per_million_output": null,
+      "require_authorization": true
+    },
+    "benchmark": {
+      "enabled": true,
+      "repetitions": 1,
+      "temperature": 1.0,
+      "max_tokens": 1200,
+      "baseline_a_prompt": "请模仿诗人{target_name}的风格，围绕题目“{topic}”创作一首现代诗。要求：{requirements}",
+      "groups": [
+        "A",
+        "B",
+        "C"
+      ]
+    }
+  },
+  "config_sha256": "7db47457b88f37cf0dece941634816af38312d4a273fb0fb6110b5ef31e96c86",
+  "corpus": {
+    "source_path": "C:\\Users\\Linza\\Documents\\workspace\\VF-StyleEngine\\var\\haizi\\corpus.jsonl",
+    "corpus_sha256": "c3a473f2dc7ee206d58e03a3a491a046fdccba380baa214eca2dae679fc62973",
+    "corpus_manifest_hash": "3e2f1ef1fcc2ea0058bd22c1369624eb043242eb450d119d5bbaa66949bfd5cb",
+    "source_notices": [
+      {
+        "poem_id": "haizi-04-41-41-00",
+        "flags": [
+          "is_fragment"
+        ]
+      },
+      {
+        "poem_id": "haizi-04-46-46-00",
+        "flags": [
+          "is_fragment"
+        ]
+      },
+      {
+        "poem_id": "haizi-02-22-22-0",
+        "flags": [
+          "is_fragment"
+        ]
+      }
+    ],
+    "selection_notices": [],
+    "selection_rule": {
+      "reference": "split=reference_split; id_prefix; exclude_flags; max_reference_chars; sort by tier/core_rank/poem_id; take reference_count",
+      "held_out": "same rule on held_out_split; never used during optimization",
+      "explicit_ids": false
+    },
+    "references": [
+      {
+        "poem_id": "haizi-01-001",
+        "title": "亚洲铜",
+        "text": "亚洲铜，亚洲铜\n祖父死在这里，父亲死在这里，我也将死在这里\n你是唯一的一块埋人的地方\n\n亚洲铜，亚洲铜\n爱怀疑和飞翔的是鸟，淹没一切的是海水\n你的主人却是青草，住在自己细小的腰上，守住野花的手掌和秘密\n\n亚洲铜，亚洲铜\n看见了吗？那两只白鸽子，它是屈原遗落在沙滩上的白鞋子\n让我们——我们和河流一起，穿上它吧\n\n亚洲铜，亚洲铜\n击鼓之后，我们把在黑暗中跳舞的心脏叫做月亮\n这月亮主要由你构成",
+        "source": "海子诗全编（西川编，上海三联书店1997）网页版，Internet Archive 快照",
+        "source_url": "https://web.archive.org/web/20150316024331id_/http://www.eywedu.com/haizi/01/001.htm",
+        "genre": "modern",
+        "period": "第一编 短诗（1983—1986）",
+        "split": "train",
+        "copyright": "third_party_copyright",
+        "metadata": {
+          "source_verified": true,
+          "is_translation": false,
+          "is_fragment": false,
+          "is_duplicate": false,
+          "misattributed": false,
+          "book": "海子诗全编",
+          "editor": "西川",
+          "catalog_path": "/01/001",
+          "catalog_title": "亚洲铜",
+          "selection_title": "亚洲铜",
+          "page_title": "亚洲铜",
+          "tier": "core",
+          "core_rank": 1,
+          "group": null,
+          "focus": "中心意象反复呼告、代际递进",
+          "style_features": "原型意象、历史意识、复沓",
+          "composed": "1984.10",
+          "chapter_count": null,
+          "chapters_fetched": null,
+          "chapters_complete": null,
+          "front_matter": null,
+          "fetched_at": "2026-11-25T13:21:24+00:00"
+        },
+        "text_sha256": "cd9147119c0e0039de9bbf73e9a0e793ad27d174580c3bc275bda8143c3406a9",
+        "han_length": 166
+      },
+      {
+        "poem_id": "haizi-03-064",
+        "title": "祖国 (或以梦为马)",
+        "text": "我要做远方的忠诚的儿子\n和物质的短暂情人\n和所有以梦为马的诗人一样\n我不得不和烈士和小丑走在同一道路上\n\n万人都要将火熄灭 我一人独将此火高高举起\n此火为大 开花落英于神圣的祖国\n和所有以梦为马的诗人一样\n我籍次火得度一生的茫茫黑夜\n\n此火为大 祖国的语言和乱石投筑的梁山城寨\n以梦为上的敦煌——那七月也会寒冷的骨骼\n如白雪的柴和坚硬的条条白雪 横放在众神之山\n和所有以梦为马的诗人一样\n我投入此火 这三者是囚禁我的灯盏 吐出光辉\n\n万人都要从我刀口走过 去建筑祖国的语言\n我甘愿一切从头开始\n和所有以梦为马的诗人一样\n我也愿将牢底坐穿\n\n众神创造物中只有我最易朽 带着不可抗拒的死亡的速度\n只有粮食是我的珍爱 我将她紧紧抱住 抱住她在故乡生儿育女\n和所有以梦为马的诗人一样\n我也愿自己埋葬在四周高高的山上 守望平静家园\n\n面对大河我无限惭愧\n我年华虚度 空有一身疲倦\n和所有以梦为马的诗人一样\n岁月易逝 一滴不剩 水滴中有一匹马儿一命归天\n\n千年后如若我再生于祖国的河岸\n千年后我再次拥有中国的稻田 和周天子的雪山 天马赐踏\n和所有以梦为马的诗人一样\n我选择永恒的事业\n\n我的事业 就是要成为太阳的一生\n他从古到今——“日”——他无比辉煌无比光明\n和所有以梦为马的诗人一样\n最后我被黄昏的众神抬入不朽的太阳\n\n太阳是我的名字\n太阳是我的一生\n太阳的山顶埋葬 诗歌的尸体——千年王国和我\n骑着五千年凤凰和名字叫“马”的龙——我必将失败\n但诗歌本身以太阳必将胜利",
+        "source": "海子诗全编（西川编，上海三联书店1997）网页版，Internet Archive 快照",
+        "source_url": "https://web.archive.org/web/20150505123809id_/http://www.eywedu.com/haizi/03/064.htm",
+        "genre": "modern",
+        "period": "第三编 短诗（1987—1989）",
+        "split": "train",
+        "copyright": "third_party_copyright",
+        "metadata": {
+          "source_verified": true,
+          "is_translation": false,
+          "is_fragment": false,
+          "is_duplicate": false,
+          "misattributed": false,
+          "book": "海子诗全编",
+          "editor": "西川",
+          "catalog_path": "/03/064",
+          "catalog_title": "祖国（或以梦为马）",
+          "selection_title": "祖国（或以梦为马）",
+          "page_title": "祖国 (或以梦为马)",
+          "tier": "core",
+          "core_rank": 2,
+          "group": null,
+          "focus": "誓言式句法、宏大时空转换",
+          "style_features": "史诗性、自我宣言",
+          "composed": "1987",
+          "chapter_count": null,
+          "chapters_fetched": null,
+          "chapters_complete": null,
+          "front_matter": null,
+          "fetched_at": "2026-11-25T13:21:27+00:00"
+        },
+        "text_sha256": "552d2151b84286ab7338856e7e738b79d13e4ac13a14e680f108ca166868ba23",
+        "han_length": 553
+      },
+      {
+        "poem_id": "haizi-01-116",
+        "title": "九月",
+        "text": "目击众神死亡的草原上野花一片\n远在远方的风比远方更远\n我的琴声呜咽 泪水全无\n我把这远方的远归还草原\n一个叫马头 一个叫马尾\n我的琴声呜咽 泪水全无\n\n远方只有在死亡中凝聚野花一片\n明月如镜高悬草原映照千年岁月\n我的琴声呜咽 泪水全无\n只身打马过草原",
+        "source": "海子诗全编（西川编，上海三联书店1997）网页版，Internet Archive 快照",
+        "source_url": "https://web.archive.org/web/20160822171021id_/http://www.eywedu.com/haizi/01/116.htm",
+        "genre": "modern",
+        "period": "第一编 短诗（1983—1986）",
+        "split": "train",
+        "copyright": "third_party_copyright",
+        "metadata": {
+          "source_verified": true,
+          "is_translation": false,
+          "is_fragment": false,
+          "is_duplicate": false,
+          "misattributed": false,
+          "book": "海子诗全编",
+          "editor": "西川",
+          "catalog_path": "/01/116",
+          "catalog_title": "九月",
+          "selection_title": "九月",
+          "page_title": "九月",
+          "tier": "core",
+          "core_rank": 3,
+          "group": null,
+          "focus": "意象回环、情绪逐层积累",
+          "style_features": "苍茫感、宗教性、音乐性",
+          "composed": "1986",
+          "chapter_count": null,
+          "chapters_fetched": null,
+          "chapters_complete": null,
+          "front_matter": null,
+          "fetched_at": "2026-11-25T13:21:31+00:00"
+        },
+        "text_sha256": "d8ab5590b948244bf70626636ac7f2a07232e00078e967e9bd3c4a8854491c46",
+        "han_length": 111
+      },
+      {
+        "poem_id": "haizi-03-126",
+        "title": "黑夜的献诗 献给黑夜的女儿",
+        "text": "黑夜从大地上升起\n遮住了光明的天空\n丰收后荒凉的大地\n黑夜从你内部上升\n\n你从远方来，我到远方去\n遥远的路程经过这里\n天空一无所有\n为何给我安慰\n\n丰收之后荒凉的大地\n人们取走了一年的收成\n取走了粮食骑走了马\n留在地里的人，埋得很深\n\n草杈闪闪发亮，稻草堆在火上\n稻谷堆在黑暗的谷仓\n谷仓中太黑暗，太寂静，太丰收\n也太荒凉，我在丰收中看到了阎王的眼睛\n\n黑雨滴一样的鸟群\n从黄昏飞入黑夜\n黑夜一无所有\n为何给我安慰\n\n走在路上\n放声歌唱\n大风刮过山岗\n上面是无边的天空",
+        "source": "海子诗全编（西川编，上海三联书店1997）网页版，Internet Archive 快照",
+        "source_url": "https://web.archive.org/web/20160824235132id_/http://www.eywedu.com/haizi/03/126.htm",
+        "genre": "modern",
+        "period": "第三编 短诗（1987—1989）",
+        "split": "train",
+        "copyright": "third_party_copyright",
+        "metadata": {
+          "source_verified": true,
+          "is_translation": false,
+          "is_fragment": false,
+          "is_duplicate": false,
+          "misattributed": false,
+          "book": "海子诗全编",
+          "editor": "西川",
+          "catalog_path": "/03/126",
+          "catalog_title": "黑夜的献诗",
+          "selection_title": "黑夜的献诗",
+          "page_title": "黑夜的献诗 献给黑夜的女儿",
+          "tier": "core",
+          "core_rank": 4,
+          "group": null,
+          "focus": "对立意象形成情感张力",
+          "style_features": "光暗对立、荒凉感",
+          "composed": "1989.2.2",
+          "chapter_count": null,
+          "chapters_fetched": null,
+          "chapters_complete": null,
+          "front_matter": null,
+          "fetched_at": "2026-11-25T13:22:00+00:00"
+        },
+        "text_sha256": "e39dcbb74a08d949ce88b51bf504e0c9adb2d92ab63363326a2f751775885228",
+        "han_length": 200
+      },
+      {
+        "poem_id": "haizi-03-106",
+        "title": "四姐妹",
+        "text": "荒凉的山冈上站着四姐妹\n所有的风只向她们吹\n所有的日子都为她们破碎\n\n空气中的一棵麦子\n高举到我的头顶\n我身在这荒芜的山冈\n怀念我空空的房间，落满灰尘\n\n我爱过的这糊涂的四姐妹啊\n光芒四射的四姐妹\n夜里我头枕卷册和神州\n想起蓝色远方的四姐妹\n我爱过的这糊涂的四姐妹啊\n像爱着我亲手写下的四首诗\n我的美丽的结伴而行的四姐妹\n比命运女神还要多出一个\n赶着美丽苍白的奶牛 走向月亮形的山峰\n\n到了二月，你是从哪里来的\n天上滚过春天的雷，你是从哪里来的\n不和陌生人一起来\n不和运货马车一起来\n不和鸟群一起来\n\n四姐妹抱着这一棵\n一棵空气中的麦子\n抱着昨天的大雪，今天的雨水\n明日的粮食与灰烬\n这是绝望的麦子\n请告诉四姐妹：这是绝望的麦子\n永远是这样\n风后面是风\n天空上面是天空\n道路前面还是道路",
+        "source": "海子诗全编（西川编，上海三联书店1997）网页版，Internet Archive 快照",
+        "source_url": "https://web.archive.org/web/20160824235107id_/http://www.eywedu.com/haizi/03/106.htm",
+        "genre": "modern",
+        "period": "第三编 短诗（1987—1989）",
+        "split": "train",
+        "copyright": "third_party_copyright",
+        "metadata": {
+          "source_verified": true,
+          "is_translation": false,
+          "is_fragment": false,
+          "is_duplicate": false,
+          "misattributed": false,
+          "book": "海子诗全编",
+          "editor": "西川",
+          "catalog_path": "/03/106",
+          "catalog_title": "四姐妹",
+          "selection_title": "四姐妹",
+          "page_title": "四姐妹",
+          "tier": "core",
+          "core_rank": 6,
+          "group": null,
+          "focus": "群体意象承载个人经验",
+          "style_features": "人物象征化、反复咏叹",
+          "composed": "1989.2.23",
+          "chapter_count": null,
+          "chapters_fetched": null,
+          "chapters_complete": null,
+          "front_matter": null,
+          "fetched_at": "2026-11-25T13:22:07+00:00"
+        },
+        "text_sha256": "2911ec6cdbe2e2a9abd89cab202d564e9c04697ad7b9c2a2badfd9de322b3014",
+        "han_length": 303
+      }
+    ],
+    "held_out": [
+      {
+        "poem_id": "haizi-01-113",
+        "title": "七月不远 ——给青海湖，请熄灭我的爱情",
+        "text": "七月不远\n性别的诞生不远\n爱情不远——马鼻子下\n湖泊含盐\n\n因此青海不远\n湖畔一捆捆蜂箱\n使我显得凄凄迷人：\n青草开满鲜花\n\n青海湖上\n我的狐独如天堂的马匹\n（因此，天堂的马匹不远）\n\n我就是那个情种：诗中吟唱的野花\n天堂的马肚子里唯一含毒的野花\n（青海湖，请熄灭我的爱情！）\n\n野花青梗不远，医箱内古老姓氏不远\n（其他的浪子，治好了疾病\n已回原籍，我这就想去见你们）\n\n因此跋水涉水死亡不远\n骨骼挂遍我身体\n如同蓝色水上的树枝\n\n啊，青海湖，暮色苍茫的水面\n一切如在眼前！\n\n只有五月生命的鸟群早已飞去\n只有饮我宝石的头一只鸟早已飞去\n只剩下青海湖，这宝石的尸体\n暮色苍茫的水面",
+        "source": "海子诗全编（西川编，上海三联书店1997）网页版，Internet Archive 快照",
+        "source_url": "https://web.archive.org/web/20150505121157id_/http://www.eywedu.com/haizi/01/113.htm",
+        "genre": "modern",
+        "period": "第一编 短诗（1983—1986）",
+        "split": "held_out",
+        "copyright": "third_party_copyright",
+        "metadata": {
+          "source_verified": true,
+          "is_translation": false,
+          "is_fragment": false,
+          "is_duplicate": false,
+          "misattributed": false,
+          "book": "海子诗全编",
+          "editor": "西川",
+          "catalog_path": "/01/113",
+          "catalog_title": "七月不远",
+          "selection_title": "七月不远",
+          "page_title": "七月不远 ——给青海湖，请熄灭我的爱情",
+          "tier": "core",
+          "core_rank": 13,
+          "group": null,
+          "focus": "将地点转化为精神坐标",
+          "style_features": "地理、记忆、远方",
+          "composed": "1986",
+          "chapter_count": null,
+          "chapters_fetched": null,
+          "chapters_complete": null,
+          "front_matter": null,
+          "fetched_at": "2026-11-25T13:24:37+00:00"
+        },
+        "text_sha256": "35d862f645ff4ca818216b1f92c268cc36a3c88752b673b93d5291f06f0b1948",
+        "han_length": 238
+      },
+      {
+        "poem_id": "haizi-03-047",
+        "title": "幸福的一日 致秋天的花楸树",
+        "text": "我无限的热爱着新的一日\n今天的太阳 今天的马 今天的花楸树\n使我健康 富足 拥有一生\n\n从黎明到黄昏\n阳光充足\n胜过一切过去的诗\n幸福找到我\n幸福说：“瞧 这个诗人\n他比我本人还要幸福”\n\n在劈开了我的秋天\n在劈开了我的骨头的秋天\n我爱你，花楸树",
+        "source": "海子诗全编（西川编，上海三联书店1997）网页版，Internet Archive 快照",
+        "source_url": "https://web.archive.org/web/20150505121249id_/http://www.eywedu.com/haizi/03/047.htm",
+        "genre": "modern",
+        "period": "第三编 短诗（1987—1989）",
+        "split": "held_out",
+        "copyright": "third_party_copyright",
+        "metadata": {
+          "source_verified": true,
+          "is_translation": false,
+          "is_fragment": false,
+          "is_duplicate": false,
+          "misattributed": false,
+          "book": "海子诗全编",
+          "editor": "西川",
+          "catalog_path": "/03/047",
+          "catalog_title": "幸福的一日",
+          "selection_title": "幸福的一日",
+          "page_title": "幸福的一日 致秋天的花楸树",
+          "tier": "core",
+          "core_rank": 30,
+          "group": null,
+          "focus": "以微小事物表达宏大幸福",
+          "style_features": "日常感知、生命体验",
+          "composed": "1987",
+          "chapter_count": null,
+          "chapters_fetched": null,
+          "chapters_complete": null,
+          "front_matter": null,
+          "fetched_at": "2026-11-25T13:25:36+00:00"
+        },
+        "text_sha256": "fa60e7453a01aa04c241f23a98998d7c8bf33efd778681a14abd1320571be6af",
+        "han_length": 101
+      },
+      {
+        "poem_id": "haizi-01-021",
+        "title": "村庄",
+        "text": "村庄里住着\n母亲和儿子\n儿子静静地长大\n母亲静静地注视\n\n芦花丛中\n村庄是一只白色的船\n我妹妹叫芦花\n我妹妹很美丽",
+        "source": "海子诗全编（西川编，上海三联书店1997）网页版，Internet Archive 快照",
+        "source_url": "https://web.archive.org/web/20160824234356id_/http://www.eywedu.com/haizi/01/021.htm",
+        "genre": "modern",
+        "period": "第一编 短诗（1983—1986）",
+        "split": "held_out",
+        "copyright": "third_party_copyright",
+        "metadata": {
+          "source_verified": true,
+          "is_translation": false,
+          "is_fragment": false,
+          "is_duplicate": false,
+          "misattributed": false,
+          "book": "海子诗全编",
+          "editor": "西川",
+          "catalog_path": "/01/021",
+          "catalog_title": "村庄",
+          "selection_title": "村庄",
+          "page_title": "村庄",
+          "tier": "A",
+          "core_rank": null,
+          "group": "G01 麦地与土地型",
+          "focus": "物质名词的象征化、农耕语汇、土地与生命的联系",
+          "style_features": "",
+          "composed": "1984",
+          "chapter_count": null,
+          "chapters_fetched": null,
+          "chapters_complete": null,
+          "front_matter": null,
+          "fetched_at": "2026-11-25T13:25:48+00:00"
+        },
+        "text_sha256": "14567cdc171179bfcfe1e8d46f555668ce6e236f44bec35c7b4e42e0e62ce476",
+        "han_length": 49
+      },
+      {
+        "poem_id": "haizi-01-029",
+        "title": "坛子",
+        "text": "这就是我张开手指所要叙说的故事\n那洞窟不会在今夜关闭。明天夜晚也不会关闭\n额头披满钟声的\n土地\n一只坛子\n\n我头一次也是最后一次进入这坛子\n因为我知道只有一次\n脖颈围着野兽的线条\n水流拥抱的\n\n坛子\n长出朴实的肉体\n\n这就是我所要叙说的事\n我对你这黑色盛水的身体并非没有话说\n敬意由此开始，接触由此开始\n这一只坛子，我的土地之上\n从野兽演变而出的\n秘密的脚，在我自己尝试的锁链之中\n正好我把嘴唇埋在坛子里，河流\n糊住四壁，一棵又一棵\n栗树像伤疤在周围隐隐出现\n而女人似的故乡，双双从水底浮上，询问生育之事",
+        "source": "海子诗全编（西川编，上海三联书店1997）网页版，Internet Archive 快照",
+        "source_url": "https://web.archive.org/web/20150505115349id_/http://www.eywedu.com/haizi/01/029.htm",
+        "genre": "modern",
+        "period": "第一编 短诗（1983—1986）",
+        "split": "held_out",
+        "copyright": "third_party_copyright",
+        "metadata": {
+          "source_verified": true,
+          "is_translation": false,
+          "is_fragment": false,
+          "is_duplicate": false,
+          "misattributed": false,
+          "book": "海子诗全编",
+          "editor": "西川",
+          "catalog_path": "/01/029",
+          "catalog_title": "坛子",
+          "selection_title": "坛子",
+          "page_title": "坛子",
+          "tier": "A",
+          "core_rank": null,
+          "group": "G07 陌生化与超现实型",
+          "focus": "名词与动词的异常搭配、物我转换、尺度变形",
+          "style_features": "",
+          "composed": null,
+          "chapter_count": null,
+          "chapters_fetched": null,
+          "chapters_complete": null,
+          "front_matter": null,
+          "fetched_at": "2026-11-25T13:29:38+00:00"
+        },
+        "text_sha256": "fe8c340e045c3bd5df238041ae21c1b57beaef49b2c4257735940bbce391cf1a",
+        "han_length": 221
+      },
+      {
+        "poem_id": "haizi-01-036",
+        "title": "得不到你",
+        "text": "得不到你\n我用河水做成的妻子\n得不到你\n我的有弱点的妇女\n\n得不到你\n妻子滑动河水\n情意泥沙俱下\n\n其余的家庭成员俯伏在锅勺上\n得不到你\n有弱点的爱情\n\n我们确实被太阳烤焦，秋天内外\n我不能再保护自己\n我不能再\n让爱情随便受伤\n\n得不到你\n但我同时又在秋天成亲\n歌声四起",
+        "source": "海子诗全编（西川编，上海三联书店1997）网页版，Internet Archive 快照",
+        "source_url": "https://web.archive.org/web/20150505121129id_/http://www.eywedu.com/haizi/01/036.htm",
+        "genre": "modern",
+        "period": "第一编 短诗（1983—1986）",
+        "split": "held_out",
+        "copyright": "third_party_copyright",
+        "metadata": {
+          "source_verified": true,
+          "is_translation": false,
+          "is_fragment": false,
+          "is_duplicate": false,
+          "misattributed": false,
+          "book": "海子诗全编",
+          "editor": "西川",
+          "catalog_path": "/01/036",
+          "catalog_title": "得不到你",
+          "selection_title": "得不到你",
+          "page_title": "得不到你",
+          "tier": "A",
+          "core_rank": null,
+          "group": "G04 爱情与女性型",
+          "focus": "第二人称、亲密称谓、女性形象与自然物的对应",
+          "style_features": "",
+          "composed": "1985.11.11",
+          "chapter_count": null,
+          "chapters_fetched": null,
+          "chapters_complete": null,
+          "front_matter": null,
+          "fetched_at": "2026-11-25T13:27:46+00:00"
+        },
+        "text_sha256": "424f46fab0e8041e2b282df66ad820085f197536ba8fe8d3c8001b52a3383d33",
+        "han_length": 114
+      }
+    ],
+    "reference_diversity": {
+      "pairs": 10,
+      "mean_style_similarity": 48.2485,
+      "max_style_similarity": 60.3303,
+      "min_style_similarity": 36.9221
+    },
+    "target_name": "海子",
+    "target_aliases": []
+  },
+  "topics": {
+    "optimization": [
+      {
+        "id": "opt-01",
+        "topic": "深夜医院走廊尽头的自动售货机",
+        "genre": "modern",
+        "max_lines": 20,
+        "requirements": "12—20行，分2—4节；每节1—6行；写深夜、机器与人的疲惫；不得出现任何诗人姓名。"
+      },
+      {
+        "id": "opt-02",
+        "topic": "洪水退去后的乡村小学操场",
+        "genre": "modern",
+        "max_lines": 20,
+        "requirements": "12—20行，分2—4节；每节1—6行；写灾后清理与儿童返校；不得出现任何诗人姓名。"
+      },
+      {
+        "id": "opt-03",
+        "topic": "跨江大桥下的夜班渡轮",
+        "genre": "modern",
+        "max_lines": 20,
+        "requirements": "12—20行，分2—4节；每节1—6行；写夜班工人、江水与城市灯光；不得出现任何诗人姓名。"
+      }
+    ],
+    "test": [
+      {
+        "id": "test-01",
+        "topic": "搬家日留下的空房间",
+        "genre": "modern",
+        "max_lines": 20,
+        "requirements": "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+      },
+      {
+        "id": "test-02",
+        "topic": "山顶气象站停电的夜晚",
+        "genre": "modern",
+        "max_lines": 20,
+        "requirements": "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+      },
+      {
+        "id": "test-03",
+        "topic": "旧火车站行李寄存处的雨伞",
+        "genre": "modern",
+        "max_lines": 20,
+        "requirements": "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+      },
+      {
+        "id": "test-04",
+        "topic": "城市天台上的小型菜园",
+        "genre": "modern",
+        "max_lines": 20,
+        "requirements": "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+      },
+      {
+        "id": "test-05",
+        "topic": "河滩上被风吹走的帐篷",
+        "genre": "modern",
+        "max_lines": 20,
+        "requirements": "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+      }
+    ]
+  },
+  "warning": "LIVE RUN：实际 API 调用。评价器与生成器可能同模型，存在自评偏差。",
+  "method": "RPE-GA adapted to Chinese poetry; see METHOD_ADAPTATION.md",
+  "config_amendments": [
+    {
+      "reason": "analysis 调用在 max_tokens=2200 时触发 finish_reason=length；提高到 4000，并把 mutation_max_tokens 提高到 2000。仅影响初始评估之后的差异分析/变异，不改变已完成初始评估的生成与 Judge 参数。",
+      "old_population": {
+        "population": 2200
+      },
+      "new_population": {
+        "analysis_max_tokens": 4000,
+        "mutation_max_tokens": 2000
+      }
+    }
+  ]
+}

@@ -7,10 +7,12 @@ response cache for resume, an append-only ledger, and JSON repair attempts.
 from __future__ import annotations
 
 import hashlib
+import http.client
 import json
 import math
 import os
 import re
+import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -252,7 +254,7 @@ def parse_json_object(text: str) -> dict:
 
 class LLM:
     def __init__(self, client, budget: Budget, cache: LLMCache, ledger: JsonlLedger,
-                 max_parse_retries=1, request_timeout=90):
+                 max_parse_retries=1, request_timeout=90, shared_lock=None):
         self.client = client
         self.model = getattr(client, "model", "unknown")
         self.mock = bool(getattr(client, "mock", False))
@@ -261,6 +263,31 @@ class LLM:
         self.ledger = ledger
         self.max_parse_retries = int(max_parse_retries)
         self.request_timeout = int(request_timeout)
+        self._lock = shared_lock or threading.RLock()
+        if not hasattr(self.budget, "_inflight_calls"):
+            self.budget._inflight_calls = 0
+            self.budget._inflight_tokens = 0
+
+    def _complete_live(self, system, user, *, max_tokens, thinking, temperature):
+        transient_markers = ("网络连接失败", "HTTP 429", "HTTP 500", "HTTP 502", "HTTP 503", "HTTP 504", "请求失败，请检查服务状态")
+        max_transient = 1 if self.mock else 5
+        for attempt in range(max_transient):
+            try:
+                return self.client.complete(
+                    system, user, timeout=self.request_timeout, max_tokens=max_tokens,
+                    thinking=thinking, temperature=temperature,
+                )
+            except (http.client.HTTPException, OSError, TimeoutError):
+                if attempt + 1 < max_transient:
+                    time.sleep(2.0 * (attempt + 1))
+                    continue
+                raise RuntimeError("网络连接失败或响应读取中断") from None
+            except RuntimeError as exc:
+                msg = str(exc)
+                if attempt + 1 < max_transient and any(m in msg for m in transient_markers):
+                    time.sleep(2.0 * (attempt + 1))
+                    continue
+                raise
 
     def call_text(self, *, purpose, system, user, max_tokens, thinking=None,
                   temperature=None, cache_variant=None, use_cache=True):
@@ -268,32 +295,48 @@ class LLM:
             model=self.model, system=system, user=user, max_tokens=max_tokens,
             thinking=thinking, temperature=temperature, variant=cache_variant,
         )
-        if use_cache:
-            cached = self.cache.get(key)
-            if cached:
-                usage = cached.get("usage") or {}
-                in_tok = usage.get("prompt_tokens") or estimate_tokens(system + user)
-                out_tok = usage.get("completion_tokens") or estimate_tokens(cached["content"])
-                self.budget.record_cache_hit(in_tok, out_tok)
-                self.ledger.append({
-                    "at": _utc_now(), "purpose": purpose, "model": self.model,
-                    "cache_hit": True, "input_tokens": 0, "output_tokens": 0,
-                    "total_tokens": 0, "estimated_cost": 0.0,
-                    "cache_key": key, "mock": self.mock,
-                    "request_settings": cached.get("request_settings"),
-                })
-                return cached["content"], {
-                    "usage": usage, "cache_hit": True,
-                    "request_settings": cached.get("request_settings") or {},
-                    "model": self.model,
-                }
+        with self._lock:
+            if use_cache:
+                cached = self.cache.get(key)
+                if cached:
+                    usage = cached.get("usage") or {}
+                    in_tok = usage.get("prompt_tokens") or estimate_tokens(system + user)
+                    out_tok = usage.get("completion_tokens") or estimate_tokens(cached["content"])
+                    self.budget.record_cache_hit(in_tok, out_tok)
+                    self.ledger.append({
+                        "at": _utc_now(), "purpose": purpose, "model": self.model,
+                        "cache_hit": True, "input_tokens": 0, "output_tokens": 0,
+                        "total_tokens": 0, "estimated_cost": 0.0,
+                        "cache_key": key, "mock": self.mock,
+                        "request_settings": cached.get("request_settings"),
+                    })
+                    return cached["content"], {
+                        "usage": usage, "cache_hit": True,
+                        "request_settings": cached.get("request_settings") or {},
+                        "model": self.model,
+                    }
 
-        est_input = estimate_tokens(system) + estimate_tokens(user)
-        self.budget.check(est_input, max_tokens)
-        result = self.client.complete(
-            system, user, timeout=self.request_timeout, max_tokens=max_tokens,
-            thinking=thinking, temperature=temperature,
-        )
+            est_input = estimate_tokens(system) + estimate_tokens(user)
+            est_worst = max(1, est_input) + max_tokens
+            if self.budget.calls + self.budget._inflight_calls >= self.budget.max_calls:
+                raise BudgetExhausted(f"API 调用预算已用尽（{self.budget.max_calls} 次）")
+            if self.budget.total_tokens + self.budget._inflight_tokens + est_worst > self.budget.max_tokens:
+                raise BudgetExhausted(
+                    f"Token 预算不足以再发起一次调用（已用 {self.budget.total_tokens}，"
+                    f"本次最坏估计 {est_worst}，上限 {self.budget.max_tokens}）"
+                )
+            self.budget._inflight_calls += 1
+            self.budget._inflight_tokens += est_worst
+
+        try:
+            result = self._complete_live(
+                system, user, max_tokens=max_tokens, thinking=thinking, temperature=temperature,
+            )
+        finally:
+            with self._lock:
+                self.budget._inflight_calls -= 1
+                self.budget._inflight_tokens -= est_worst
+
         content = result.get("content")
         if not isinstance(content, str) or not content.strip():
             raise LLMOutputError(f"{purpose}：模型返回空正文")
@@ -304,22 +347,23 @@ class LLM:
             in_tok = est_input
         if out_tok is None:
             out_tok = estimate_tokens(content)
-        self.budget.record_call(in_tok, out_tok)
-        cost = 0.0
-        if self.budget.price_input is not None and self.budget.price_output is not None:
-            cost = (int(in_tok) * self.budget.price_input + int(out_tok) * self.budget.price_output) / 1_000_000
         request_settings = result.get("request_settings") or {}
-        self.ledger.append({
-            "at": _utc_now(), "purpose": purpose, "model": self.model,
-            "cache_hit": False, "input_tokens": int(in_tok), "output_tokens": int(out_tok),
-            "total_tokens": int(in_tok) + int(out_tok), "estimated_cost": round(cost, 6),
-            "cache_key": key, "mock": self.mock, "request_settings": request_settings,
-        })
-        if use_cache:
-            self.cache.put(
-                key, model=self.model, system=system, user=user, content=content,
-                usage=usage, request_settings=request_settings, purpose=purpose,
-            )
+        with self._lock:
+            self.budget.record_call(in_tok, out_tok)
+            cost = 0.0
+            if self.budget.price_input is not None and self.budget.price_output is not None:
+                cost = (int(in_tok) * self.budget.price_input + int(out_tok) * self.budget.price_output) / 1_000_000
+            self.ledger.append({
+                "at": _utc_now(), "purpose": purpose, "model": self.model,
+                "cache_hit": False, "input_tokens": int(in_tok), "output_tokens": int(out_tok),
+                "total_tokens": int(in_tok) + int(out_tok), "estimated_cost": round(cost, 6),
+                "cache_key": key, "mock": self.mock, "request_settings": request_settings,
+            })
+            if use_cache:
+                self.cache.put(
+                    key, model=self.model, system=system, user=user, content=content,
+                    usage=usage, request_settings=request_settings, purpose=purpose,
+                )
         return content, {
             "usage": usage, "cache_hit": False,
             "request_settings": request_settings, "model": self.model,
@@ -379,8 +423,9 @@ def restore_budget_from_ledger(budget: Budget, ledger_path: Path) -> None:
 
 
 def make_live_llms(config, run_dir: Path, *, project_root: Path):
-    """Build generation and judge wrappers sharing one budget/cache/ledger."""
+    """Build generation and judge wrappers sharing one budget/cache/ledger/lock."""
     load_env(project_root / ".env")
+    shared_lock = threading.RLock()
     budget = Budget(
         config["budget"]["max_api_calls"],
         config["budget"]["max_total_tokens"],
@@ -392,13 +437,15 @@ def make_live_llms(config, run_dir: Path, *, project_root: Path):
     gen_client = DeepSeekClient()
     gen_llm = LLM(gen_client, budget, cache, ledger,
                   max_parse_retries=config["budget"]["max_parse_retries"],
-                  request_timeout=config["budget"]["request_timeout"])
+                  request_timeout=config["budget"]["request_timeout"],
+                  shared_lock=shared_lock)
     configured_judge = config["evaluation"].get("judge_model") or os.environ.get("DEEPSEEK_JUDGE_MODEL")
     if configured_judge and configured_judge != gen_client.model:
         judge_client = DeepSeekClient(model=configured_judge)
         judge_llm = LLM(judge_client, budget, cache, ledger,
                         max_parse_retries=config["budget"]["max_parse_retries"],
-                        request_timeout=config["budget"]["request_timeout"])
+                        request_timeout=config["budget"]["request_timeout"],
+                        shared_lock=shared_lock)
         same = False
     else:
         judge_llm = gen_llm

@@ -8,9 +8,10 @@ Test topics and held-out reference poems are never used to mutate any prompt.
 """
 from __future__ import annotations
 
+import statistics
 from datetime import datetime, timezone
 
-from .evaluator import aggregate_evaluations, evaluate_candidate
+from .evaluator import aggregate_evaluations, evaluate_candidate, selection_objective
 from .initializer import reverse_once
 from .metrics import han_only, reference_diversity
 
@@ -76,6 +77,9 @@ def _group_result(label, prompt, aggregate, usage, prompt_records):
         "aggregate": {
             "fitness": aggregate.get("fitness"),
             "eligible": aggregate.get("eligible"),
+            "eligible_count": aggregate["eligible_count"],
+            "eligible_rate": aggregate["eligible_rate"],
+            "eligible_style": aggregate["eligible_style"],
             "style_score": aggregate.get("style_score"),
             "deterministic_style_score": aggregate.get("deterministic_style_score"),
             "judge_style_score": aggregate.get("judge_style_score"),
@@ -93,6 +97,44 @@ def _group_result(label, prompt, aggregate, usage, prompt_records):
         "usage": usage,
         "evaluations": aggregate.get("evaluations", []),
     }
+
+
+def compare_qualified(groups):
+    """Report tied ranks and matched-topic style differences for C against each baseline."""
+    available = [key for key, group in groups.items() if group["aggregate"].get("successful_evaluations")]
+    ordered = sorted(available, key=lambda k: selection_objective(groups[k]["aggregate"]), reverse=True)
+    ranks = []
+    for key in ordered:
+        if not ranks or selection_objective(groups[key]["aggregate"]) != selection_objective(groups[ranks[-1][0]]["aggregate"]):
+            ranks.append([])
+        ranks[-1].append(key)
+
+    def passed(group):
+        return {(e["topic_id"], e["repetition"]): e["components"]["style_score"]
+                for e in groups[group]["evaluations"] if e["ok"] and e["components"]["eligible"]}
+
+    candidate = passed("C")
+    pairs = {}
+    for base in ("A", "B"):
+        baseline = passed(base)
+        by_topic = {}
+        for key in sorted(candidate.keys() & baseline.keys()):
+            by_topic.setdefault(key[0], []).append(candidate[key] - baseline[key])
+        differences = [statistics.mean(values) for values in by_topic.values()]
+        # Sensitivity to removing one topic, not a confidence interval.
+        leave_one_out = [(sum(differences) - delta) / (len(differences) - 1)
+                         for delta in differences] if len(differences) >= 2 else []
+        pairs[base] = {
+            "leave_one_topic_out_range": ([round(min(leave_one_out), 4), round(max(leave_one_out), 4)]
+                                          if leave_one_out else None),
+            "matched_samples": sum(map(len, by_topic.values())),
+            "matched_topics": len(differences),
+            "wins": sum(d > 0 for d in differences),
+            "ties": sum(d == 0 for d in differences),
+            "losses": sum(d < 0 for d in differences),
+            "mean_style_delta": round(statistics.mean(differences), 4) if differences else None,
+        }
+    return {"ranks": ranks, "paired_C_minus_baseline": pairs}
 
 
 def run_benchmark(*, config, selection, test_topics, best_prompt, llm, judge_llm=None,
@@ -145,7 +187,7 @@ def run_benchmark(*, config, selection, test_topics, best_prompt, llm, judge_llm
         )
     else:
         b_evaluation = aggregate_evaluations({"id": "bench-B"}, [], config)
-    b_aggregate = aggregate_evaluations({"id": "benchmark-B"}, b_evaluation.get("evaluations", []), config)
+    b_aggregate = b_evaluation
     results["B"] = _group_result(
         GROUP_LABELS["B"], b_prompt, b_aggregate, _usage_delta(before, _usage_snapshot(llm)),
         [reverse],
@@ -162,7 +204,7 @@ def run_benchmark(*, config, selection, test_topics, best_prompt, llm, judge_llm
         llm, config, c_candidate, test_topics, selection, judge_llm=judge_llm,
         repetitions=config["benchmark"]["repetitions"], kind="held_out",
     )
-    c_aggregate = aggregate_evaluations({"id": "benchmark-C"}, c_evaluation.get("evaluations", []), config)
+    c_aggregate = c_evaluation
     results["C"] = _group_result(
         GROUP_LABELS["C"], best_prompt, c_aggregate, _usage_delta(before, _usage_snapshot(llm)),
         [{"prompt": best_prompt, "origin": "rpe_ga_best"}],
@@ -186,7 +228,8 @@ def run_benchmark(*, config, selection, test_topics, best_prompt, llm, judge_llm
         key=lambda key: results[key]["aggregate"]["style_score"], reverse=True,
     )
     report = {
-        "schema_version": "rpe-benchmark-zh-v1",
+        "schema_version": "rpe-benchmark-zh-v2",
+        "qualified_comparison": compare_qualified(results),
         "is_mock": bool(getattr(llm, "mock", False)),
         "created_at": datetime.now(timezone.utc).isoformat(),
         "test_topics": test_topics,
@@ -215,7 +258,7 @@ def run_benchmark(*, config, selection, test_topics, best_prompt, llm, judge_llm
     }
     if state is not None:
         state["benchmark"] = {
-            key: report[key] for key in ("ranking_by_style_score", "comparison", "usage_total", "fairness", "limitations")
+            key: report[key] for key in ("qualified_comparison", "ranking_by_style_score", "comparison", "usage_total", "fairness", "limitations")
         }
         state["benchmark"]["details_path"] = "benchmark/benchmark.json"
     if store:

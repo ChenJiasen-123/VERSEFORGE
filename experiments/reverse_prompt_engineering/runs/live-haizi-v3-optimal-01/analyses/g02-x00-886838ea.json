@@ -1,0 +1,170 @@
+{
+  "reproduced": [
+    {
+      "feature": "无标点呼吸分行",
+      "generated_evidence": "全部生成诗行末几乎无标点，如“这是夜的值班室”“白色的胃 亮着”“吞下硬币 又吐出糖”，行末标点率极低。",
+      "reference_evidence": "参考诗行末标点率中位数为0，unpunctuated_break_rate中位数为1.0。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "第一人称赤诚呼告与直接命名",
+      "generated_evidence": "“操场，你是一片摊开的淤泥”“铁皮棚，你数过多少辆车的喘息”“姐姐，今夜我在德令哈”式呼告在生成中常见，如“你还要站多久”“孩子，我把它拖到太阳下”。",
+      "reference_evidence": "参考诗大量使用“亚洲铜，亚洲铜”“姐姐，今夜我在德令哈”“麦地啊”等呼告。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "核心词跨节回返并变奏",
+      "generated_evidence": "“亮着”在opt-01两版中反复出现，且句法位置变化（“白色的胃 亮着”“你继续亮着”“你亮着 我靠着墙站了一会儿”）；“风把沙按进”在opt-05中重复但宾语变化（加油枪的嘴/我的衣领）。",
+      "reference_evidence": "参考诗“和所有以梦为马的诗人一样”反复出现但每次后续句法不同；“我的琴声呜咽 泪水全无”多次回返。",
+      "claim_type": "observation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "具身动作与现场器物并置",
+      "generated_evidence": "“我把额头抵在你胸口”“我弯腰扛起一袋洋葱”“我攥紧缆绳 再攥紧”等动作句密集。",
+      "reference_evidence": "参考诗“喂马，劈柴”“我把石头还给石头”“只身打马过草原”等具身动作。",
+      "claim_type": "observation",
+      "confidence": "high"
+    }
+  ],
+  "missing": [
+    {
+      "feature": "原初元素/时间生命尺度与日常物件的碰撞",
+      "generated_evidence": "生成诗多困于走廊、操场、渡轮、市场等现场事务，如“走廊尽头只剩你一个活物”“我数着剩下的筐数”，缺少大地、黑夜、水火、时间、生命尺度等原初元素的直接碰撞。",
+      "reference_evidence": "参考诗“黑夜从大地上升起”“远在远方的风比远方更远”“太阳是我的名字/太阳是我的一生”等，原初元素与日常物件（麦地、村庄、马）直接相撞。",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "feature": "长短句张力与行长变异",
+      "generated_evidence": "多首诗行长变异系数偏低（opt-01:0.19，opt-02:0.18，opt-03:0.14，opt-04:0.18），anti_slop_flags出现“uniform_line_lengths”。",
+      "reference_evidence": "参考诗行长变异系数中位数0.338，p10为0.224，长短行反差明显。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "质朴而有重量的词域（具体字面词密度）",
+      "generated_evidence": "opt-01具体字面词/百字仅3.17，opt-01(rep1)为6.67，均低于参考p10（8.19）。",
+      "reference_evidence": "参考诗具体字面词/百字中位数10.56，p10为8.19。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "赤诚呼告的变奏回返（非机械复沓）",
+      "generated_evidence": "opt-01两版均以“你亮着”回返，但后续句法变化有限；opt-02“水退多远，我就跟多远”等句偏格言化，未形成参考式呼告变奏。",
+      "reference_evidence": "参考诗“和所有以梦为马的诗人一样”每次回返后接不同动作与意象，形成潮水式变奏。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "神话/崇高语域的自然带出",
+      "generated_evidence": "生成诗偶有“一桶星星”“黑夜是最大的秤”等，但整体困于事务描写，未自然升至元素与存在高度；评审mythic_register均分2.45，最低。",
+      "reference_evidence": "参考诗“众神创造物中只有我最易朽”“敦煌是千年以前/起了大火的森林”等，崇高语域由现场器物自然带出。",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    }
+  ],
+  "extraneous": [
+    {
+      "feature": "解释性明喻与廉价比喻",
+      "generated_evidence": "“像某个病人的肺”“像一块从夜里撕下来的炭”“像数着未亮起的路灯”“像一句没有说完的呼告”等明喻频繁出现。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "格言化收束与总结升华",
+      "generated_evidence": "“这船是我的 水不是”“黑夜是最大的秤”“这地方是火熄后的嘴”等句带有格言式判断，结尾常试图点题。",
+      "claim_type": "observation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "清单式罗列琐碎物件",
+      "generated_evidence": "“糖水 饼干 一罐冷掉的咖啡”“碎玻璃和死鱼”“烂菜叶和碎冰”等清单式排列，缺乏精神开阔度。",
+      "claim_type": "observation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "解释性连词与过渡",
+      "generated_evidence": "“像”“让”“被”“把”等虚词使用偏多，opt-01(rep1)虚词字占比0.32，高于参考p90（0.31）。",
+      "claim_type": "observation",
+      "confidence": "medium"
+    }
+  ],
+  "prompt_issues": [
+    {
+      "quote": "单节保持紧凑克制，常为三到五行，不养臃肿长节",
+      "issue_type": "over_specific",
+      "explanation": "规定每节三到五行导致生成诗节长高度均一，行长变异系数普遍偏低（0.14—0.19），与参考诗长短句张力相悖。应删除具体行数配额，改为“节长随呼吸自然伸缩”。",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "quote": "核心词与意象可跨节回返，但每次回返必须改变句法位置或语义重量",
+      "issue_type": "template_inducing",
+      "explanation": "“必须改变句法位置”被生成模型简化为“同一呼告词+不同动词”的填空模板，如“你亮着/你继续亮着/你亮着 我靠着墙站了一会儿”，回返变奏沦为机械替换。应改为“回返时让词义自身生长或偏移，而非仅换句法槽位”。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "quote": "从现场器物与具身动作直接跃向原初尺度，不绕道解释，不作过渡铺垫",
+      "issue_type": "vague",
+      "explanation": "“原初尺度”未界定，生成模型未能有效执行，导致诗作困于现场事务（mythic_register均分2.45最低）。应明确列举“大地、黑夜、水火、时间、生死”等元素，并要求它们与现场器物在同一句中相撞，而非分节陈述。",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "quote": "比喻能省则省，让事物自己站立",
+      "issue_type": "ineffective",
+      "explanation": "生成诗仍频繁出现明喻（“像某个病人的肺”“像一块从夜里撕下来的炭”），该条款未产生约束力。应改为“禁止使用‘像’‘如’‘似’引出的明喻；需要类比时用判断句‘A是B’直接命名”。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "quote": "结尾回到一个动作、物象或呼唤，在未闭合处停住，不写格言、不作总结升华",
+      "issue_type": "conflicting",
+      "explanation": "生成诗结尾仍出现格言化判断（“这船是我的 水不是”“黑夜是最大的秤”），与“不写格言”冲突。原因可能是“回到一个动作、物象或呼唤”被理解为“用判断句点题”。应删去“回到一个动作、物象或呼唤”的宽泛许可，改为“结尾只落在一个具体的、未完成的动作或物象上，不出现判断句或总结性名词”。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    }
+  ],
+  "topic_overreliance": {
+    "assessment": "生成诗高度依赖题目现场的具体事务（走廊、操场、渡轮、市场、加油站），未能从现场跃向原初元素与生命尺度，导致诗作成为“现场速写”而非参考诗式的“元素碰撞”。",
+    "evidence": "opt-01两版均围绕售货机与走廊，opt-02围绕操场淤泥与课桌，opt-05围绕加油站铁皮棚；mythic_register维度均分2.45，评审指出“困于走廊事务”“困于灾后事务描写”。",
+    "claim_type": "interpretation",
+    "confidence": "high"
+  },
+  "summary": "当前生成诗已自然复现无标点呼吸分行、第一人称呼告、具身动作等特征，但核心瓶颈在于：Prompt的“三到五行”配额压平了长短句张力，“原初尺度”含糊导致诗作困于现场事务而无法与大地黑夜时间碰撞，“回返必须改变句法位置”被简化为填空模板，且明喻与格言化收束未被有效禁止。整体呈现“规则练习作”的僵硬感，而非参考诗那种赤诚而开阔的元素碰撞。",
+  "actionable_suggestions": [
+    "删除“单节常为三到五行”的具体行数配额，改为“节长随呼吸自然伸缩，允许一行独节与长句跨行，制造长短行反差”。",
+    "将“从现场器物与具身动作直接跃向原初尺度”改为“每节至少让一个现场器物与大地/黑夜/水火/时间/生死等原初元素在同一句中直接相撞，用判断句‘A是B’或动作句完成，不另起一节解释”。",
+    "将“核心词与意象可跨节回返，但每次回返必须改变句法位置或语义重量”改为“核心词回返时，让它的含义随上下文偏移或加重，而非仅更换句法槽位；避免同一呼告词连续多节重复”。",
+    "将“比喻能省则省”改为“禁止使用‘像’‘如’‘似’引出的明喻；需要类比时用判断句直接命名，让事物自己站立”。",
+    "将结尾条款改为“结尾只落在一个具体的、未完成的动作或物象上，不出现判断句、格言或总结性名词；删去‘回到一个动作、物象或呼唤’中的‘呼唤’许可，防止呼告式点题”。"
+  ],
+  "analysis_model": "deepseek-flash",
+  "analysis_meta": {
+    "usage": {
+      "prompt_tokens": 7209,
+      "completion_tokens": 2727,
+      "total_tokens": 9936,
+      "prompt_tokens_details": {
+        "cached_tokens": 3200
+      },
+      "prompt_cache_hit_tokens": 3200,
+      "prompt_cache_miss_tokens": 4009
+    },
+    "cache_hit": true,
+    "request_settings": {
+      "max_tokens": 4000,
+      "response_format": "json_object",
+      "thinking": "disabled",
+      "temperature": 0.2
+    },
+    "model": "deepseek-flash",
+    "attempt": 1
+  },
+  "fallback": false,
+  "mock": false
+}

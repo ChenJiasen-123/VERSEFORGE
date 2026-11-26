@@ -1,0 +1,186 @@
+{
+  "reproduced": [
+    {
+      "feature": "无标点呼吸分行：行末几乎不落标点，靠换行建立停顿",
+      "generated_evidence": "五首生成诗行末均无标点，如“这是夜的最深处”“桥墩把黑夜分成两半”“风把招牌吹成一把锈”",
+      "reference_evidence": "参考诗行末标点率中位数 0.0，无标点断行率中位数 1.0；如“亚洲铜，亚洲铜”“黑夜从大地上升起”",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "第一人称赤诚声口与直接呼告",
+      "generated_evidence": "“你属于谁 铁皮里的冷光”“我喊一声 你就从泥里拔出一块砖”“我朝着路问 你要开往哪里”",
+      "reference_evidence": "“姐姐，今夜我在德令哈”“四姐妹抱着这一棵”“麦地啊，人类的痛苦”",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "基础高频实词与具身动作并置",
+      "generated_evidence": "“把手伸进去取一罐水”“我把空罐握在手中”“我搓了搓手”“把耳朵贴在铁皮上”",
+      "reference_evidence": "“喂马，劈柴”“我把石头还给石头”“双手劳动 慰籍心灵”",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "核心词跨节回返（但变奏不足，见 missing）",
+      "generated_evidence": "“操场”在 opt-02 中首节与第三节回返；“水”在 opt-03 中多次出现",
+      "reference_evidence": "“亚洲铜”四次回返且每次句法位置变化；“麦地”在《询问》《答复》中回返并变奏",
+      "claim_type": "observation",
+      "confidence": "medium"
+    }
+  ],
+  "missing": [
+    {
+      "feature": "长短句张力：行长变异系数与分句长度变异系数显著偏低，缺少峭拔短行与舒展长行的呼吸落差",
+      "generated_evidence": "opt-01 行长 CV 0.15、分句 CV 0.15；opt-05 行长 CV 0.14、分句 CV 0.14；均低于参考 p10（0.22/0.26），触发 uniform_line_lengths 反套路警告",
+      "reference_evidence": "参考行长 CV 中位数 0.338，p10 0.224；如“亚洲铜，亚洲铜”后接“祖父死在这里，父亲死在这里，我也将死在这里”形成极短与极长的落差",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "原初元素/时间生命尺度与日常物件的真实碰撞：生成诗多困于现场事务描写，未打开时间纵深或大地黑夜元素的精神高度",
+      "generated_evidence": "opt-01 全诗围绕售货机、走廊、推车、空罐；opt-04 围绕土豆、麻袋、筐、卡车；仅 opt-05 末行“听见太阳在沙下翻了个身”稍触原初尺度，但整体仍以事务收束",
+      "reference_evidence": "“黑夜从大地上升起”“目击众神死亡的草原上野花一片”“太阳是我的名字/太阳是我的一生”“千年后如若我再生于祖国的河岸”",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "赤诚痛感与情绪重量：生成诗偏冷静观察，呼告程式化，痛感偏淡",
+      "generated_evidence": "opt-01“我站在这里 听自己吞咽”偏内省克制；opt-02“我把国旗拧干/像拧一件小孩的衣裳”有巧思但痛感被比喻稀释；评审 emotion 维度均分 3.0",
+      "reference_evidence": "“悲痛时握不住一颗泪滴”“我年华虚度 空有一身疲倦”“你不能说我一无所有/你不能说我两手空空”",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "回返变奏：核心词回返时句法位置或语义重量未充分改变，部分节套用同一呼告填空句式",
+      "generated_evidence": "opt-02“我说操场 你就把课本举过头顶”“我喊一声 你就从泥里拔出一块砖”为同一“我说/喊…你就…”模板；opt-01“你属于谁 铁皮里的冷光”“你吞下夜晚又吐出糖水”连续两行同一主语起句",
+      "reference_evidence": "“亚洲铜”每次回返分别作呼语、判断主语、动作宾语；“和所有以梦为马的诗人一样”虽重复但每节后接不同动作与语义重量",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "质朴而有重量的词域：生成诗出现“像数自己未合拢的眼睛”“像数自己没睡的年头”“像谁在黑暗里划了根火柴”等明喻，偏离参考诗几乎不用明喻的特征",
+      "generated_evidence": "opt-01“像数自己未合拢的眼睛”；opt-03“像数自己没睡的年头”；opt-04“像谁在黑暗里划了根火柴”",
+      "reference_evidence": "参考诗明喻率中位数 0.0，p90 0.198；参考多用判断句与并列短语直接相撞，如“你是唯一的一块埋人的地方”“太阳是我的名字”",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "神话/崇高语域的自然带出：生成诗几乎不涉神话或原初崇高语域，评审 mythic_register 维度均分仅 2.5，为最弱维度",
+      "generated_evidence": "五首生成诗均无“众神”“屈原”“敦煌”“千年”等语域；opt-05 末行“太阳在沙下翻了个身”稍触但未展开",
+      "reference_evidence": "“众神创造物中只有我最易朽”“屈原遗落在沙滩上的白鞋子”“敦煌石窟像马肚子下”“千年后如若我再生于祖国的河岸”",
+      "claim_type": "observation",
+      "confidence": "high"
+    }
+  ],
+  "extraneous": [
+    {
+      "feature": "解释性明喻与“像”字句：参考诗几乎不用明喻，生成诗反复出现“像数…”“像谁…”",
+      "generated_evidence": "opt-01“像数自己未合拢的眼睛”；opt-03“像数自己没睡的年头”；opt-04“像谁在黑暗里划了根火柴”",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "清点琐碎工业零件/事务流程，缺少精神开阔度",
+      "generated_evidence": "opt-01“硬币”“糖水”“格子”“空罐”“推车声”；opt-04“麻袋”“筐”“卡车”“车厢”“鞋”",
+      "claim_type": "observation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "行末句句加标点像散文的倾向（虽行末无标点，但行内句法完整、缺少跨行悬置）",
+      "generated_evidence": "opt-03“桥墩把黑夜分成两半/你收起缆绳/铁桩上还留着白日的体温”每行均为完整陈述句，跨行无悬置",
+      "reference_evidence": "参考诗常以跨行悬置制造呼吸，如“你的主人却是青草，住在自己细小的腰上，守住野花的手掌和秘密”跨行不断句",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    }
+  ],
+  "prompt_issues": [
+    {
+      "quote": "单节紧凑克制，常为三到五行",
+      "issue_type": "over_specific",
+      "explanation": "规定每节三到五行导致生成诗节长高度均一，行长与分句长度变异系数普遍低于参考 p10，直接诱发 uniform_line_lengths 反套路警告。参考诗节长并不固定，有单行节、双行节、长节交错。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "quote": "抽象词每节至多一个，且须被具体动作或实物立即接住",
+      "issue_type": "over_specific",
+      "explanation": "配额式规定使生成诗回避抽象词，但并未因此获得重量，反而滑向事务清单式罗列；参考诗抽象词率中位数 1.65/百字，并非极低，关键在于抽象词与具身动作的碰撞质量而非数量配额。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "quote": "核心词与意象可跨节回返，但每次回返须改变句法位置或语义重量：或作呼语，或作判断主语，或作动作宾语，或被拆解反写",
+      "issue_type": "template_inducing",
+      "explanation": "列举“或作呼语，或作判断主语，或作动作宾语”等选项，实际被生成器当作填空模板套用，产生“我说操场 你就…”“我喊一声 你就…”同一呼告句式连续出现，回返变成机械换位而非语义变奏。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "quote": "从现场一件器物或一个具身动作起步，一两行内直接跃向原初尺度",
+      "issue_type": "ineffective",
+      "explanation": "“一两行内直接跃向原初尺度”在生成诗中几乎未被执行：opt-01、opt-04 全诗未跃向原初尺度，opt-02 仅以“昨天的太阳”浅触。该条款缺少可操作的触发条件，且与“结尾落地留白”的沉降要求方向相反，生成器倾向选择保守的事务收束。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "quote": "崇高或神话语域若进入，须由现场器物与动作自然带出，不滑向空洞的宏大咏叹",
+      "issue_type": "vague",
+      "explanation": "“若进入”为条件句，未给出任何进入的触发方式或密度参照，生成器默认不进入，导致 mythic_register 维度均分仅 2.5，为最弱维度。参考诗中神话语域是常态而非例外。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "quote": "不用明喻，不加过渡说明",
+      "issue_type": "ineffective",
+      "explanation": "禁令未阻止生成诗出现“像数自己未合拢的眼睛”“像谁在黑暗里划了根火柴”等明喻；参考诗明喻率中位数 0.0，生成诗明喻率明显偏高。禁令需替换为正面句法示范（判断句、并列短语直接相撞），而非单纯禁止。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "quote": "总纲：以赤诚的第一人称声口直呼现场之物，用近乎无标点的自然断行承接大地、黑夜、水火、时间与身体的重量，朴素陈述与具身动作并置，不解释、不总结。",
+      "issue_type": "redundant",
+      "explanation": "总纲已涵盖第1、2、3、6条的核心内容（第一人称呼告、无标点断行、朴素陈述、不总结），后续条款重复展开且互相叠加配额，造成指令膨胀，生成器在多重约束下倾向选择最安全的填空路径。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    }
+  ],
+  "topic_overreliance": {
+    "assessment": "生成诗高度依赖题目给定的现场物件与事务流程，将“从现场器物起步”误读为“围绕现场器物清点”，未能在一两行内跃向原初尺度。五首中仅 opt-05 末行稍触太阳意象，其余均以事务性动作收束，导致 mythic_register 与 imagery 维度得分最低。",
+    "evidence": "opt-01 全诗物件：白炽灯管、机器、硬币、糖水、格子、空罐、推车；opt-04 全诗物件：土豆、麻袋、霜、筐、卡车、车厢、鞋；评审 weakest_dimension_rationales 指出“困于走廊事务描写，未打开时间纵深或原初元素高度”。",
+    "claim_type": "observation",
+    "confidence": "high"
+  },
+  "summary": "当前生成诗已自然复现无标点断行、第一人称呼告、基础实词与具身动作等表层特征，但核心瓶颈在于：一、行长与分句长度变异系数普遍低于参考 p10，长短句张力缺失，节长被“三到五行”配额压平；二、原初元素/时间生命尺度与日常物件的碰撞几乎未发生，生成诗困于题目现场的事务清单，mythic_register 维度均分仅 2.5；三、回返变奏被 Prompt 的“或作呼语，或作判断主语”选项诱导为“我说…你就…”填空模板，重复沦为机械换位；四、明喻禁令无效，生成诗明喻率偏高，偏离参考诗判断句与并列短语直接相撞的句法。Prompt 病因在于配额过死（节长、抽象词数量）、条件句含糊（神话语域“若进入”）、禁令缺少正面替代（不用明喻），以及总纲与分条冗余叠加，共同将生成推向安全但僵化的事务描写路径。",
+  "actionable_suggestions": [
+    "删除“单节紧凑克制，常为三到五行”的节长配额，改为“节长随呼吸自然伸缩，允许单行节与长节交错”，以恢复行长与分句长度变异系数至参考 p10 以上。",
+    "将“核心词与意象可跨节回返……或作呼语，或作判断主语，或作动作宾语”的选项清单替换为单一原则：“回返时须改变该词所承受的动作方向或所属关系，不得连续两节以同一主语起句”，消除“我说…你就…”填空模板。",
+    "将“崇高或神话语域若进入”的条件句改为正面触发：“从现场器物起步后，须有一处将视线抬向天象、时间或死者/众神的尺度，再由具体动作接回”，并删除“一两行内”的硬性时限，避免与结尾沉降要求冲突。",
+    "将“不用明喻”的禁令替换为正面句法示范：“用判断句（‘你是…’‘这是…’）与并列短语直接相撞完成连接，禁止‘像…’‘如…’式明喻”，直接针对生成诗中“像数自己未合拢的眼睛”类句式。",
+    "压缩总纲与第1、2、3、6条的重复表述，将总纲精简为一句声口与断行原则，删除“抽象词每节至多一个”的数量配额，改为“抽象词须与具身动作同句出现，不得单独成行”，减少多重配额叠加导致的保守填空。"
+  ],
+  "analysis_model": "deepseek-flash",
+  "analysis_meta": {
+    "usage": {
+      "prompt_tokens": 6574,
+      "completion_tokens": 3526,
+      "total_tokens": 10100,
+      "prompt_tokens_details": {
+        "cached_tokens": 3200
+      },
+      "prompt_cache_hit_tokens": 3200,
+      "prompt_cache_miss_tokens": 3374
+    },
+    "cache_hit": false,
+    "request_settings": {
+      "max_tokens": 4000,
+      "response_format": "json_object",
+      "thinking": "disabled",
+      "temperature": 0.2
+    },
+    "model": "deepseek-flash",
+    "attempt": 1
+  },
+  "fallback": false,
+  "mock": false
+}

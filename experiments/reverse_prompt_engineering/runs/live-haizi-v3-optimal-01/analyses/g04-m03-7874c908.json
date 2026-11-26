@@ -1,0 +1,190 @@
+{
+  "reproduced": [
+    {
+      "feature": "无标点呼吸分行（部分诗作）",
+      "generated_evidence": "opt-01、opt-02、opt-03、opt-05 行末标点率接近 0，如 opt-01「尽头，你是尽头 / 是白墙吞下又吐出的铁柜」行末无标点。",
+      "reference_evidence": "参考诗行末标点率中位数 0.00，无标点断行率中位数 1.00。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "呼告与直接命名",
+      "generated_evidence": "opt-01「售货机，我喊你一声兄弟」；opt-02「操场，我喊你三声」；opt-03「渡轮，你把这截江水含在嘴里」。",
+      "reference_evidence": "参考作品1「亚洲铜，亚洲铜」；参考作品11「姐姐，今夜我在德令哈」。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "核心词回返",
+      "generated_evidence": "opt-01「尽头」在首尾及第四节回返；opt-02「操场」在首尾回返；opt-03「渡轮」在首尾及第三节回返。",
+      "reference_evidence": "参考作品2「和所有以梦为马的诗人一样」多次回返；参考作品3「我的琴声呜咽 泪水全无」三次回返。",
+      "claim_type": "observation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "原初元素与日常物碰撞（部分实现）",
+      "generated_evidence": "opt-02「太阳来了 / 它搬来铁锹和胶鞋」；opt-03「你吃水，也吃黑」；opt-05「黑夜来称它 称出半斤铁锈 二两盐」。",
+      "reference_evidence": "参考作品4「黑夜从大地上升起 / 遮住了光明的天空」；参考作品13「太阳强烈 / 水波温柔」。",
+      "claim_type": "observation",
+      "confidence": "medium"
+    }
+  ],
+  "missing": [
+    {
+      "feature": "长短句张力与行长变异",
+      "generated_evidence": "opt-01 行长变异系数 0.17，opt-02 0.15，opt-04 0.18，均低于参考 p10 0.22；opt-02 被 anti_slop 标记「uniform_line_lengths」。",
+      "reference_evidence": "参考诗行长变异系数中位数 0.338，p10 0.224。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "质朴而有重量的词域（具体字面词密度）",
+      "generated_evidence": "opt-01 具体字面词/百字 3.70，远低于参考 p10 8.19；opt-01 的/地/得/百字 3.70 也低于参考 p10 4.73。",
+      "reference_evidence": "参考诗具体字面词/百字中位数 10.56，p10 8.19。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "赤诚痛感与情感灼热",
+      "generated_evidence": "opt-01「你数硬币像数心跳」「吞下我最后一枚疲惫」偏机巧；opt-02 整体克制叙述，缺呼告的灼热。评审 weakest_dimension_rationales 指出「抒情偏轻巧机灵，缺参考诗的赤诚痛感与沉重」。",
+      "reference_evidence": "参考作品11「悲痛时握不住一颗泪滴」；参考作品5「这是绝望的麦子」。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "复沓的语义增重（非模板回环）",
+      "generated_evidence": "opt-02「第一声是你的泥」「第二声你听」「第三声，孩子们回来了」为机械编号填空；opt-01 首尾「尽头」回返但语义重量未明显变化。评审 repetition 维度 2.5，指出「近于模板回环」。",
+      "reference_evidence": "参考作品2「和所有以梦为马的诗人一样」每次回返伴随不同事业/死亡/太阳语境；参考作品3「我的琴声呜咽 泪水全无」在死亡、明月、只身打马中变奏。",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "feature": "神话/原初尺度的时间纵深",
+      "generated_evidence": "opt-01 困在走廊事务；opt-02 困在操场清理；opt-04 困在批发市场。评审 mythic_register 维度 2.3，指出「未打开时间纵深或原初元素」。",
+      "reference_evidence": "参考作品1「祖父死在这里，父亲死在这里，我也将死在这里」；参考作品12「敦煌是千年以前 / 起了大火的森林」。",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "feature": "行内留白与停顿",
+      "generated_evidence": "生成诗多用逗号、句号切分，行内留白少；opt-04 行末标点率 0.93，几乎散文分行。",
+      "reference_evidence": "参考作品2「万人都要将火熄灭 我一人独将此火高高举起」；参考作品3「我的琴声呜咽 泪水全无」以空格制造停顿。",
+      "claim_type": "observation",
+      "confidence": "medium"
+    }
+  ],
+  "extraneous": [
+    {
+      "feature": "散文式行末标点",
+      "generated_evidence": "opt-04 行末标点率 0.93，如「凌晨四点。批发市场。白的灯。」「你蹲在白菜堆前点数霜迹，」；anti_slop 标记「prose_line_end_punctuation」罚 16.433。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "机械编号填空式呼告",
+      "generated_evidence": "opt-02「第一声是你的泥」「第二声你听」「第三声，孩子们回来了」；评审 syntax 维度指出「第一声是……第二声你听」带机械编号感。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "解释性明喻与机巧比喻",
+      "generated_evidence": "opt-01「你数硬币像数心跳」「像三十个没说完的夜班」；opt-03「像含着一块冷铁」；opt-05「像一截烧焦的肋骨」「像谁咽回去的半句话」。",
+      "claim_type": "observation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "琐碎工业零件清点",
+      "generated_evidence": "opt-01「铁皮里三十包饼干过期」「投币口裂开一道口子」；opt-05「九十二号 九十五号 都归沙管」；opt-03「五个工人和两筐蔬菜」。",
+      "claim_type": "observation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "解释性连词与说明句",
+      "generated_evidence": "opt-01「你把冷光递给吊瓶的人 / 把糖水递给守夜的家属」为散文式交代；opt-02「它搬来铁锹和胶鞋 / 把淤泥一铲一铲还给泥土」偏说明。",
+      "claim_type": "observation",
+      "confidence": "medium"
+    }
+  ],
+  "prompt_issues": [
+    {
+      "quote": "呼告贯穿但允许游移：对一个人、地点或物直接说话，语气从私密到炽热，祈愿与质问并置。呼告对象可在诗中不同位置出现、转移或短暂沉默，避免每节以同一呼告句式开头。",
+      "issue_type": "template_inducing",
+      "explanation": "「避免每节以同一呼告句式开头」被模型反向执行为「每节换一个编号呼告」，如 opt-02「第一声/第二声/第三声」，形成新的填空模板。应删去「避免每节以同一呼告句式开头」的否定式配额，改为正面描述呼告的自然游移。",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "quote": "核心词回返并增重：让题目的核心词在诗中至少回返两次，每次换配不同的动词、判断句或呼语位置，使复沓像回旋的潮水，每次退回都带走一点不同的东西，而非原地重复同一句式。",
+      "issue_type": "over_specific",
+      "explanation": "「至少回返两次」是硬性配额，导致模型机械复现核心词而不增重；「每次换配不同的动词、判断句或呼语位置」进一步诱导填空式变奏。应删去次数配额，改为描述复沓的语义增重效果。",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "quote": "节长随呼吸自然变化：短行峭拔、长句舒展，交错而非整齐；单节保持紧凑，避免臃肿长节。",
+      "issue_type": "ineffective",
+      "explanation": "该条虽正确但过于笼统，模型未内化长短行反差；生成诗行长变异系数普遍低于参考 p10，opt-02 被标记 uniform_line_lengths。需给出更具体的节奏示范或删去「单节保持紧凑」的模糊限制。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "quote": "命名先行：多用短促的肯定句，直接说出眼前之物是什么、属于谁、该被称为什么，少用修饰性铺陈。",
+      "issue_type": "vague",
+      "explanation": "「多用短促的肯定句」与「少用修饰性铺陈」含糊，模型仍大量使用明喻和解释性连词（opt-01「像数心跳」、opt-05「像一截烧焦的肋骨」）。应明确禁止解释性明喻和说明句，而非仅说「少用」。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "quote": "从现场直接跃向原初尺度：不绕道解释，不作过渡性铺垫，让题目的物与太阳、河流、泥土、死亡、粮食、黑夜、水火、时间、身体发生突然而结实的碰撞。碰撞靠动词与判断句完成，少用明喻，不用连接词解释因果。",
+      "issue_type": "redundant",
+      "explanation": "「不绕道解释，不作过渡性铺垫」与「少用明喻，不用连接词解释因果」语义重叠，且「太阳、河流、泥土、死亡、粮食、黑夜、水火、时间、身体」清单过长，诱导模型机械罗列元素而非自然碰撞。应精简元素清单，合并重复禁令。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "quote": "结尾回到具体动作、物象或一声呼唤，不写格言，不作总结，不把话说满，让诗在未闭合处停住，余下的重量交给留白与沉默。",
+      "issue_type": "conflicting",
+      "explanation": "「回到具体动作、物象或一声呼唤」与「不把话说满」存在张力，模型常以「你答，用一声铁门」（opt-04）这类半闭合句收尾，既非具体动作也非留白。应删去「一声呼唤」选项，聚焦于未闭合的具体物象。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    }
+  ],
+  "topic_overreliance": {
+    "assessment": "生成诗高度依赖题目现场的具体事务描写（医院走廊、操场清理、批发市场、加油站），未能从现场跃向原初尺度；评审 mythic_register 维度 2.3 为最低，指出「整体困在走廊事务描写」「困在操场清理事务」。",
+    "evidence": "opt-01 全诗围绕售货机、吊瓶、饼干、投币口；opt-02 围绕淤泥、铁锹、胶鞋、旗杆；opt-04 围绕白菜、土豆、大秤、三轮。均缺少参考诗中「太阳」「死亡」「千年」「众神」等时间纵深元素。",
+    "claim_type": "interpretation",
+    "confidence": "high"
+  },
+  "summary": "当前生成诗在无标点分行、呼告命名、核心词回返等表面特征上已部分复现参考风格，但核心瓶颈在于：一、行长变异系数普遍低于参考 p10，长短句呼吸张力缺失；二、具体字面词密度偏低，词域偏轻巧机巧，缺质朴重量；三、复沓退化为机械编号填空（opt-02「第一声/第二声/第三声」），语义未增重；四、神话/原初尺度的时间纵深严重不足，困于题目现场事务；五、opt-04 行末标点率 0.93，散文分行病突出。Prompt 病因在于「至少回返两次」「避免每节以同一呼告句式开头」等否定式配额被反向执行为新模板，且元素清单过长诱导机械罗列。",
+  "actionable_suggestions": [
+    "删去「核心词回返并增重」中的「至少回返两次」硬性配额，改为「让核心词在自然需要处回返，每次回返须携带新的语境重量，而非换配动词的填空变奏」。",
+    "删去「呼告贯穿但允许游移」中的「避免每节以同一呼告句式开头」，改为「呼告随呼吸自然出现、转移或沉默，不预设每节呼告位置」，以消除编号填空模板。",
+    "将「从现场直接跃向原初尺度」的元素清单「太阳、河流、泥土、死亡、粮食、黑夜、水火、时间、身体」精简为「太阳、泥土、黑夜、死亡、时间」等三至五个核心原初元素，并合并「不绕道解释，不作过渡性铺垫」与「少用明喻，不用连接词解释因果」为一条禁令。",
+    "将「命名先行」中的「少用修饰性铺陈」改为「禁用解释性明喻和说明句，命名句须以动词或判断句直接承担重量」，以遏制 opt-01「像数心跳」、opt-05「像一截烧焦的肋骨」类机巧比喻。",
+    "将「节长随呼吸自然变化」中的「单节保持紧凑，避免臃肿长节」删去，改为「行与行之间须有长短反差，短行可短至三字，长句可跨行舒展，让停顿在行内留白与行末无标点处自行发生」，以直接针对行长变异系数偏低和行末标点率偏高的问题。"
+  ],
+  "analysis_model": "deepseek-flash",
+  "analysis_meta": {
+    "usage": {
+      "prompt_tokens": 6931,
+      "completion_tokens": 3463,
+      "total_tokens": 10394,
+      "prompt_tokens_details": {
+        "cached_tokens": 3200
+      },
+      "prompt_cache_hit_tokens": 3200,
+      "prompt_cache_miss_tokens": 3731
+    },
+    "cache_hit": false,
+    "request_settings": {
+      "max_tokens": 4000,
+      "response_format": "json_object",
+      "thinking": "disabled",
+      "temperature": 0.2
+    },
+    "model": "deepseek-flash",
+    "attempt": 1
+  },
+  "fallback": false,
+  "mock": false
+}

@@ -109,38 +109,58 @@ def generation_payload(style_prompt: str, topic: dict, config: dict) -> dict:
 
 
 def generate_poem(llm, config, style_prompt: str, topic: dict, *, cache_variant: str) -> dict:
+    task = task_from_topic(topic, config)
     payload = generation_payload(style_prompt, topic, config)
+    repair_attempts = int(config["generation"].get("max_form_repair_attempts", 0))
+    last_result = None
     try:
-        data, meta = llm.call_json(
-            purpose="rpe_generate_poem",
-            system=GENERATOR_SYSTEM,
-            user=json.dumps(payload, ensure_ascii=False),
-            max_tokens=config["generation"]["max_tokens"],
-            temperature=config["generation"]["temperature"],
-            thinking=config["generation"]["thinking"],
-            validator=validate_generation,
-            cache_variant=cache_variant,
-        )
-        raw_lines = [line.strip() for line in data["lines"]]
-        body_lines = [line for line in raw_lines if line]
-        if not body_lines:
-            raise ValueError("lines 没有非空正文")
-        poem = Poem(str(data["title"]).strip(), body_lines)
-        task = task_from_topic(topic, config)
-        form_issues = check(poem, task) + requirement_issues(raw_lines, topic)
-        text = "\n".join(raw_lines).strip("\n")
-        return {
-            "ok": True,
-            "topic_id": topic["id"],
-            "title": poem.title,
-            "lines": poem.lines,
-            "raw_lines": raw_lines,
-            "text": text,
-            "form_ok": not form_issues,
-            "form_issues": form_issues,
-            "meta": meta,
-            "mock": bool(getattr(llm, "mock", False)),
-        }
+        for attempt in range(repair_attempts + 1):
+            current_payload = dict(payload)
+            if attempt:
+                current_payload["_previous_draft"] = last_result["raw_lines"]
+                current_payload["_form_feedback"] = (
+                    "上一稿（见 _previous_draft）未通过题目格式检查：" + "；".join(last_result["form_issues"]) +
+                    "。请完整保留原诗的声口、意象与诗意，仅针对违规处调整分节空行或合并/微调超限行，确保总行数、总节数和每节行数全部严格符合 requirements；分节用空字符串 \"\" 表示。"
+                )
+            try:
+                data, meta = llm.call_json(
+                    purpose="rpe_generate_poem",
+                    system=GENERATOR_SYSTEM,
+                    user=json.dumps(current_payload, ensure_ascii=False),
+                    max_tokens=config["generation"]["max_tokens"],
+                    temperature=config["generation"]["temperature"],
+                    thinking=config["generation"]["thinking"],
+                    validator=validate_generation,
+                    cache_variant=(cache_variant if attempt == 0 else f"{cache_variant}:formrepair{attempt}"),
+                )
+            except LLMOutputError:
+                if last_result is not None:
+                    return last_result
+                raise
+            raw_lines = [line.strip() for line in data["lines"]]
+            body_lines = [line for line in raw_lines if line]
+            if not body_lines:
+                raise ValueError("lines 没有非空正文")
+            poem = Poem(str(data["title"]).strip(), body_lines)
+            form_issues = check(poem, task) + requirement_issues(raw_lines, topic)
+            text = "\n".join(raw_lines).strip("\n")
+            result = {
+                "ok": True,
+                "topic_id": topic["id"],
+                "title": poem.title,
+                "lines": poem.lines,
+                "raw_lines": raw_lines,
+                "text": text,
+                "form_ok": not form_issues,
+                "form_issues": form_issues,
+                "form_repair_attempts": attempt,
+                "meta": meta,
+                "mock": bool(getattr(llm, "mock", False)),
+            }
+            if not form_issues or attempt >= repair_attempts:
+                return result
+            last_result = result
+        return last_result
     except BudgetExhausted:
         raise
     except LLMOutputError as exc:  # unusable JSON is an evaluation failure

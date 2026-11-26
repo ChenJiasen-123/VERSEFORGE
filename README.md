@@ -81,6 +81,8 @@ constraints_passed 只表示已实现条件未发现失败，不认证文学质�
 
 ## 验证与研究工具
 
+风格相似度与语料归属可离线执行：`python style_similarity.py --corpus 海子=var/haizi/corpus.jsonl --corpus 北岛=var/beidao/corpus.jsonl --text "……"`。字符 1—2gram TF-IDF 余弦，纯标准库，与 scikit-learn 口径核对的最大偏差为 9.2e-15；输出近邻投票、各语料平均相似度与最近邻清单，不产生质量分。`--parity` 仅在开发环境装有 sklearn 时做口径校验。结论与限制见[基线对照](research/style-similarity-baseline-01.md)：真实语料上 1-NN 约 0.81—0.84，监督分类器可达 0.88—0.92，每位作者至少 8 首、16 首以上才稳定；公开的 560M 风格嵌入在同一语料上与 n-gram 持平，且对“同体裁不同作者”只有 0.015 的薄差，不引入。
+
 ```powershell
 python -m unittest discover -s tests
 python evaluate.py --mock --count 4

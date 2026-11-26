@@ -399,54 +399,166 @@ experiments/reverse_prompt_engineering/runs/live-haizi-02/
 - 确定性风格分新增 `progression` 代理（转折/推进标记、行首新鲜度、分节变化），权重 **0.10**
 - 适应度里 Judge 风格分从等权平均改为可配置加权平均
 
-### 11.3 长跑
+### 11.3 长跑完成（patience=5）
 
-`live-haizi-expanded-progression-01` 从已有扩展运行续跑，配置为：
+用户要求“只想找好 prompt”，将 `population.patience` 从 0 调为 **5**，并修复 resume 时 `stale` 从 0 重置的问题。长跑在第 27 代因连续 5 代无显著提升而提前停止。
 
-- 最多 30 代；`patience=0`（不因短期无提升自动停止）
-- 每 **5 代**保存 `checkpoints/gen_XXX/`：`snapshot.json`、`best_prompt.txt`、`leaderboard.md`
-- 逐代完整记录仍在 `population/gen_XXX.json`
-- 预算上限：2500 次调用 / 12,000,000 token
+结果：
 
-截至本次记录：
+- 最终候选：`g15-m03-6470617d`
+- 优化题目适应度：**57.6715**（5 次评估，score_std 4.50，未进入确认重评）
+- 确认重评的 top-3 全部下降：
+  - `g18-m00` 58.28 → 56.62
+  - `g09-m02` 58.25 → 55.79
+  - `g13-m02` 57.98 → 56.72
+- 因此最终第一是确认重评之后才浮出的 `g15-m03`，它本身没有经过确认重评，稳健性不足
+- 最终 Prompt 长度 **1241 字、15 条强约束**
+- 累计调用 **1444 次**、**4,986,853 token**、缓存命中 86 次
+- checkpoint：`gen_005`、`gen_010`、`gen_015`、`gen_020`、`gen_025`
 
-- 长跑在 02:58 左右、第 22 代后停止：Judge 返回的 `uncertainty` 不是严格的 low/medium/high，旧校验在 3 次重试后抛出 `LLMOutputError`；而异常处理顺序又把 `LLMOutputError` 当成普通 `RuntimeError` 向上抛，导致整个进程退出。
-- 已修复：先捕获 `LLMOutputError`，再做截断处理；同时把 `uncertainty` 归一化（medium-high→high、中→medium、低→low、缺失→high）。
-- 09:55 已从第 22 代续跑成功，进程正在运行。
-- 已有 checkpoint：`gen_005`、`gen_010`、`gen_015`、`gen_020`。
-- 最后一次检查：约 1201 次调用、4,137,247 token；当前最优 58.2775，已连续 13 代未显著提升。
-- 长跑会继续到第 30 代或预算上限；若再次停止，用同一 run-id 续跑。
+### 11.4 对照实验：C > B > A，但有一个重要保留
 
-### 11.4 八小时后检查位置
+完整 benchmark：
+
+| 组 | 风格 | 文学质量 | 题意 | 原创性 | 格式通过率 |
+|---|---:|---:|---:|---:|---:|
+| A | 51.22 | 52 | 4.8 | 3.5 | 1.0 |
+| B | 55.47 | 60 | 5.0 | 4.0 | 1.0 |
+| C | **58.43** | 62 | 5.0 | 4.0 | **0.8** |
+
+C 的风格分高于 B 和 A，但 **10 首测试诗中有 1 首格式不通过**。原因是最终 Prompt 写了“总行数 15—40 行”，而测试题要求“12—20 行、2—4 节”；Prompt 与题目约束冲突。
+
+为避免这个冲突，已在生成器系统提示中加入：
+
+> 题目、体裁、行数、分节和题目中的明确要求优先于风格指令；冲突时以题目要求为准。
+
+然后用同一份最终 Prompt 在 10 个留出测试题目上重跑了一遍（`final-prompt-validation-01`）：
+
+| 指标 | 结果 |
+|---|---:|
+| 格式通过率 | **1.0** |
+| 风格分 | **54.94** |
+| 文学质量 | 58 |
+| 题意 | 5.0 |
+| 原创性 | 4.0 |
+| 复制率 | 0.0 |
+| 适应度 | 55.40 |
+
+也就是说：
+
+- 强制遵守题目行数后，C 的风格分从 **58.43 降到 54.94**
+- 54.94 仍高于 A（51.22），但**低于 B（55.47）**
+- 之前 C 超过 B 的一部分优势，来自它违反了题目的行数要求
+
+在 5 个优化题目上追加确认（`final-prompt-validation-01`）：
+
+- 风格 53.62
+- 文学质量 64
+- 格式通过率 1.0
+- 适应度 55.18（低于长跑中的 57.67）
+
+### 11.5 结论
+
+这次长跑确实产出了一个 **C 组风格分最高的候选 Prompt**，但它还不能称为“可靠的好 Prompt”：
+
+1. 最终第一没有经过确认重评，score_std 4.50
+2. 强制遵守题目格式后，风格优势明显缩小，且低于 B
+3. Prompt 有 1241 字、15 条约束，明显偏长，存在对优化题目/评价器过拟合的迹象
+4. 仍是同模型 Judge、单次 benchmark、无人类评审
+
+下一步如果要继续找“真正常用的好 Prompt”，应当：
+
+- 给 Prompt 长度/约束数量加惩罚，或把 `max_prompt_chars` 降到约 900
+- 把 `confirmation_top_k` 提高到 5，确保最终第一也经过确认
+- 用题目约束优先的生成器重跑
+- 增加独立测试题目和重复次数
+
+### 11.6 检查位置
 
 ```text
 experiments/reverse_prompt_engineering/runs/live-haizi-expanded-progression-01/
   checkpoints/gen_005/
   checkpoints/gen_010/
   checkpoints/gen_015/
-  ...
-  population/gen_XXX.json
+  checkpoints/gen_020/
+  checkpoints/gen_025/
+  final_prompt.txt
+  report.md
+  benchmark/benchmark.json
   state.json
   ledger.jsonl
-```
 
-如果进程因预算或中断停止，使用同一 `run-id` 续跑：
-
-```powershell
-python experiments/reverse_prompt_engineering/run.py --mode live --authorize-spend --resume --run-id live-haizi-expanded-progression-01
+experiments/reverse_prompt_engineering/runs/final-prompt-validation-01/
+  validation.json
 ```
 
 ---
 
-## 12. 最终状态
+## 12. Compact 运行与 402 阻塞（2026-11-26）
 
-- 代码：已完成，可运行；新增 `progression` 维度、加权 Judge 风格分、B 组污染清洗和每 5 代 checkpoint。
-- RPE-GA Mock/单元测试：21 个通过。
+在 `live-haizi-expanded-progression-01` 之后启动了 `live-haizi-compact-01`，目标是抑制过拟合：
+
+- `max_prompt_chars=1000`
+- 超过 900 字开始扣分（1.5 分/100 字，最多 8 分）
+- `confirmation_top_k=5`
+- `patience=10`，最多 50 代，每 5 代 checkpoint
+- 生成器增加“题目/体裁/行数要求优先于风格指令”
+- 生成阶段增加格式修复重写（`max_form_repair_attempts=1`）
+- 移除误伤正常方位词的禁用短语“上面”
+
+运行到第 5 代时：
+
+- 初始 Prompt 长度 459—715 字，全部低于 900，长度惩罚未触发
+- 第 1 代最优 51.5134
+- 第 2—5 代均值从 42.35 回升到 47.33，但最优一直停在 51.5134
+- 已生成 `checkpoints/gen_005/`
+- 累计 373 次调用 / 1,210,295 token
+
+**2026-11-26 11:50，DeepSeek 返回 HTTP 402：余额不足，运行停止。**
+
+当前状态：
+
+- compact 运行标记为 `blocked_provider_402`
+- 自动推进已暂时关闭，避免反复 402
+- 已完成的 checkpoint、ledger、cache 和 state 全部保留
+- 没有用 Mock 数据替代这次真实运行
+
+充值或更换有效 key 后：
+
+```powershell
+python experiments/reverse_prompt_engineering/run.py --mode live --authorize-spend --resume --run-id live-haizi-compact-01
+```
+
+并把 `.pi/goal-state.json` 的 `enabled` 改回 `true`。
+
+---
+
+## 13. 最终状态
+
+
+- 代码：已完成，可运行；新增 `progression` 维度、加权 Judge 风格分、B 组污染清洗、每 5 代 checkpoint、题目约束优先、resume stale 连续性、compact 长度惩罚和格式修复重写。
+- RPE-GA Mock/单元测试：27 个通过。
 - 原有项目回归测试：247 个通过（新增 `tests/__init__.py` 解决本机 `tests` 包遮蔽）。
 - `live-haizi-02`：C 未超过 A/B，是明确的负结果。
-- `live-haizi-expanded-01`：15 首参考下 C 超过 A（+6.92 风格分），但 B 因旧规则缺失，且只有一次运行，不能作为最终结论。
-- `live-haizi-expanded-progression-01`：长跑进行中，最多 30 代，每 5 代 checkpoint；八小时后应检查 `checkpoints/` 与 `population/`。
-- 研究结论：**目前没有“可靠且可复现”的最终 Style Prompt**。扩展运行给出了一个正向信号，但需要更干净的复跑、人工评审或跨模型评审来确认。
+- `live-haizi-expanded-01`：15 首参考下 C 超过 A（+6.92 风格分），但 B 因旧规则缺失。
+- `live-haizi-expanded-progression-01`：长跑完成，第 27 代 patience=5 提前停止；最终 `g15-m03` 适应度 57.6715；benchmark C > B > A（58.43 / 55.47 / 51.22），但 C 格式通过率 0.8。
+- `final-prompt-validation-01`：强制题目约束后 C 风格 54.94、格式 1.0；高于 A，但低于 B。
+- `live-haizi-compact-01`：第 5 代时 **HTTP 402 余额不足**停止；最优 51.5134，已有 `checkpoints/gen_005/`；等待充值/换 key 后 resume。
+- 研究结论：**没有“可靠且可复现”的最终 Style Prompt**。当前候选有正向信号，但确认重评、格式修复和 compact 运行都还没有给出稳定超过 B 的结果。
 - 安全：API 密钥曾在聊天中传输，**应立即在供应商控制台轮换/吊销**。`.env` 已被 `.gitignore` 忽略，但密钥已经暴露。
 
-一句话：**工程已能持续多代运行并保留快照；结论仍待长跑和独立评审确认。**
+一句话：**真实调用因余额不足暂停；在充值前不能继续找 Prompt，也不会用 Mock 或单次结果冒充结论。**
+
+---
+
+## 14. v3 指标与遗传算法升级及完整收敛结果（2026-11-26 更新）
+
+在 API 恢复可用后，完成了 `v3` 评价指标重构（修复零标点反转 Bug、建立 13 维语料分位带 + 留一校准字符 TF-IDF + 反套路惩罚，海子留出集区分 AUC 达 `0.806—0.900`；匿名评审切换为独立模型 `deepseek-chat`）与遗传算法机制升级（数据锚定初始化、定量瓶颈注入差异分析、精英语义重组算子 `Semantic Crossover`、相似度生态位去克隆、轮内双样本确认及带前稿上下文的格式微调），并完成了 `live-haizi-v3-pilot-01` 与完整运行 `live-haizi-v3-optimal-01`（8 代演化 + 60 首留出集盲测，1,229 次调用 / 3,758,946 tokens）。
+
+- **最优 Style Prompt**：[`experiments/reverse_prompt_engineering/optimal_style_prompt.txt`](experiments/reverse_prompt_engineering/optimal_style_prompt.txt)（候选 `g07-x01-d3fab7f1`，531 字，6 条原则，优化集 10/10 全合格）。
+- **留出集 60 首独立盲测（10 测试题 × 2 次重复）**：
+  - **C（RPE-GA v3）**：合格率 **`0.85`（17/20）**，合格风格分 **`64.01`**，全样本风格分 **`63.34`**，文学质量 **`62.00`**，综合适应度 **`55.53`**；
+  - **B（一次性反推）**：合格率 `0.70`（14/20），合格风格分 `57.26`，全样本风格分 `57.59`，文学质量 `56.00`，综合适应度 `46.69`；
+  - **A（直接点名模仿）**：合格率 `0.70`（14/20），合格风格分 `55.02`，全样本风格分 `53.57`，文学质量 `49.50`，综合适应度 `46.35`。
+- **配对统计检验**：总序 **C > B > A**；同题双方均合格时 **C vs B 为 8 胜 0 平 0 负**（均差 `+6.63`），**C vs A 为 8 胜 0 平 1 负**（均差 `+7.88`）；全 10 题双侧精确置换检验 $p_{\text{C vs B}} = 0.0098$、$p_{\text{C vs A}} = 0.0039$。
+- 完整诊断、谱系与盲测数据详见仓库根目录 [`EAReport.md`](EAReport.md)。

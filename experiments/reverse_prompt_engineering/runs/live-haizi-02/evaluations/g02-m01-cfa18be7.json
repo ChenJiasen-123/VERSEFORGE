@@ -1,0 +1,1299 @@
+{
+  "candidate_id": "g02-m01-cfa18be7",
+  "evaluations": [
+    {
+      "topic_id": "opt-01",
+      "topic": "深夜医院走廊尽头的自动售货机",
+      "repetition": 0,
+      "generation": {
+        "ok": true,
+        "topic_id": "opt-01",
+        "title": "走廊尽头",
+        "lines": [
+          "从电梯口向右",
+          "灯管低鸣",
+          "我数着地砖走",
+          "白墙延伸",
+          "脚步声很轻",
+          "售货机立在那里",
+          "屏幕亮着",
+          "硬币投入",
+          "哐当一声",
+          "它不说话",
+          "我蹲下取货",
+          "后来夜更深",
+          "窗外无星",
+          "走廊空空的",
+          "机器嗡嗡响",
+          "只剩半瓶水"
+        ],
+        "raw_lines": [
+          "从电梯口向右",
+          "灯管低鸣",
+          "我数着地砖走",
+          "白墙延伸",
+          "脚步声很轻",
+          "",
+          "售货机立在那里",
+          "屏幕亮着",
+          "硬币投入",
+          "哐当一声",
+          "它不说话",
+          "我蹲下取货",
+          "",
+          "后来夜更深",
+          "窗外无星",
+          "走廊空空的",
+          "机器嗡嗡响",
+          "只剩半瓶水"
+        ],
+        "text": "从电梯口向右\n灯管低鸣\n我数着地砖走\n白墙延伸\n脚步声很轻\n\n售货机立在那里\n屏幕亮着\n硬币投入\n哐当一声\n它不说话\n我蹲下取货\n\n后来夜更深\n窗外无星\n走廊空空的\n机器嗡嗡响\n只剩半瓶水",
+        "form_ok": true,
+        "form_issues": [],
+        "meta": {
+          "usage": {
+            "prompt_tokens": 857,
+            "completion_tokens": 102,
+            "total_tokens": 959,
+            "prompt_tokens_details": {
+              "cached_tokens": 640
+            },
+            "prompt_cache_hit_tokens": 640,
+            "prompt_cache_miss_tokens": 217
+          },
+          "cache_hit": false,
+          "request_settings": {
+            "max_tokens": 1200,
+            "response_format": "json_object",
+            "thinking": "disabled",
+            "temperature": 1.0
+          },
+          "model": "deepseek-flash",
+          "attempt": 1
+        },
+        "mock": false
+      },
+      "ok": true,
+      "created_at": "2026-11-25T15:15:04.403067+00:00",
+      "judge_model": "deepseek-flash",
+      "rubric_version": "rpe-poetry-zh-v1",
+      "mock": false,
+      "poem_id": "bd70594173d9a5afc07e735c8a557ab3f0e72c79216273c179a051fb566a4556",
+      "deterministic": {
+        "score": 34.2331,
+        "mean": 34.2331,
+        "max": 37.6949,
+        "min": 29.9977,
+        "std": 2.8455,
+        "per_reference": [
+          {
+            "reference": 1,
+            "score": 29.9977,
+            "components": {
+              "character_bigram": 0.0,
+              "character_unigram": 0.181947,
+              "function_chars": 0.453817,
+              "line_length": 0.102073,
+              "punctuation": 0.0,
+              "line_endings": 0.102062,
+              "structure": 0.578157,
+              "pronouns": 0.716115
+            }
+          },
+          {
+            "reference": 2,
+            "score": 31.9294,
+            "components": {
+              "character_bigram": 0.003044,
+              "character_unigram": 0.228377,
+              "function_chars": 0.504624,
+              "line_length": 0.029052,
+              "punctuation": 0.0,
+              "line_endings": 0.0,
+              "structure": 0.647343,
+              "pronouns": 0.88752
+            }
+          },
+          {
+            "reference": 3,
+            "score": 36.2818,
+            "components": {
+              "character_bigram": 0.0,
+              "character_unigram": 0.203844,
+              "function_chars": 0.574038,
+              "line_length": 0.039844,
+              "punctuation": 0.0,
+              "line_endings": 0.0,
+              "structure": 0.783906,
+              "pronouns": 0.894427
+            }
+          },
+          {
+            "reference": 4,
+            "score": 37.6949,
+            "components": {
+              "character_bigram": 0.0,
+              "character_unigram": 0.289696,
+              "function_chars": 0.530608,
+              "line_length": 0.209321,
+              "punctuation": 0.0,
+              "line_endings": 0.085749,
+              "structure": 0.735325,
+              "pronouns": 0.8
+            }
+          },
+          {
+            "reference": 5,
+            "score": 35.2615,
+            "components": {
+              "character_bigram": 0.009677,
+              "character_unigram": 0.24938,
+              "function_chars": 0.476418,
+              "line_length": 0.116537,
+              "punctuation": 0.0,
+              "line_endings": 0.093026,
+              "structure": 0.733432,
+              "pronouns": 0.820783
+            }
+          }
+        ],
+        "mean_components": {
+          "character_bigram": 0.002544,
+          "character_unigram": 0.230649,
+          "function_chars": 0.507901,
+          "line_length": 0.099365,
+          "punctuation": 0.0,
+          "line_endings": 0.056167,
+          "structure": 0.695633,
+          "pronouns": 0.823769
+        },
+        "feature_schema": "rpe-poetry-style-v1",
+        "notes": "满分100；逐项为生成诗与每篇参考诗的特征相似度，主分取与各参考诗的均值。"
+      },
+      "copy_diagnostics": {
+        "max_lcs_chars": 3,
+        "max_rouge1_f1": 0.158845,
+        "matched_reference_lines": [],
+        "copy_flag": false,
+        "thresholds": {
+          "lcs_chars": 12,
+          "line_chars": 8,
+          "rouge1_f1": 0.8
+        },
+        "note": "ROUGE-1 仅作文本重合诊断，不作为风格得分；高重合不等于风格模仿成功。"
+      },
+      "rouge1_diagnostic": {
+        "per_reference": [
+          {
+            "precision": 0.18181818181818182,
+            "recall": 0.08433734939759036,
+            "f1": 0.11522633744855967
+          },
+          {
+            "precision": 0.3246753246753247,
+            "recall": 0.045207956600361664,
+            "f1": 0.07936507936507937
+          },
+          {
+            "precision": 0.14285714285714285,
+            "recall": 0.0990990990990991,
+            "f1": 0.11702127659574468
+          },
+          {
+            "precision": 0.2857142857142857,
+            "recall": 0.11,
+            "f1": 0.15884476534296027
+          },
+          {
+            "precision": 0.2987012987012987,
+            "recall": 0.07590759075907591,
+            "f1": 0.12105263157894736
+          }
+        ],
+        "mean_f1": 0.118302,
+        "max_f1": 0.158845,
+        "note": "仅作文本重合诊断；不把高 ROUGE-1 当作风格模仿成功。"
+      },
+      "judge": {
+        "dimensions": {
+          "lexical": {
+            "score": 2.0,
+            "evidence": [
+              "灯管低鸣",
+              "哐当一声"
+            ],
+            "rationale": "生成诗多用日常具体名词与拟声词，语言偏口语白描；参考诗则大量抽象词、宏大词与书面语，词域差异明显。",
+            "uncertainty": "low"
+          },
+          "syntax": {
+            "score": 2.0,
+            "evidence": [
+              "我数着地砖走",
+              "它不说话"
+            ],
+            "rationale": "生成诗以短促主谓句和动作句为主，少排比、呼告与破折号解释；参考诗多复沓长句、呼告和跨行铺陈。",
+            "uncertainty": "low"
+          },
+          "lineation": {
+            "score": 3.0,
+            "evidence": [
+              "从电梯口向右",
+              "只剩半瓶水"
+            ],
+            "rationale": "两者都用短行分节、行尾落点干净；但生成诗行更短更碎，缺少参考诗的长行与重复节奏。",
+            "uncertainty": "medium"
+          },
+          "imagery": {
+            "score": 2.0,
+            "evidence": [
+              "屏幕亮着",
+              "窗外无星"
+            ],
+            "rationale": "生成诗意象为走廊、售货机、水瓶等日常器物，并置平实；参考诗意象宏大、自然与神话交织，修辞密度高。",
+            "uncertainty": "low"
+          },
+          "emotion": {
+            "score": 2.0,
+            "evidence": [
+              "脚步声很轻",
+              "只剩半瓶水"
+            ],
+            "rationale": "生成诗情感克制、藏在动作与场景里；参考诗抒情外放、强度高，常直接呼告与咏叹。",
+            "uncertainty": "low"
+          },
+          "structure": {
+            "score": 3.0,
+            "evidence": [
+              "后来夜更深",
+              "走廊空空的"
+            ],
+            "rationale": "生成诗按时间推进、三节收束于空景，结构完整；参考诗多回环复沓、章节铺排，推进方式不同。",
+            "uncertainty": "medium"
+          },
+          "literary_quality": {
+            "score": 3.0,
+            "evidence": [
+              "灯管低鸣",
+              "机器嗡嗡响"
+            ],
+            "rationale": "语言干净、场景准确，但意象与用词偏常见，新鲜度和完成度中等，未落入陈词但也不够突出。",
+            "uncertainty": "medium"
+          },
+          "topic_adherence": {
+            "score": 5.0,
+            "evidence": [
+              "售货机立在那里",
+              "深夜医院走廊"
+            ],
+            "rationale": "紧扣深夜、走廊尽头售货机与人的疲惫，行数分节符合要求，未出现诗人姓名。",
+            "uncertainty": "low"
+          },
+          "originality": {
+            "score": 4.0,
+            "evidence": [
+              "我蹲下取货",
+              "只剩半瓶水"
+            ],
+            "rationale": "未复制参考诗成句，以自身日常观察组织语言，有独立场景与收束，原创性较好。",
+            "uncertainty": "low"
+          }
+        },
+        "overall_notes": "生成诗在题材与要求上完成度高，语言干净克制；但与参考诗相比，词域、句法、意象宏大度和抒情强度均明显偏日常轻淡，风格接近度中等偏低。",
+        "confidence": "medium",
+        "raw": {
+          "dimensions": {
+            "lexical": {
+              "score": 2,
+              "evidence": [
+                "灯管低鸣",
+                "哐当一声"
+              ],
+              "rationale": "生成诗多用日常具体名词与拟声词，语言偏口语白描；参考诗则大量抽象词、宏大词与书面语，词域差异明显。",
+              "uncertainty": "low"
+            },
+            "syntax": {
+              "score": 2,
+              "evidence": [
+                "我数着地砖走",
+                "它不说话"
+              ],
+              "rationale": "生成诗以短促主谓句和动作句为主，少排比、呼告与破折号解释；参考诗多复沓长句、呼告和跨行铺陈。",
+              "uncertainty": "low"
+            },
+            "lineation": {
+              "score": 3,
+              "evidence": [
+                "从电梯口向右",
+                "只剩半瓶水"
+              ],
+              "rationale": "两者都用短行分节、行尾落点干净；但生成诗行更短更碎，缺少参考诗的长行与重复节奏。",
+              "uncertainty": "medium"
+            },
+            "imagery": {
+              "score": 2,
+              "evidence": [
+                "屏幕亮着",
+                "窗外无星"
+              ],
+              "rationale": "生成诗意象为走廊、售货机、水瓶等日常器物，并置平实；参考诗意象宏大、自然与神话交织，修辞密度高。",
+              "uncertainty": "low"
+            },
+            "emotion": {
+              "score": 2,
+              "evidence": [
+                "脚步声很轻",
+                "只剩半瓶水"
+              ],
+              "rationale": "生成诗情感克制、藏在动作与场景里；参考诗抒情外放、强度高，常直接呼告与咏叹。",
+              "uncertainty": "low"
+            },
+            "structure": {
+              "score": 3,
+              "evidence": [
+                "后来夜更深",
+                "走廊空空的"
+              ],
+              "rationale": "生成诗按时间推进、三节收束于空景，结构完整；参考诗多回环复沓、章节铺排，推进方式不同。",
+              "uncertainty": "medium"
+            },
+            "literary_quality": {
+              "score": 3,
+              "evidence": [
+                "灯管低鸣",
+                "机器嗡嗡响"
+              ],
+              "rationale": "语言干净、场景准确，但意象与用词偏常见，新鲜度和完成度中等，未落入陈词但也不够突出。",
+              "uncertainty": "medium"
+            },
+            "topic_adherence": {
+              "score": 5,
+              "evidence": [
+                "售货机立在那里",
+                "深夜医院走廊"
+              ],
+              "rationale": "紧扣深夜、走廊尽头售货机与人的疲惫，行数分节符合要求，未出现诗人姓名。",
+              "uncertainty": "low"
+            },
+            "originality": {
+              "score": 4,
+              "evidence": [
+                "我蹲下取货",
+                "只剩半瓶水"
+              ],
+              "rationale": "未复制参考诗成句，以自身日常观察组织语言，有独立场景与收束，原创性较好。",
+              "uncertainty": "low"
+            }
+          },
+          "overall_notes": "生成诗在题材与要求上完成度高，语言干净克制；但与参考诗相比，词域、句法、意象宏大度和抒情强度均明显偏日常轻淡，风格接近度中等偏低。",
+          "confidence": "medium"
+        }
+      },
+      "judge_meta": {
+        "usage": {
+          "prompt_tokens": 2384,
+          "completion_tokens": 690,
+          "total_tokens": 3074,
+          "prompt_tokens_details": {
+            "cached_tokens": 2048
+          },
+          "prompt_cache_hit_tokens": 2048,
+          "prompt_cache_miss_tokens": 336
+        },
+        "cache_hit": false,
+        "request_settings": {
+          "max_tokens": 2600,
+          "response_format": "json_object",
+          "thinking": "disabled",
+          "temperature": 0.0
+        },
+        "model": "deepseek-flash",
+        "attempt": 1
+      },
+      "components": {
+        "fitness": 44.9677,
+        "eligible": true,
+        "base": 44.9677,
+        "penalty": 0.0,
+        "style_score": 42.3149,
+        "deterministic_style_score": 34.2331,
+        "judge_style_score": 46.6667,
+        "literary_quality_score": 60.0,
+        "literary_quality_raw": 3.0,
+        "topic_adherence": 5.0,
+        "originality": 4.0,
+        "form_ok": true,
+        "copy_flag": false,
+        "high_uncertainty_dimensions": []
+      }
+    },
+    {
+      "topic_id": "opt-02",
+      "topic": "洪水退去后的乡村小学操场",
+      "repetition": 0,
+      "generation": {
+        "ok": true,
+        "topic_id": "opt-02",
+        "title": "操场上的泥线",
+        "lines": [
+          "从屋顶退下来",
+          "水痕停在墙腰",
+          "我扛铁锹走",
+          "泥里埋着半块砖",
+          "砖是硬的",
+          "我们在操场挖沟",
+          "锹刃磕出白点",
+          "草叶翻出根须",
+          "水洼里漂着纸船",
+          "纸船沉了",
+          "天亮前推来一车沙",
+          "我举起簸箕倒",
+          "沙盖住旧球架",
+          "沙盖住鞋印",
+          "沙是凉的",
+          "旗杆下堆起一堆土",
+          "土里插着新哨"
+        ],
+        "raw_lines": [
+          "从屋顶退下来",
+          "水痕停在墙腰",
+          "我扛铁锹走",
+          "泥里埋着半块砖",
+          "砖是硬的",
+          "",
+          "我们在操场挖沟",
+          "锹刃磕出白点",
+          "草叶翻出根须",
+          "水洼里漂着纸船",
+          "纸船沉了",
+          "",
+          "天亮前推来一车沙",
+          "我举起簸箕倒",
+          "沙盖住旧球架",
+          "沙盖住鞋印",
+          "沙是凉的",
+          "",
+          "旗杆下堆起一堆土",
+          "土里插着新哨"
+        ],
+        "text": "从屋顶退下来\n水痕停在墙腰\n我扛铁锹走\n泥里埋着半块砖\n砖是硬的\n\n我们在操场挖沟\n锹刃磕出白点\n草叶翻出根须\n水洼里漂着纸船\n纸船沉了\n\n天亮前推来一车沙\n我举起簸箕倒\n沙盖住旧球架\n沙盖住鞋印\n沙是凉的\n\n旗杆下堆起一堆土\n土里插着新哨",
+        "form_ok": true,
+        "form_issues": [],
+        "meta": {
+          "usage": {
+            "prompt_tokens": 855,
+            "completion_tokens": 142,
+            "total_tokens": 997,
+            "prompt_tokens_details": {
+              "cached_tokens": 640
+            },
+            "prompt_cache_hit_tokens": 640,
+            "prompt_cache_miss_tokens": 215
+          },
+          "cache_hit": false,
+          "request_settings": {
+            "max_tokens": 1200,
+            "response_format": "json_object",
+            "thinking": "disabled",
+            "temperature": 1.0
+          },
+          "model": "deepseek-flash",
+          "attempt": 1
+        },
+        "mock": false
+      },
+      "ok": true,
+      "created_at": "2026-11-25T15:15:13.878603+00:00",
+      "judge_model": "deepseek-flash",
+      "rubric_version": "rpe-poetry-zh-v1",
+      "mock": false,
+      "poem_id": "167eadfa83853f693e2a70bc6eccb10c99afaf43a95051a625008ca892f2e604",
+      "deterministic": {
+        "score": 40.593,
+        "mean": 40.593,
+        "max": 44.6127,
+        "min": 37.2674,
+        "std": 3.0733,
+        "per_reference": [
+          {
+            "reference": 1,
+            "score": 38.3502,
+            "components": {
+              "character_bigram": 0.016366,
+              "character_unigram": 0.313177,
+              "function_chars": 0.693769,
+              "line_length": 0.206001,
+              "punctuation": 0.0,
+              "line_endings": 0.0,
+              "structure": 0.651439,
+              "pronouns": 0.759555
+            }
+          },
+          {
+            "reference": 2,
+            "score": 37.2674,
+            "components": {
+              "character_bigram": 0.005155,
+              "character_unigram": 0.271763,
+              "function_chars": 0.615325,
+              "line_length": 0.097005,
+              "punctuation": 0.0,
+              "line_endings": 0.0,
+              "structure": 0.714487,
+              "pronouns": 0.941357
+            }
+          },
+          {
+            "reference": 3,
+            "score": 38.7426,
+            "components": {
+              "character_bigram": 0.0,
+              "character_unigram": 0.201134,
+              "function_chars": 0.617032,
+              "line_length": 0.067533,
+              "punctuation": 0.0,
+              "line_endings": 0.0,
+              "structure": 0.825242,
+              "pronouns": 0.948683
+            }
+          },
+          {
+            "reference": 4,
+            "score": 44.6127,
+            "components": {
+              "character_bigram": 0.011467,
+              "character_unigram": 0.289989,
+              "function_chars": 0.673555,
+              "line_length": 0.405105,
+              "punctuation": 0.0,
+              "line_endings": 0.0,
+              "structure": 0.81461,
+              "pronouns": 0.848528
+            }
+          },
+          {
+            "reference": 5,
+            "score": 43.9922,
+            "components": {
+              "character_bigram": 0.004097,
+              "character_unigram": 0.33513,
+              "function_chars": 0.653113,
+              "line_length": 0.222005,
+              "punctuation": 0.0,
+              "line_endings": 0.199189,
+              "structure": 0.812561,
+              "pronouns": 0.870572
+            }
+          }
+        ],
+        "mean_components": {
+          "character_bigram": 0.007417,
+          "character_unigram": 0.282239,
+          "function_chars": 0.650559,
+          "line_length": 0.19953,
+          "punctuation": 0.0,
+          "line_endings": 0.039838,
+          "structure": 0.763668,
+          "pronouns": 0.873739
+        },
+        "feature_schema": "rpe-poetry-style-v1",
+        "notes": "满分100；逐项为生成诗与每篇参考诗的特征相似度，主分取与各参考诗的均值。"
+      },
+      "copy_diagnostics": {
+        "max_lcs_chars": 2,
+        "max_rouge1_f1": 0.209738,
+        "matched_reference_lines": [],
+        "copy_flag": false,
+        "thresholds": {
+          "lcs_chars": 12,
+          "line_chars": 8,
+          "rouge1_f1": 0.8
+        },
+        "note": "ROUGE-1 仅作文本重合诊断，不作为风格得分；高重合不等于风格模仿成功。"
+      },
+      "rouge1_diagnostic": {
+        "per_reference": [
+          {
+            "precision": 0.27722772277227725,
+            "recall": 0.1686746987951807,
+            "f1": 0.20973782771535582
+          },
+          {
+            "precision": 0.25742574257425743,
+            "recall": 0.04701627486437613,
+            "f1": 0.07951070336391437
+          },
+          {
+            "precision": 0.1188118811881188,
+            "recall": 0.10810810810810811,
+            "f1": 0.11320754716981132
+          },
+          {
+            "precision": 0.25742574257425743,
+            "recall": 0.13,
+            "f1": 0.17275747508305647
+          },
+          {
+            "precision": 0.3465346534653465,
+            "recall": 0.11551155115511551,
+            "f1": 0.17326732673267325
+          }
+        ],
+        "mean_f1": 0.149696,
+        "max_f1": 0.209738,
+        "note": "仅作文本重合诊断；不把高 ROUGE-1 当作风格模仿成功。"
+      },
+      "judge": {
+        "dimensions": {
+          "lexical": {
+            "score": 2.0,
+            "evidence": [
+              "我扛铁锹走",
+              "砖是硬的"
+            ],
+            "rationale": "生成诗多用具体日常名词与短促动词，口语化；参考诗则抽象词、宏大词密集，词域明显不同。",
+            "uncertainty": "low"
+          },
+          "syntax": {
+            "score": 2.0,
+            "evidence": [
+              "沙盖住旧球架",
+              "土里插着新哨"
+            ],
+            "rationale": "生成诗以短主谓句和并列动作推进，少用呼告、排比与破折号；参考诗多长句、复沓与感叹结构。",
+            "uncertainty": "low"
+          },
+          "lineation": {
+            "score": 3.0,
+            "evidence": [
+              "水痕停在墙腰",
+              "纸船沉了"
+            ],
+            "rationale": "同为短行自由诗、四节结构，行尾落点干脆；但参考诗行内跨行与复沓节奏更强，生成诗偏均匀短句。",
+            "uncertainty": "low"
+          },
+          "imagery": {
+            "score": 2.0,
+            "evidence": [
+              "水洼里漂着纸船",
+              "沙是凉的"
+            ],
+            "rationale": "生成诗意象为灾后清理的日常器物，写实并置；参考诗意象宏大、象征化，常以自然与神话并置并作解释性比喻。",
+            "uncertainty": "low"
+          },
+          "emotion": {
+            "score": 2.0,
+            "evidence": [
+              "我举起簸箕倒",
+              "土里插着新哨"
+            ],
+            "rationale": "生成诗情感克制，藏在动作与场景中，几乎不直说；参考诗抒情外放、反复咏叹，强度更高。",
+            "uncertainty": "low"
+          },
+          "structure": {
+            "score": 3.0,
+            "evidence": [
+              "天亮前推来一车沙",
+              "旗杆下堆起一堆土"
+            ],
+            "rationale": "生成诗按时间与空间推进清理过程，四节收束于旗杆下；参考诗多回环复沓、主题句反复，结构更咏叹化。",
+            "uncertainty": "low"
+          },
+          "literary_quality": {
+            "score": 3.0,
+            "evidence": [
+              "泥里埋着半块砖",
+              "沙盖住鞋印"
+            ],
+            "rationale": "语言干净、细节准确，但意象偏平实，缺少新鲜转喻与节奏变化；完成度尚可。",
+            "uncertainty": "low"
+          },
+          "topic_adherence": {
+            "score": 5.0,
+            "evidence": [
+              "我们在操场挖沟",
+              "土里插着新哨"
+            ],
+            "rationale": "明确写洪水退后操场清淤、推沙、插哨，回应灾后清理与返校准备，体裁与行数分节均符合。",
+            "uncertainty": "low"
+          },
+          "originality": {
+            "score": 4.0,
+            "evidence": [
+              "水痕停在墙腰",
+              "纸船沉了"
+            ],
+            "rationale": "未复制参考诗成句，以自身日常清理细节组织语言；与参考风格距离较大，但无套作痕迹。",
+            "uncertainty": "low"
+          }
+        },
+        "overall_notes": "生成诗在题材与日常写实上成立，但与参考诗那种宏大象征、复沓咏叹的风格差距明显，接近度偏低。",
+        "confidence": "medium",
+        "raw": {
+          "dimensions": {
+            "lexical": {
+              "score": 2,
+              "evidence": [
+                "我扛铁锹走",
+                "砖是硬的"
+              ],
+              "rationale": "生成诗多用具体日常名词与短促动词，口语化；参考诗则抽象词、宏大词密集，词域明显不同。",
+              "uncertainty": "low"
+            },
+            "syntax": {
+              "score": 2,
+              "evidence": [
+                "沙盖住旧球架",
+                "土里插着新哨"
+              ],
+              "rationale": "生成诗以短主谓句和并列动作推进，少用呼告、排比与破折号；参考诗多长句、复沓与感叹结构。",
+              "uncertainty": "low"
+            },
+            "lineation": {
+              "score": 3,
+              "evidence": [
+                "水痕停在墙腰",
+                "纸船沉了"
+              ],
+              "rationale": "同为短行自由诗、四节结构，行尾落点干脆；但参考诗行内跨行与复沓节奏更强，生成诗偏均匀短句。",
+              "uncertainty": "low"
+            },
+            "imagery": {
+              "score": 2,
+              "evidence": [
+                "水洼里漂着纸船",
+                "沙是凉的"
+              ],
+              "rationale": "生成诗意象为灾后清理的日常器物，写实并置；参考诗意象宏大、象征化，常以自然与神话并置并作解释性比喻。",
+              "uncertainty": "low"
+            },
+            "emotion": {
+              "score": 2,
+              "evidence": [
+                "我举起簸箕倒",
+                "土里插着新哨"
+              ],
+              "rationale": "生成诗情感克制，藏在动作与场景中，几乎不直说；参考诗抒情外放、反复咏叹，强度更高。",
+              "uncertainty": "low"
+            },
+            "structure": {
+              "score": 3,
+              "evidence": [
+                "天亮前推来一车沙",
+                "旗杆下堆起一堆土"
+              ],
+              "rationale": "生成诗按时间与空间推进清理过程，四节收束于旗杆下；参考诗多回环复沓、主题句反复，结构更咏叹化。",
+              "uncertainty": "low"
+            },
+            "literary_quality": {
+              "score": 3,
+              "evidence": [
+                "泥里埋着半块砖",
+                "沙盖住鞋印"
+              ],
+              "rationale": "语言干净、细节准确，但意象偏平实，缺少新鲜转喻与节奏变化；完成度尚可。",
+              "uncertainty": "low"
+            },
+            "topic_adherence": {
+              "score": 5,
+              "evidence": [
+                "我们在操场挖沟",
+                "土里插着新哨"
+              ],
+              "rationale": "明确写洪水退后操场清淤、推沙、插哨，回应灾后清理与返校准备，体裁与行数分节均符合。",
+              "uncertainty": "low"
+            },
+            "originality": {
+              "score": 4,
+              "evidence": [
+                "水痕停在墙腰",
+                "纸船沉了"
+              ],
+              "rationale": "未复制参考诗成句，以自身日常清理细节组织语言；与参考风格距离较大，但无套作痕迹。",
+              "uncertainty": "low"
+            }
+          },
+          "overall_notes": "生成诗在题材与日常写实上成立，但与参考诗那种宏大象征、复沓咏叹的风格差距明显，接近度偏低。",
+          "confidence": "medium"
+        }
+      },
+      "judge_meta": {
+        "usage": {
+          "prompt_tokens": 2625,
+          "completion_tokens": 714,
+          "total_tokens": 3339,
+          "prompt_tokens_details": {
+            "cached_tokens": 2432
+          },
+          "prompt_cache_hit_tokens": 2432,
+          "prompt_cache_miss_tokens": 193
+        },
+        "cache_hit": false,
+        "request_settings": {
+          "max_tokens": 2600,
+          "response_format": "json_object",
+          "thinking": "disabled",
+          "temperature": 0.0
+        },
+        "model": "deepseek-flash",
+        "attempt": 2
+      },
+      "components": {
+        "fitness": 46.8598,
+        "eligible": true,
+        "base": 46.8598,
+        "penalty": 0.0,
+        "style_score": 44.5409,
+        "deterministic_style_score": 40.593,
+        "judge_style_score": 46.6667,
+        "literary_quality_score": 60.0,
+        "literary_quality_raw": 3.0,
+        "topic_adherence": 5.0,
+        "originality": 4.0,
+        "form_ok": true,
+        "copy_flag": false,
+        "high_uncertainty_dimensions": []
+      }
+    },
+    {
+      "topic_id": "opt-03",
+      "topic": "跨江大桥下的夜班渡轮",
+      "repetition": 0,
+      "generation": {
+        "ok": true,
+        "topic_id": "opt-03",
+        "title": "桥下夜渡",
+        "lines": [
+          "从桥墩的阴影里滑出",
+          "铁皮船切开黑水",
+          "灯在江心散作碎金",
+          "我握紧缆绳",
+          "风是凉的",
+          "缆绳勒进手掌",
+          "对岸的塔吊垂下钢索",
+          "像一根绷断的弦",
+          "水底的石头不动",
+          "桥上有人走过",
+          "脚步声落进水里",
+          "什么也没有留下",
+          "末班钟声从岸上传来",
+          "我收起跳板",
+          "把缆绳在桩上绕三圈",
+          "江面漂着一只空瓶"
+        ],
+        "raw_lines": [
+          "从桥墩的阴影里滑出",
+          "铁皮船切开黑水",
+          "灯在江心散作碎金",
+          "我握紧缆绳",
+          "风是凉的",
+          "",
+          "缆绳勒进手掌",
+          "对岸的塔吊垂下钢索",
+          "像一根绷断的弦",
+          "水底的石头不动",
+          "桥上有人走过",
+          "脚步声落进水里",
+          "什么也没有留下",
+          "",
+          "末班钟声从岸上传来",
+          "我收起跳板",
+          "把缆绳在桩上绕三圈",
+          "江面漂着一只空瓶"
+        ],
+        "text": "从桥墩的阴影里滑出\n铁皮船切开黑水\n灯在江心散作碎金\n我握紧缆绳\n风是凉的\n\n缆绳勒进手掌\n对岸的塔吊垂下钢索\n像一根绷断的弦\n水底的石头不动\n桥上有人走过\n脚步声落进水里\n什么也没有留下\n\n末班钟声从岸上传来\n我收起跳板\n把缆绳在桩上绕三圈\n江面漂着一只空瓶",
+        "form_ok": true,
+        "form_issues": [],
+        "meta": {
+          "usage": {
+            "prompt_tokens": 858,
+            "completion_tokens": 138,
+            "total_tokens": 996,
+            "prompt_tokens_details": {
+              "cached_tokens": 640
+            },
+            "prompt_cache_hit_tokens": 640,
+            "prompt_cache_miss_tokens": 218
+          },
+          "cache_hit": false,
+          "request_settings": {
+            "max_tokens": 1200,
+            "response_format": "json_object",
+            "thinking": "disabled",
+            "temperature": 1.0
+          },
+          "model": "deepseek-flash",
+          "attempt": 1
+        },
+        "mock": false
+      },
+      "ok": true,
+      "created_at": "2026-11-25T15:15:28.522421+00:00",
+      "judge_model": "deepseek-flash",
+      "rubric_version": "rpe-poetry-zh-v1",
+      "mock": false,
+      "poem_id": "0a5f2c1438094073f9ac848659e78693e276d9dfce8bfc9028f72db1d33a956d",
+      "deterministic": {
+        "score": 45.4348,
+        "mean": 45.4348,
+        "max": 50.2871,
+        "min": 39.1167,
+        "std": 4.2949,
+        "per_reference": [
+          {
+            "reference": 1,
+            "score": 39.1167,
+            "components": {
+              "character_bigram": 0.00517,
+              "character_unigram": 0.349911,
+              "function_chars": 0.73364,
+              "line_length": 0.180817,
+              "punctuation": 0.0,
+              "line_endings": 0.102062,
+              "structure": 0.644885,
+              "pronouns": 0.640513
+            }
+          },
+          {
+            "reference": 2,
+            "score": 43.5138,
+            "components": {
+              "character_bigram": 0.002443,
+              "character_unigram": 0.419835,
+              "function_chars": 0.806516,
+              "line_length": 0.167942,
+              "punctuation": 0.0,
+              "line_endings": 0.0,
+              "structure": 0.713211,
+              "pronouns": 0.992278
+            }
+          },
+          {
+            "reference": 3,
+            "score": 44.0185,
+            "components": {
+              "character_bigram": 0.0,
+              "character_unigram": 0.317281,
+              "function_chars": 0.773325,
+              "line_length": 0.086109,
+              "punctuation": 0.0,
+              "line_endings": 0.0,
+              "structure": 0.854918,
+              "pronouns": 1.0
+            }
+          },
+          {
+            "reference": 4,
+            "score": 50.2381,
+            "components": {
+              "character_bigram": 0.016302,
+              "character_unigram": 0.42735,
+              "function_chars": 0.835088,
+              "line_length": 0.450373,
+              "punctuation": 0.0,
+              "line_endings": 0.042875,
+              "structure": 0.810062,
+              "pronouns": 0.894427
+            }
+          },
+          {
+            "reference": 5,
+            "score": 50.2871,
+            "components": {
+              "character_bigram": 0.003883,
+              "character_unigram": 0.44868,
+              "function_chars": 0.822679,
+              "line_length": 0.362036,
+              "punctuation": 0.0,
+              "line_endings": 0.186052,
+              "structure": 0.807385,
+              "pronouns": 0.917663
+            }
+          }
+        ],
+        "mean_components": {
+          "character_bigram": 0.00556,
+          "character_unigram": 0.392611,
+          "function_chars": 0.79425,
+          "line_length": 0.249455,
+          "punctuation": 0.0,
+          "line_endings": 0.066198,
+          "structure": 0.766092,
+          "pronouns": 0.888976
+        },
+        "feature_schema": "rpe-poetry-style-v1",
+        "notes": "满分100；逐项为生成诗与每篇参考诗的特征相似度，主分取与各参考诗的均值。"
+      },
+      "copy_diagnostics": {
+        "max_lcs_chars": 2,
+        "max_rouge1_f1": 0.223642,
+        "matched_reference_lines": [],
+        "copy_flag": false,
+        "thresholds": {
+          "lcs_chars": 12,
+          "line_chars": 8,
+          "rouge1_f1": 0.8
+        },
+        "note": "ROUGE-1 仅作文本重合诊断，不作为风格得分；高重合不等于风格模仿成功。"
+      },
+      "rouge1_diagnostic": {
+        "per_reference": [
+          {
+            "precision": 0.2743362831858407,
+            "recall": 0.18674698795180722,
+            "f1": 0.2222222222222222
+          },
+          {
+            "precision": 0.3805309734513274,
+            "recall": 0.07775768535262206,
+            "f1": 0.12912912912912913
+          },
+          {
+            "precision": 0.20353982300884957,
+            "recall": 0.2072072072072072,
+            "f1": 0.20535714285714288
+          },
+          {
+            "precision": 0.30973451327433627,
+            "recall": 0.175,
+            "f1": 0.22364217252396165
+          },
+          {
+            "precision": 0.35398230088495575,
+            "recall": 0.132013201320132,
+            "f1": 0.1923076923076923
+          }
+        ],
+        "mean_f1": 0.194532,
+        "max_f1": 0.223642,
+        "note": "仅作文本重合诊断；不把高 ROUGE-1 当作风格模仿成功。"
+      },
+      "judge": {
+        "dimensions": {
+          "lexical": {
+            "score": 2.0,
+            "evidence": [
+              "铁皮船切开黑水",
+              "风是凉的"
+            ],
+            "rationale": "生成诗多用具体器物与动作词，口语化短句；参考诗则大量抽象大词与呼告，词域偏宏大抒情，差异明显。",
+            "uncertainty": "low"
+          },
+          "syntax": {
+            "score": 2.0,
+            "evidence": [
+              "我握紧缆绳",
+              "什么也没有留下"
+            ],
+            "rationale": "生成诗以短促主谓句和陈述推进，少排比与呼告；参考诗多长句铺陈、复沓与破折号解释，句法气质不同。",
+            "uncertainty": "low"
+          },
+          "lineation": {
+            "score": 3.0,
+            "evidence": [
+              "从桥墩的阴影里滑出",
+              "江面漂着一只空瓶"
+            ],
+            "rationale": "同为短行自由诗、三节结构，行尾多落在名词或动词上；但参考诗行更长、复沓更强，生成诗节奏更均匀克制。",
+            "uncertainty": "medium"
+          },
+          "imagery": {
+            "score": 2.0,
+            "evidence": [
+              "灯在江心散作碎金",
+              "像一根绷断的弦"
+            ],
+            "rationale": "生成诗意象取自码头日常器物，比喻明确而收敛；参考诗意象宏大、神话化并反复呼告，组织方式差别较大。",
+            "uncertainty": "low"
+          },
+          "emotion": {
+            "score": 2.0,
+            "evidence": [
+              "风是凉的",
+              "什么也没有留下"
+            ],
+            "rationale": "生成诗情感克制、藏在动作与景物里；参考诗抒情外放、强度高且反复直呼，情感表达方式明显不同。",
+            "uncertainty": "low"
+          },
+          "structure": {
+            "score": 3.0,
+            "evidence": [
+              "末班钟声从岸上传来",
+              "把缆绳在桩上绕三圈"
+            ],
+            "rationale": "生成诗按夜班动作时间推进，三节收束于空瓶；参考诗多为复沓回环、空间跳跃，结构逻辑有可辨差异。",
+            "uncertainty": "medium"
+          },
+          "literary_quality": {
+            "score": 3.0,
+            "evidence": [
+              "水底的石头不动",
+              "江面漂着一只空瓶"
+            ],
+            "rationale": "语言干净、意象准确、结尾有余味，完成度尚可；但个别比喻偏熟，整体新鲜度中等。",
+            "uncertainty": "medium"
+          },
+          "topic_adherence": {
+            "score": 5.0,
+            "evidence": [
+              "铁皮船切开黑水",
+              "我收起跳板"
+            ],
+            "rationale": "紧扣夜班渡轮、江水、桥与城市灯光，分三节、行数合规，未出现诗人姓名，题意完成充分。",
+            "uncertainty": "low"
+          },
+          "originality": {
+            "score": 4.0,
+            "evidence": [
+              "缆绳勒进手掌",
+              "把缆绳在桩上绕三圈"
+            ],
+            "rationale": "未见复制参考诗成句或连续片段，以缆绳、跳板等自组细节建立自己的语言组织，原创性较好。",
+            "uncertainty": "low"
+          }
+        },
+        "overall_notes": "生成诗在题材与体裁要求上完成度高，语言干净克制；但与参考诗那种宏大、复沓、呼告式的抒情风格相比，词域、句法与情感强度均偏日常内敛，风格接近度中等偏低。",
+        "confidence": "medium",
+        "raw": {
+          "dimensions": {
+            "lexical": {
+              "score": 2,
+              "evidence": [
+                "铁皮船切开黑水",
+                "风是凉的"
+              ],
+              "rationale": "生成诗多用具体器物与动作词，口语化短句；参考诗则大量抽象大词与呼告，词域偏宏大抒情，差异明显。",
+              "uncertainty": "low"
+            },
+            "syntax": {
+              "score": 2,
+              "evidence": [
+                "我握紧缆绳",
+                "什么也没有留下"
+              ],
+              "rationale": "生成诗以短促主谓句和陈述推进，少排比与呼告；参考诗多长句铺陈、复沓与破折号解释，句法气质不同。",
+              "uncertainty": "low"
+            },
+            "lineation": {
+              "score": 3,
+              "evidence": [
+                "从桥墩的阴影里滑出",
+                "江面漂着一只空瓶"
+              ],
+              "rationale": "同为短行自由诗、三节结构，行尾多落在名词或动词上；但参考诗行更长、复沓更强，生成诗节奏更均匀克制。",
+              "uncertainty": "medium"
+            },
+            "imagery": {
+              "score": 2,
+              "evidence": [
+                "灯在江心散作碎金",
+                "像一根绷断的弦"
+              ],
+              "rationale": "生成诗意象取自码头日常器物，比喻明确而收敛；参考诗意象宏大、神话化并反复呼告，组织方式差别较大。",
+              "uncertainty": "low"
+            },
+            "emotion": {
+              "score": 2,
+              "evidence": [
+                "风是凉的",
+                "什么也没有留下"
+              ],
+              "rationale": "生成诗情感克制、藏在动作与景物里；参考诗抒情外放、强度高且反复直呼，情感表达方式明显不同。",
+              "uncertainty": "low"
+            },
+            "structure": {
+              "score": 3,
+              "evidence": [
+                "末班钟声从岸上传来",
+                "把缆绳在桩上绕三圈"
+              ],
+              "rationale": "生成诗按夜班动作时间推进，三节收束于空瓶；参考诗多为复沓回环、空间跳跃，结构逻辑有可辨差异。",
+              "uncertainty": "medium"
+            },
+            "literary_quality": {
+              "score": 3,
+              "evidence": [
+                "水底的石头不动",
+                "江面漂着一只空瓶"
+              ],
+              "rationale": "语言干净、意象准确、结尾有余味，完成度尚可；但个别比喻偏熟，整体新鲜度中等。",
+              "uncertainty": "medium"
+            },
+            "topic_adherence": {
+              "score": 5,
+              "evidence": [
+                "铁皮船切开黑水",
+                "我收起跳板"
+              ],
+              "rationale": "紧扣夜班渡轮、江水、桥与城市灯光，分三节、行数合规，未出现诗人姓名，题意完成充分。",
+              "uncertainty": "low"
+            },
+            "originality": {
+              "score": 4,
+              "evidence": [
+                "缆绳勒进手掌",
+                "把缆绳在桩上绕三圈"
+              ],
+              "rationale": "未见复制参考诗成句或连续片段，以缆绳、跳板等自组细节建立自己的语言组织，原创性较好。",
+              "uncertainty": "low"
+            }
+          },
+          "overall_notes": "生成诗在题材与体裁要求上完成度高，语言干净克制；但与参考诗那种宏大、复沓、呼告式的抒情风格相比，词域、句法与情感强度均偏日常内敛，风格接近度中等偏低。",
+          "confidence": "medium"
+        }
+      },
+      "judge_meta": {
+        "usage": {
+          "prompt_tokens": 2455,
+          "completion_tokens": 744,
+          "total_tokens": 3199,
+          "prompt_tokens_details": {
+            "cached_tokens": 2048
+          },
+          "prompt_cache_hit_tokens": 2048,
+          "prompt_cache_miss_tokens": 407
+        },
+        "cache_hit": false,
+        "request_settings": {
+          "max_tokens": 2600,
+          "response_format": "json_object",
+          "thinking": "disabled",
+          "temperature": 0.0
+        },
+        "model": "deepseek-flash",
+        "attempt": 1
+      },
+      "components": {
+        "fitness": 48.3002,
+        "eligible": true,
+        "base": 48.3002,
+        "penalty": 0.0,
+        "style_score": 46.2355,
+        "deterministic_style_score": 45.4348,
+        "judge_style_score": 46.6667,
+        "literary_quality_score": 60.0,
+        "literary_quality_raw": 3.0,
+        "topic_adherence": 5.0,
+        "originality": 4.0,
+        "form_ok": true,
+        "copy_flag": false,
+        "high_uncertainty_dimensions": []
+      }
+    }
+  ],
+  "evaluation_count": 3,
+  "successful_evaluations": 3,
+  "failed_evaluations": 0,
+  "fitness": 46.7092,
+  "eligible": true,
+  "style_score": 44.3638,
+  "literary_quality_score": 60.0,
+  "topic_adherence": 5.0,
+  "originality": 4.0,
+  "form_ok_rate": 1.0,
+  "copy_rate": 0.0,
+  "score_std": 1.3646,
+  "aggregation": "mean of per-poem fitness; failed generations penalized; eligibility requires form, non-copy, topic, originality and quality floors",
+  "deterministic_style_score": 40.087,
+  "judge_style_score": 46.6667,
+  "mean_rouge1_f1": 0.154177
+}

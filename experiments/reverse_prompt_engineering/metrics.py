@@ -1,8 +1,15 @@
-"""Deterministic, offline poetry-style metrics.
+"""Deterministic, offline poetry-style metrics (rpe-poetry-style-v3).
 
-These metrics are proxies.  They are reported separately from the LLM judge
-and are never treated as a direct measurement of literary style.  Character
-ROUGE-1 is retained as a *diagnostic* for textual overlap only.
+Combines three complementary, offline, zero-dependency signals computed strictly
+from the active reference set:
+1. Empirical corpus-band alignment (robust IQR/SD Gaussian distance on audited
+   lineation, breath-contrast, lexical-recurrence, and function-word features);
+2. Leave-one-out calibrated character 1-2 gram sublinear TF-IDF similarity;
+3. Anti-mechanical / anti-slop diagnostics (penalising prose line-end punctuation,
+   verbatim refrain cloning, vocative fill-in-the-blank templates, and explanatory
+   connective overuse).
+
+Character ROUGE-1 is retained strictly as a textual-overlap diagnostic.
 """
 from __future__ import annotations
 
@@ -12,7 +19,10 @@ import re
 import statistics
 import unicodedata
 from collections import Counter
+from functools import lru_cache
 
+from poetry_agent.style import similarity as ngram_sim
+from poetry_agent.style import stylometry
 from poetry_agent.style.features import is_han
 
 
@@ -22,6 +32,7 @@ FUNCTION_CHARS = frozenset(
 PRONOUNS = ("我们", "你们", "他们", "她们", "它们", "我", "你", "您", "他", "她", "它", "自己")
 
 PUNCT = "，。！？；：、,.!?;:'\"“”‘’（）()《》〈〉—…·-"
+LINE_END_PUNCT = frozenset("，。！？；：、,.!?;:…—")
 TURN_MARKERS = (
     "但", "却", "而", "又", "再", "然后", "接着", "于是", "忽然", "终于",
     "直到", "后来", "等到", "开始", "继续", "停下", "离开", "回来", "转向",
@@ -62,10 +73,6 @@ def stanza_line_counts(text: str) -> list[int]:
     return counts
 
 
-def _counter(values):
-    return Counter(values)
-
-
 def _cosine(left: Counter, right: Counter) -> float:
     if not left or not right:
         return 0.0
@@ -75,6 +82,20 @@ def _cosine(left: Counter, right: Counter) -> float:
     if n1 == 0 or n2 == 0:
         return 0.0
     return max(0.0, min(1.0, dot / (n1 * n2)))
+
+
+def _optional_distribution_sim(left: Counter, right: Counter, rate_a: float, rate_b: float, scale: float) -> float:
+    """Similarity for sparse/optional markers such as punctuation or pronouns.
+
+    Two unpunctuated free-verse poems share an identical habit (similarity 1.0),
+    whereas previous raw cosine returned 0.0 whenever either Counter was empty.
+    """
+    rate_sim = math.exp(-abs(rate_a - rate_b) / max(scale, 1e-6))
+    if not left and not right:
+        return 1.0
+    if not left or not right:
+        return 0.65 * rate_sim
+    return 0.45 * _cosine(left, right) + 0.55 * rate_sim
 
 
 def _hist(values, upto=40):
@@ -100,7 +121,6 @@ def _js_similarity(left: dict, right: dict) -> float:
             divergence += 0.5 * p * math.log2(p / m)
         if q > 0:
             divergence += 0.5 * q * math.log2(q / m)
-    # JS divergence is in [0,1] for base-2; sqrt is a metric.
     return max(0.0, min(1.0, 1.0 - math.sqrt(max(0.0, divergence))))
 
 
@@ -114,7 +134,7 @@ def _ratio_sim(a, b) -> float:
 
 
 def profile(text: str) -> dict:
-    """A compact, deterministic feature profile.  Counts are normalized later."""
+    """Compact deterministic per-poem feature profile."""
     lines = nonempty_lines(text)
     han_lines = [han_only(line) for line in lines]
     lengths = [len(line) for line in han_lines]
@@ -128,14 +148,27 @@ def profile(text: str) -> dict:
     line_start = Counter(line[0] for line in han_lines if line)
     pronouns = Counter()
     for word in PRONOUNS:
-        pronouns[word] += text.count(word)
+        count = text.count(word)
+        if count:
+            pronouns[word] += count
     question_lines = sum(1 for line in lines if "？" in line or "?" in line)
     exclaim_lines = sum(1 for line in lines if "！" in line or "!" in line)
     short_lines = sum(1 for n in lengths if n <= 4)
     long_lines = sum(1 for n in lengths if n >= 15)
-    terminal = ("。", "！", "？", ".", "!", "?", "；", ";")
-    enjambed = sum(1 for line in lines if not line.rstrip().endswith(terminal))
     line_count = len(lines)
+    # True unpunctuated break rate (lines not closed by comma/period/etc.)
+    if line_count > 1:
+        enjambed = sum(1 for line in lines[:-1] if line and line.rstrip()[-1] not in LINE_END_PUNCT)
+        enjambment_rate = enjambed / (line_count - 1)
+    elif line_count == 1:
+        enjambment_rate = 1.0 if lines[0].rstrip()[-1:] not in LINE_END_PUNCT else 0.0
+    else:
+        enjambment_rate = 0.0
+    line_end_punct_rate = (
+        sum(1 for line in lines if line and line.rstrip()[-1] in LINE_END_PUNCT) / line_count
+        if line_count else 0.0
+    )
+    mid_space_lines = sum(1 for line in lines if re.search(r"[\u3400-\u9fff]\s+[\u3400-\u9fff]", line))
     stanza_counts = stanza_line_counts(text)
     turn_lines = sum(1 for line in lines if any(marker in line for marker in TURN_MARKERS))
     turn_rate = turn_lines / line_count if line_count else 0.0
@@ -151,17 +184,21 @@ def profile(text: str) -> dict:
     )
     mean_len = statistics.mean(lengths) if lengths else 0.0
     std_len = statistics.pstdev(lengths) if len(lengths) > 1 else 0.0
+    pronoun_rate = sum(pronouns.values()) / total if total else 0.0
     return {
         "text_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
         "char_count": total,
         "line_count": line_count,
         "stanza_count": stanza_count(text),
-        "stanza_line_counts": stanza_line_counts(text),
+        "stanza_line_counts": stanza_counts,
         "line_lengths": lengths,
-        "enjambment_rate": enjambed / line_count if line_count else 0.0,
+        "enjambment_rate": enjambment_rate,
+        "line_end_punct_rate": line_end_punct_rate,
+        "mid_line_space_rate": mid_space_lines / line_count if line_count else 0.0,
         "progression_proxy": progression_proxy,
         "mean_line_length": mean_len,
         "std_line_length": std_len,
+        "line_length_cv": std_len / mean_len if mean_len > 0 else 0.0,
         "unique_ratio": len(unigrams) / total if total else 0.0,
         "repetition_ratio": 1 - (len(unigrams) / total) if total else 0.0,
         "question_rate": question_lines / line_count if line_count else 0.0,
@@ -170,6 +207,7 @@ def profile(text: str) -> dict:
         "long_line_rate": long_lines / line_count if line_count else 0.0,
         "comma_per_line": (text.count("，") + text.count(",")) / line_count if line_count else 0.0,
         "punct_per_char": sum(punctuation.values()) / total if total else 0.0,
+        "pronoun_per_char": pronoun_rate,
         "unigrams": unigrams,
         "bigrams": bigrams,
         "function_chars": function,
@@ -182,35 +220,67 @@ def profile(text: str) -> dict:
 
 def _structure_similarity(a: dict, b: dict) -> float:
     parts = [
-        _ratio_sim(a["line_count"], b["line_count"]),
-        _ratio_sim(a["stanza_count"], b["stanza_count"]),
         _ratio_sim(a["mean_line_length"], b["mean_line_length"]),
-        1 - min(1.0, abs(a["std_line_length"] - b["std_line_length"]) / max(a["mean_line_length"], b["mean_line_length"], 1.0)),
-        1 - abs(a["repetition_ratio"] - b["repetition_ratio"]),
-        1 - abs(a["unique_ratio"] - b["unique_ratio"]),
+        1 - min(1.0, abs(a.get("line_length_cv", 0.0) - b.get("line_length_cv", 0.0)) / 0.35),
+        1 - min(1.0, abs(a["repetition_ratio"] - b["repetition_ratio"]) / 0.35),
+        1 - min(1.0, abs(a["unique_ratio"] - b["unique_ratio"]) / 0.35),
         1 - abs(a["question_rate"] - b["question_rate"]),
         1 - abs(a["exclaim_rate"] - b["exclaim_rate"]),
         1 - abs(a["short_line_rate"] - b["short_line_rate"]),
         1 - abs(a["long_line_rate"] - b["long_line_rate"]),
-        1 - abs(a["comma_per_line"] - b["comma_per_line"]) / max(a["comma_per_line"], b["comma_per_line"], 1.0),
-        1 - abs(a["punct_per_char"] - b["punct_per_char"]) / max(a["punct_per_char"], b["punct_per_char"], 0.1),
+        1 - min(1.0, abs(a.get("line_end_punct_rate", 0.0) - b.get("line_end_punct_rate", 0.0))),
+        1 - min(1.0, abs(a["punct_per_char"] - b["punct_per_char"]) / 0.15),
     ]
     return sum(max(0.0, min(1.0, p)) for p in parts) / len(parts)
 
 
 STYLE_WEIGHTS = {
-    "character_bigram": 0.09,
-    "character_unigram": 0.054,
-    "function_chars": 0.144,
-    "line_length": 0.108,
-    "punctuation": 0.063,
-    "line_endings": 0.072,
-    "line_starts": 0.072,
-    "stanza_shape": 0.072,
-    "enjambment": 0.045,
-    "structure": 0.126,
-    "progression": 0.10,
-    "pronouns": 0.054,
+    "character_bigram": 0.05,
+    "character_unigram": 0.06,
+    "function_chars": 0.16,
+    "line_length": 0.14,
+    "punctuation": 0.13,
+    "line_endings": 0.03,
+    "line_starts": 0.04,
+    "stanza_shape": 0.08,
+    "enjambment": 0.11,
+    "structure": 0.14,
+    "progression": 0.0,  # Surface diagnostic; insensitive to line order.
+    "pronouns": 0.06,
+}
+
+# Audited corpus-band features (selected by empirical AUC separating Haizi from
+# both baseline LLM outputs and neighbouring modern poets).
+BAND_WEIGHTS = {
+    "line_length_cv": 0.14,
+    "clause_length_cv": 0.08,
+    "unpunctuated_break_rate": 0.12,
+    "line_end_punct_rate": 0.10,
+    "repetition_ratio": 0.13,
+    "hapax_ratio": 0.08,
+    "stanza_return_rate": 0.08,
+    "anaphora_rate": 0.05,
+    "function_char_ratio": 0.07,
+    "modifier_de_per_100": 0.05,
+    "short_line_rate": 0.04,
+    "concrete_char_per_100": 0.03,
+    "stanza_length_cv": 0.03,
+}
+
+MIN_FEATURE_SCALES = {
+    "line_length_cv": 0.06,
+    "clause_length_cv": 0.06,
+    "unpunctuated_break_rate": 0.08,
+    "line_end_punct_rate": 0.08,
+    "repetition_ratio": 0.05,
+    "hapax_ratio": 0.05,
+    "stanza_return_rate": 0.04,
+    "anaphora_rate": 0.04,
+    "function_char_ratio": 0.04,
+    "modifier_de_per_100": 1.5,
+    "short_line_rate": 0.06,
+    "concrete_char_per_100": 2.0,
+    "stanza_length_cv": 0.08,
 }
 
 
@@ -220,47 +290,278 @@ def compare_profiles(gen: dict, ref: dict) -> dict:
         "character_unigram": _cosine(gen["unigrams"], ref["unigrams"]),
         "function_chars": _cosine(gen["function_chars"], ref["function_chars"]),
         "line_length": _js_similarity(_hist(gen["line_lengths"]), _hist(ref["line_lengths"])),
-        "punctuation": _cosine(gen["punctuation"], ref["punctuation"]),
+        "punctuation": _optional_distribution_sim(
+            gen["punctuation"], ref["punctuation"],
+            gen.get("punct_per_char", 0.0), ref.get("punct_per_char", 0.0), 0.08,
+        ),
         "line_endings": _cosine(gen["line_end_chars"], ref["line_end_chars"]),
         "line_starts": _cosine(gen["line_start_chars"], ref["line_start_chars"]),
-        "stanza_shape": _js_similarity(_hist(gen["stanza_line_counts"], upto=12), _hist(ref["stanza_line_counts"], upto=12)),
+        "stanza_shape": _js_similarity(
+            _hist(gen["stanza_line_counts"], upto=12),
+            _hist(ref["stanza_line_counts"], upto=12),
+        ),
         "enjambment": 1 - abs(gen["enjambment_rate"] - ref["enjambment_rate"]),
         "progression": 1 - abs(gen["progression_proxy"] - ref["progression_proxy"]),
         "structure": _structure_similarity(gen, ref),
-        "pronouns": _cosine(gen["pronouns"], ref["pronouns"]),
+        "pronouns": _optional_distribution_sim(
+            gen["pronouns"], ref["pronouns"],
+            gen.get("pronoun_per_char", 0.0), ref.get("pronoun_per_char", 0.0), 0.04,
+        ),
     }
     score = sum(STYLE_WEIGHTS[k] * components[k] for k in STYLE_WEIGHTS)
     return {"score": 100.0 * score, "components": components}
 
 
+def _quantile(sorted_vals: list[float], q: float) -> float:
+    if not sorted_vals:
+        return 0.0
+    if len(sorted_vals) == 1:
+        return float(sorted_vals[0])
+    pos = (len(sorted_vals) - 1) * q
+    lo = math.floor(pos)
+    hi = math.ceil(pos)
+    if lo == hi:
+        return float(sorted_vals[lo])
+    w = pos - lo
+    return float(sorted_vals[lo] * (1.0 - w) + sorted_vals[hi] * w)
+
+
+@lru_cache(maxsize=32)
+def _build_reference_model(ref_tuple: tuple[str, ...]) -> dict:
+    ref_profiles = [profile(text) for text in ref_tuple]
+    stylo_profiles = [stylometry.profile(text) for text in ref_tuple]
+    bands = {}
+    all_keys = set(BAND_WEIGHTS) | {
+        "repeated_line_rate", "connective_per_100", "simile_per_100",
+        "abstract_per_100", "median_line_length", "pronoun_per_100",
+    }
+    for feat in all_keys:
+        vals = sorted(float(sp[feat]) for sp in stylo_profiles)
+        p10 = _quantile(vals, 0.10)
+        p25 = _quantile(vals, 0.25)
+        med = _quantile(vals, 0.50)
+        p75 = _quantile(vals, 0.75)
+        p90 = _quantile(vals, 0.90)
+        iqr = p75 - p25
+        sd = statistics.pstdev(vals) if len(vals) > 1 else 0.0
+        scale = max(iqr / 1.349, sd, MIN_FEATURE_SCALES.get(feat, 0.05))
+        bands[feat] = {
+            "p10": p10, "p25": p25, "median": med, "p75": p75, "p90": p90,
+            "iqr": iqr, "sd": sd, "scale": scale,
+        }
+    tfidf_index = ngram_sim.Index(list(ref_tuple), ns=(1, 2), sublinear=True, han=True)
+    if len(ref_tuple) > 1:
+        loo_scores = []
+        for i in range(len(ref_tuple)):
+            others = [
+                ngram_sim.cosine(tfidf_index.vectors[i], tfidf_index.vectors[j])
+                for j in range(len(ref_tuple)) if j != i
+            ]
+            loo_scores.append(0.5 * (sum(others) / len(others) + max(others)))
+        loo_sorted = sorted(loo_scores)
+        tfidf_anchor = max(0.03, _quantile(loo_sorted, 0.85) * 1.12)
+    else:
+        tfidf_anchor = 1.0
+    return {
+        "ref_profiles": ref_profiles,
+        "stylo_profiles": stylo_profiles,
+        "bands": bands,
+        "tfidf_index": tfidf_index,
+        "tfidf_anchor": tfidf_anchor,
+    }
+
+
+def _anti_slop_diagnostics(gen_text: str, gen_stylo: dict, bands: dict) -> dict:
+    flags = []
+    penalty = 0.0
+
+    ref_end_med = bands["line_end_punct_rate"]["median"]
+    if ref_end_med < 0.25 and gen_stylo["line_end_punct_rate"] > 0.45:
+        excess = gen_stylo["line_end_punct_rate"] - 0.45
+        p = min(0.18, excess * 0.34)
+        penalty += p
+        flags.append({
+            "code": "prose_line_end_punctuation",
+            "detail": f"行末标点率 {gen_stylo['line_end_punct_rate']:.2f} 远高于参考中位数 {ref_end_med:.2f}",
+            "penalty": round(p * 100.0, 3),
+        })
+
+    rep_cap = max(0.22, bands["repeated_line_rate"]["p90"] + 0.06)
+    if gen_stylo["repeated_line_rate"] > rep_cap:
+        excess = gen_stylo["repeated_line_rate"] - rep_cap
+        p = min(0.15, excess * 0.55)
+        penalty += p
+        flags.append({
+            "code": "mechanical_line_repetition",
+            "detail": f"整行原样重复率 {gen_stylo['repeated_line_rate']:.2f} 超过参考上界 {rep_cap:.2f}",
+            "penalty": round(p * 100.0, 3),
+        })
+
+    stz = stylometry.stanzas(gen_text)
+    if len(stz) >= 3:
+        vocative_heads = sum(
+            1 for s in stz if s and re.match(r"^[^，,。！？]{1,6}[，,]\s*(?:[^，,。！？]{1,6}[，,]\s*)?你", s[0])
+        )
+        numbered_heads = sum(
+            1 for s in stz if s and re.match(r"^第[一二三四五六七八九十\d]+", s[0])
+        )
+        if vocative_heads >= 3 or numbered_heads >= 3:
+            penalty += 0.10
+            flags.append({
+                "code": "stanza_head_template_cloning",
+                "detail": "至少三节首行机械套用同一呼告或编号填空模板",
+                "penalty": 10.0,
+            })
+
+    conn_cap = max(1.4, bands["connective_per_100"]["p90"] * 1.35)
+    if gen_stylo["connective_per_100"] > conn_cap:
+        p = min(0.10, (gen_stylo["connective_per_100"] - conn_cap) * 0.06)
+        penalty += p
+        flags.append({
+            "code": "explanatory_connectives",
+            "detail": f"解释性连词 {gen_stylo['connective_per_100']:.2f}/百字 偏多",
+            "penalty": round(p * 100.0, 3),
+        })
+
+    sim_cap = max(2.0, bands["simile_per_100"]["p90"] + 1.2)
+    if gen_stylo["simile_per_100"] > sim_cap:
+        p = min(0.08, (gen_stylo["simile_per_100"] - sim_cap) * 0.05)
+        penalty += p
+        flags.append({
+            "code": "simile_overuse",
+            "detail": f"明喻标记 {gen_stylo['simile_per_100']:.2f}/百字 偏密",
+            "penalty": round(p * 100.0, 3),
+        })
+
+    if gen_stylo["line_count"] >= 8 and gen_stylo["line_length_cv"] < 0.16 and bands["line_length_cv"]["median"] > 0.25:
+        p = min(0.08, (0.16 - gen_stylo["line_length_cv"]) * 0.6)
+        penalty += p
+        flags.append({
+            "code": "uniform_line_lengths",
+            "detail": f"行长变异系数 {gen_stylo['line_length_cv']:.2f} 过平，缺少长短句呼吸对比",
+            "penalty": round(p * 100.0, 3),
+        })
+
+    return {"penalty": round(min(0.35, penalty), 6), "flags": flags}
+
+
 def style_similarity(generated_text: str, reference_texts: list[str]) -> dict:
     if not reference_texts:
         raise ValueError("style_similarity 需要至少一篇参考文本")
+    ref_tuple = tuple(reference_texts)
+    model = _build_reference_model(ref_tuple)
     gen = profile(generated_text)
+    gen_stylo = stylometry.profile(generated_text)
+
     rows = []
     component_rows = []
-    for index, ref_text in enumerate(reference_texts, 1):
-        ref = profile(ref_text)
-        result = compare_profiles(gen, ref)
-        rows.append({"reference": index, "score": round(result["score"], 4),
-                     "components": {k: round(v, 6) for k, v in result["components"].items()}})
+    for index, ref_prof in enumerate(model["ref_profiles"], 1):
+        result = compare_profiles(gen, ref_prof)
+        rows.append({
+            "reference": index,
+            "score": round(result["score"], 4),
+            "components": {k: round(v, 6) for k, v in result["components"].items()},
+        })
         component_rows.append(result["components"])
-    scores = [row["score"] for row in rows]
+    pairwise_scores = [row["score"] for row in rows]
     mean_components = {
         key: round(sum(row[key] for row in component_rows) / len(component_rows), 6)
         for key in STYLE_WEIGHTS
     }
+    pairwise_mean = (sum(pairwise_scores) / len(pairwise_scores)) / 100.0
+
+    # Corpus-band score across empirically validated stylometric features
+    bands = model["bands"]
+    band_components = {}
+    for feat, weight in BAND_WEIGHTS.items():
+        b = bands[feat]
+        val = float(gen_stylo[feat])
+        if b["p25"] <= val <= b["p75"]:
+            z = 0.20 * abs(val - b["median"]) / b["scale"]
+        else:
+            edge = b["p25"] if val < b["p25"] else b["p75"]
+            z = 0.20 * abs(edge - b["median"]) / b["scale"] + abs(val - edge) / b["scale"]
+        band_components[feat] = round(math.exp(-0.5 * z * z), 6)
+    band_sim = sum(BAND_WEIGHTS[k] * band_components[k] for k in BAND_WEIGHTS) / sum(BAND_WEIGHTS.values())
+
+    # Sublinear char 1-2 gram TF-IDF lexical resonance
+    tfidf_sims = model["tfidf_index"].similarity(generated_text)
+    raw_tfidf = 0.5 * (sum(tfidf_sims) / len(tfidf_sims) + max(tfidf_sims))
+    tfidf_sim = min(1.0, raw_tfidf / model["tfidf_anchor"])
+
+    slop = _anti_slop_diagnostics(generated_text, gen_stylo, bands)
+    composite = max(0.0, min(1.0, 0.52 * band_sim + 0.26 * tfidf_sim + 0.22 * pairwise_mean - slop["penalty"]))
+    score = 100.0 * composite
+    if any(generated_text == ref for ref in ref_tuple):
+        score = 100.0
+
     return {
-        "score": round(sum(scores) / len(scores), 4),
-        "mean": round(sum(scores) / len(scores), 4),
-        "max": round(max(scores), 4),
-        "min": round(min(scores), 4),
-        "std": round(statistics.pstdev(scores), 4) if len(scores) > 1 else 0.0,
+        "score": round(score, 4),
+        "mean": round(sum(pairwise_scores) / len(pairwise_scores), 4),
+        "max": round(max(pairwise_scores), 4),
+        "min": round(min(pairwise_scores), 4),
+        "std": round(statistics.pstdev(pairwise_scores), 4) if len(pairwise_scores) > 1 else 0.0,
+        "corpus_band_score": round(100.0 * band_sim, 4),
+        "tfidf_lexical_score": round(100.0 * tfidf_sim, 4),
+        "pairwise_profile_score": round(100.0 * pairwise_mean, 4),
+        "anti_slop_penalty": round(100.0 * slop["penalty"], 4),
+        "anti_slop_flags": slop["flags"],
+        "band_components": band_components,
         "per_reference": rows,
         "mean_components": mean_components,
-        "feature_schema": "rpe-poetry-style-v1",
-        "notes": "满分100；逐项为生成诗与每篇参考诗的特征相似度，主分取与各参考诗的均值。",
+        "feature_schema": "rpe-poetry-style-v3",
+        "notes": "满分100；综合语料分位带对齐(0.52)、字符1-2gram TF-IDF词域共鸣(0.26)、逐篇结构特征(0.22)并扣除机械套路惩罚。",
     }
+
+
+def corpus_stylometry_summary(reference_texts: list[str]) -> dict:
+    """Anonymous quantitative distribution summary of the reference set for prompting/analysis."""
+    if not reference_texts:
+        return {}
+    model = _build_reference_model(tuple(reference_texts))
+    bands = model["bands"]
+    selected = (
+        "median_line_length", "line_length_cv", "short_line_rate",
+        "unpunctuated_break_rate", "line_end_punct_rate",
+        "repetition_ratio", "stanza_return_rate", "anaphora_rate",
+        "function_char_ratio", "pronoun_per_100", "abstract_per_100",
+        "connective_per_100", "simile_per_100",
+    )
+    return {
+        key: {
+            "p10": round(bands[key]["p10"], 3),
+            "median": round(bands[key]["median"], 3),
+            "p90": round(bands[key]["p90"], 3),
+        }
+        for key in selected if key in bands
+    }
+
+
+def diagnose_poem_vs_corpus(generated_text: str, reference_texts: list[str]) -> dict:
+    """Return concrete surface deviations between one generated poem and reference bands."""
+    if not reference_texts:
+        return {"deviations": [], "anti_slop_flags": []}
+    model = _build_reference_model(tuple(reference_texts))
+    bands = model["bands"]
+    gp = stylometry.profile(generated_text)
+    labels = stylometry.FEATURE_LABELS
+    deviations = []
+    for feat in BAND_WEIGHTS:
+        b = bands[feat]
+        val = float(gp[feat])
+        if val < b["p10"]:
+            deviations.append(f"{labels.get(feat, feat)}偏低（生成 {val:.2f} < 参考p10 {b['p10']:.2f}，中位数 {b['median']:.2f}）")
+        elif val > b["p90"]:
+            deviations.append(f"{labels.get(feat, feat)}偏高（生成 {val:.2f} > 参考p90 {b['p90']:.2f}，中位数 {b['median']:.2f}）")
+    slop = _anti_slop_diagnostics(generated_text, gp, bands)
+    return {"deviations": deviations[:6], "anti_slop_flags": slop["flags"]}
+
+
+def prompt_similarity(left_prompt: str, right_prompt: str) -> float:
+    """Character 1-2 gram cosine between two prompts for population niching."""
+    a = ngram_sim.grams(left_prompt, ns=(1, 2), han=True)
+    b = ngram_sim.grams(right_prompt, ns=(1, 2), han=True)
+    return _cosine(a, b)
 
 
 def rouge1_char(prediction: str, reference: str) -> dict:

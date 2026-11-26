@@ -49,50 +49,57 @@ DEFAULTS = {
         "temperature": 1.0,
         "max_tokens": 1200,
         "thinking": "disabled",
+        "max_form_repair_attempts": 1,
         "default_genre": "modern",
         "default_max_lines": 20,
         "default_requirements": "12—20行，分2—4节；每节1—6行；使用现代汉语；不得出现任何诗人姓名。",
     },
     "population": {
-        "size": 5,
-        "generations": 4,
+        "size": 6,
+        "generations": 8,
+        "crossover_count": 2,
+        "survivor_max_similarity": 0.88,
+        "in_run_confirm_top_k": 2,
         "initialization_mode": "independent",
-        "init_temperature": 1.0,
+        "init_temperature": 0.95,
         "init_max_tokens": 1400,
         "mutation_temperature": 0.8,
-        "mutation_max_tokens": 2000,
+        "mutation_max_tokens": 1800,
         "analysis_temperature": 0.2,
         "analysis_max_tokens": 4000,
         "thinking": "disabled",
         "min_prompt_chars": 120,
-        "max_prompt_chars": 1400,
-        "max_prompt_repair_attempts": 1,
-        "patience": 2,
-        "min_improvement": 0.25,
-        "checkpoint_every": 5,
+        "max_prompt_chars": 600,
+        "max_prompt_repair_attempts": 2,
+        "patience": 3,
+        "min_improvement": 0.20,
+        "checkpoint_every": 2,
     },
     "evaluation": {
         "judge_model": None,
         "judge_temperature": 0.0,
         "judge_max_tokens": 3800,
         "judge_thinking": "disabled",
-        "rubric_version": "rpe-poetry-zh-v1",
-        "deterministic_style_weight": 0.35,
-        "judge_style_weight": 0.65,
+        "rubric_version": "rpe-poetry-zh-v2",
+        "deterministic_style_weight": 0.40,
+        "judge_style_weight": 0.60,
         "quality_weight": 0.15,
+        "prompt_length_free": 480,
+        "prompt_length_penalty_per_100_chars": 3.0,
+        "prompt_length_penalty_max": 8.0,
         "style_dimension_weights": {
-            "progression": 0.24,
-            "structure": 0.10,
-            "imagery": 0.09,
-            "emotion": 0.08,
-            "lexical": 0.07,
-            "syntax": 0.07,
-            "lineation": 0.07,
-            "concreteness": 0.06,
-            "repetition": 0.06,
+            "progression": 0.00,
+            "imagery": 0.14,
+            "emotion": 0.13,
+            "lexical": 0.12,
+            "syntax": 0.11,
+            "lineation": 0.11,
+            "mythic_register": 0.09,
+            "structure": 0.09,
+            "repetition": 0.07,
             "closure": 0.06,
-            "addressivity": 0.05,
-            "mythic_register": 0.05,
+            "addressivity": 0.04,
+            "concreteness": 0.04,
         },
         "topic_threshold": 3.0,
         "originality_threshold": 3.0,
@@ -105,7 +112,7 @@ DEFAULTS = {
         "copy_lcs_chars": 12,
         "copy_line_chars": 8,
         "copy_rouge1_cap": 0.80,
-        "confirmation_top_k": 3,
+        "confirmation_top_k": 6,
         "confirmation_repetitions": 1,
         "judge_evidence_required": True,
     },
@@ -114,10 +121,19 @@ DEFAULTS = {
         "warn_reference_ngram": 8,
         "max_vague_phrases": 2,
         "min_instruction_units": 3,
+        "max_instruction_units": 8,
+        "forbid_hardcoded_poem_counts": True,
+        "forbidden_meta_phrases": [
+            "完成后自检", "定稿前自检", "成稿后逐条自查", "数出明喻",
+            "任一项不满足则重写", "逐项统计", "自查清单",
+        ],
+        "forbidden_signature_props": [
+            "麦地", "麦穗", "麦子", "粮仓", "草原", "德令哈", "青海湖", "敦煌", "亚洲铜", "以梦为马", "面朝大海",
+        ],
         "forbidden_dependency_phrases": [
             "参考上面", "参考上述", "上述作品", "以上作品", "这些诗", "前文",
             "上面这些", "所给作品", "给出的诗", "参考作品", "参考诗",
-            "上述", "上面", "这些作品", "原作", "旧作",
+            "上述", "这些作品", "原作", "旧作",
         ],
         "vague_phrases": [
             "富有诗意", "意境深远", "意境优美", "语言优美", "文采斐然",
@@ -126,8 +142,8 @@ DEFAULTS = {
         ],
     },
     "budget": {
-        "max_api_calls": 700,
-        "max_total_tokens": 4000000,
+        "max_api_calls": 5000,
+        "max_total_tokens": 50000000,
         "request_timeout": 90,
         "max_parse_retries": 2,
         "price_per_million_input": None,
@@ -136,7 +152,7 @@ DEFAULTS = {
     },
     "benchmark": {
         "enabled": True,
-        "repetitions": 1,
+        "repetitions": 2,
         "temperature": 1.0,
         "max_tokens": 1200,
         "baseline_a_prompt": "请模仿诗人{target_name}的风格，围绕题目“{topic}”创作一首现代诗。要求：{requirements}",
@@ -222,12 +238,19 @@ def validate_config(config: dict) -> None:
     gen = config["generation"]
     require(type(gen.get("repetitions")) is int and gen["repetitions"] >= 1, "generation.repetitions 须为正整数")
     require(type(gen.get("max_tokens")) is int and gen["max_tokens"] >= 128, "generation.max_tokens 须不小于128")
+    require(type(gen.get("max_form_repair_attempts")) is int and 0 <= gen["max_form_repair_attempts"] <= 2,
+            "generation.max_form_repair_attempts 须在0—2之间")
     _number_between(gen.get("temperature"), 0, 2, "generation.temperature")
     require(gen.get("thinking") in (None, "enabled", "disabled"), "generation.thinking 须为 enabled/disabled/null")
 
     pop = config["population"]
     require(type(pop.get("size")) is int and pop["size"] >= 2, "population.size 须为不小于2的整数")
     require(type(pop.get("generations")) is int and pop["generations"] >= 0, "population.generations 须为非负整数")
+    require(type(pop.get("crossover_count", 0)) is int and pop.get("crossover_count", 0) >= 0,
+            "population.crossover_count 须为非负整数")
+    _number_between(pop.get("survivor_max_similarity", 0.88), 0.5, 1.0, "population.survivor_max_similarity")
+    require(type(pop.get("in_run_confirm_top_k", 0)) is int and pop.get("in_run_confirm_top_k", 0) >= 0,
+            "population.in_run_confirm_top_k 须为非负整数")
     require(pop.get("initialization_mode") == "independent", "population.initialization_mode 目前仅支持 independent")
     for key in ("init_max_tokens", "mutation_max_tokens", "analysis_max_tokens"):
         require(type(pop.get(key)) is int and pop[key] >= 128, f"population.{key} 须不小于128")
@@ -264,6 +287,11 @@ def validate_config(config: dict) -> None:
     require(abs(sum(weights.values()) - 1.0) < 1e-6,
             "evaluation.style_dimension_weights 权重之和须为1")
     _number_between(ev.get("quality_weight"), 0, 1, "evaluation.quality_weight")
+    require(type(ev.get("prompt_length_free")) is int and ev["prompt_length_free"] >= 0,
+            "evaluation.prompt_length_free 须为非负整数")
+    _number_between(ev.get("prompt_length_penalty_per_100_chars"), 0, 10,
+                    "evaluation.prompt_length_penalty_per_100_chars")
+    _number_between(ev.get("prompt_length_penalty_max"), 0, 50, "evaluation.prompt_length_penalty_max")
     for key in ("topic_threshold", "originality_threshold", "quality_floor"):
         _number_between(ev.get(key), 0, 5, f"evaluation.{key}")
     for key in ("form_penalty", "topic_penalty_scale", "originality_penalty_scale",
@@ -286,9 +314,20 @@ def validate_config(config: dict) -> None:
             "prompt_rules.max_vague_phrases 无效")
     require(type(rules.get("min_instruction_units")) is int and rules["min_instruction_units"] >= 1,
             "prompt_rules.min_instruction_units 无效")
+    if rules.get("max_instruction_units") is not None:
+        require(type(rules.get("max_instruction_units")) is int and rules["max_instruction_units"] >= rules["min_instruction_units"],
+                "prompt_rules.max_instruction_units 须不小于 min_instruction_units")
+    require(isinstance(rules.get("forbid_hardcoded_poem_counts", False), bool),
+            "prompt_rules.forbid_hardcoded_poem_counts 须为布尔值")
     for key in ("forbidden_dependency_phrases", "vague_phrases"):
         require(isinstance(rules.get(key), list) and all(isinstance(x, str) and x for x in rules[key]),
                 f"prompt_rules.{key} 须为非空字符串列表")
+    if "forbidden_meta_phrases" in rules:
+        require(isinstance(rules["forbidden_meta_phrases"], list) and all(isinstance(x, str) and x for x in rules["forbidden_meta_phrases"]),
+                "prompt_rules.forbidden_meta_phrases 须为非空字符串列表")
+    if "forbidden_signature_props" in rules:
+        require(isinstance(rules["forbidden_signature_props"], list) and all(isinstance(x, str) and x for x in rules["forbidden_signature_props"]),
+                "prompt_rules.forbidden_signature_props 须为非空字符串列表")
 
     budget = config["budget"]
     require(type(budget.get("max_api_calls")) is int and budget["max_api_calls"] >= 1,

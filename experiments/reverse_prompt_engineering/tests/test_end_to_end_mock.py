@@ -41,6 +41,10 @@ class EndToEndMockTests(unittest.TestCase):
             best = state["final_prompt"]
             self.assertIn(best["candidate_id"], {c["id"] for c in state["population"]})
             self.assertTrue(best["is_mock"])
+            confirmation = state["confirmation"]
+            self.assertTrue(confirmation["completed"])
+            self.assertEqual(confirmation["shortlist"], [best["candidate_id"]])
+            self.assertEqual(best["evaluation_count"], 2 * len(cfg["topics"]["optimization"]))
             run_dir = Path(cfg["experiment"]["output_root"]) / "e2e"
             for name in (
                 "state.json", "run.json", "report.md", "initial_population.json",
@@ -69,7 +73,7 @@ class EndToEndMockTests(unittest.TestCase):
                 payload = json.loads(row["user"])
                 self.assertNotIn("reference_poems", payload)
                 self.assertNotIn("reference_poems", row["user"])
-                allowed = {"kind", "style_prompt", "topic", "genre", "max_lines", "requirements", "output_schema", "_retry_feedback"}
+                allowed = {"kind", "style_prompt", "topic", "genre", "max_lines", "requirements", "output_schema", "_retry_feedback", "_form_feedback", "_previous_draft"}
                 self.assertTrue(set(payload) <= allowed, set(payload) - allowed)
                 # Baseline A intentionally uses the poet name; all optimized/baseline-B
                 # prompts must not contain the name.

@@ -5,25 +5,24 @@ import json
 
 from .corpus import anonymous_references
 from .llm import LLMOutputError, is_output_truncation_error
+from .metrics import corpus_stylometry_summary
 from .validation import validate_initializer, validate_prompt
 
 
-INIT_SYSTEM = """你是一位中文现代诗写作指导教师。你会看到若干匿名参考作品。
-你的任务不是写文学评论，也不是猜测作者，而是把多篇作品共同的可迁移写作规律，写成一份可被另一个写作者独立使用的“风格指令”，使其在拿到全新题目、且完全看不到参考作品时，仍能写出在以下方面相近的诗：字词选择、句法、分行与节奏、意象与修辞、情感表达、篇章结构。
+INIT_SYSTEM = """你是一位中文现代诗比较诗学与创作指导专家。你会看到若干来自同一诗人的匿名参考作品，以及这批作品的客观表面分布统计（行长、长短行变异、无标点断行率、词汇重现率等）。
+你的任务不是写文学评论，也不是猜测作者，而是归纳这批参考诗最核心、可迁移的声口、呼吸、意象张力与抒情组织规律，写成一份精炼、高密度的“风格指令”，使另一个完全看不到参考诗的写作者，在面对任何全新现代日常题目时，也能写出神似而非形似机械拼装的诗作。
 
 硬性要求：
-1. 指令必须具体、可执行，使用“动作+对象+约束”的写法，例如“每节2—5行，行尾多落在具体名词或短促动作上”。
-2. 概括多篇作品中反复出现的规律，不要把某一篇的题材、人物、地名、情节当成通则。
-3. 把可迁移的写作手法与仅属于原题材的内容分开；不要要求新诗继续写旧题材。
-4. 禁止使用“富有诗意”“意境深远”“语言优美”“情感真挚”等无法操作的套话。
-5. 禁止出现任何诗人姓名，也不得依赖姓名触发风格模仿。
-6. 禁止引用参考作品的完整诗句或连续长片段；只能概括，不能复制。
-7. 指令必须能独立使用，不得写“参考上面”“这些诗”“如前文”等依赖参考作品的话。
-8. 输出 5—10 条编号指令，每条尽量短；可加一句总体说明。
-9. 只输出 JSON，不要 markdown，不要解释 JSON 之外的任何内容。
+1. 精炼高密度：输出 5—6 条编号原则（可加一句简短总纲），总字数控制在 260—460 字左右（不超过 600 字）。
+2. 严禁硬编码全诗总行数或总节数（如禁止写“全诗控制在4—8节”“总行数15—40行”），篇幅服从具体题目要求；但应提醒单节保持紧凑克制（通常每节 3—5 行，不写出超过 6 行的臃肿长节）。
+3. 严禁写入具体示范名物词表或示范台词：不要在指令里举例写“木桶、麦穗、粮仓、马、村庄”或“我愿……”“你无力偿还……”等具体词句（否则写作者会在无关题目里照搬这些词句导致串味扣分）！只描述“从题目自身的现场具体器物出发，直接跃向大地、黑夜、水火、时间、身体等原初尺度”的关系机制与句法功能。
+4. 严禁机械填空模板与写后计数自检：不要规定“至少三节首行原样重复”，禁止写“完成后自检”“数出明喻处数”。复沓与呼告须随语境改变句法位置或语义重量。
+5. 抓住精神重力与无标点呼吸的统一：行末极少落标点，靠自然断行、行内留白以及舒展长句与峭拔短行的反差建立节奏；朴素直陈与具象动作并置，结尾承接前文落地留白，不作格言总结。
+6. 禁止出现任何诗人姓名，禁止引用参考原句，禁止出现“参考上面”“这些诗”等依赖语，禁止使用“富有诗意”“意境深远”等空泛套话。
+7. 只输出 JSON，不要 markdown，不要额外解释。
 
 JSON 结构：
-{"prompt": "完整风格指令", "design_notes": "你如何从多篇作品中归纳，不能引用长句", "covered_dimensions": ["lexical", "syntax", "lineation", "imagery", "emotion", "structure"]}"""
+{"prompt": "完整风格指令", "design_notes": "归纳依据简述（不引用长句）", "covered_dimensions": ["lexical", "syntax", "lineation", "imagery", "emotion", "structure", "mythic_register"]}"""
 
 
 def _rules(config):
@@ -35,19 +34,27 @@ def _rules(config):
 
 
 def _payload(config, selection, *, focus, index, total, mode):
+    ref_texts = [p["text"] for p in selection["references"]]
     return {
         "kind": "rpe_initialize" if mode == "population" else "rpe_reverse_once",
-        "task": "从匿名参考作品反推可复用的中文诗歌风格指令",
+        "task": "从匿名参考作品及客观分布统计反推可迁移的中文现代诗风格指令",
         "mode": mode,
         "candidate_index": index,
         "candidate_total": total,
         "focus": focus,
+        "reference_stylometry_summary": corpus_stylometry_summary(ref_texts),
         "reference_poems": anonymous_references(selection["references"]),
         "constraints": {
             "prompt_chars": [config["population"]["min_prompt_chars"], config["population"]["max_prompt_chars"]],
-            "instruction_units_min": config["prompt_rules"]["min_instruction_units"],
+            "target_chars_ideal": [240, 520],
+            "instruction_units_range": [
+                config["prompt_rules"]["min_instruction_units"],
+                config["prompt_rules"].get("max_instruction_units", 8),
+            ],
             "no_poet_names": True,
             "no_reference_quotes": True,
+            "no_hardcoded_poem_line_or_stanza_totals": True,
+            "no_post_writing_counting_checklists": True,
             "must_be_independently_usable": True,
             "do_not_send_or_infer_author_identity": True,
         },
@@ -95,14 +102,14 @@ def make_prompt_candidate(llm, config, selection, *, focus, index, total, mode="
     for repair in range(repairs):
         if validation["ok"]:
             break
-        payload = _payload(config, selection, focus=focus, index=index, total=total, mode=mode)
-        payload["_validation_feedback"] = (
+        feedback = (
             "上一次生成的指令违反了以下硬性规则：" + "；".join(validation["errors"]) +
-            "。请完整重写 prompt，保留有效的具体指令，只修复违规处，不要引用参考原句。"
+            "。请完整重写更精炼的 prompt（5—7条，不写全诗总行数/总节数，不写自检计数清单，不引用原句）。"
         )
         data, meta, prompt, validation = _one_call(
             llm, config, selection, focus=focus, index=index, total=total, mode=mode,
-            cache_tag=f"{cache_tag}-repair{repair + 1}", payload_extra={"_validation_feedback": payload["_validation_feedback"]},
+            cache_tag=f"{cache_tag}-repair{repair + 1}",
+            payload_extra={"_validation_feedback": feedback},
         )
         attempts.append({"attempt": repair + 2, "validation": validation, "meta": meta})
     return {
@@ -123,13 +130,12 @@ def make_prompt_candidate(llm, config, selection, *, focus, index, total, mode="
 def initialize_population(llm, config, selection):
     size = config["population"]["size"]
     focuses = [
-        "字词与语气：优先具体的名词和动词，少用抽象形容词。",
-        "句法与分行：让短句、跨行停顿和重复结构承担节奏。",
-        "意象与修辞：让日常物件与自然物并置，避免解释性比喻。",
-        "情感与抒情位置：先写动作和场景，再让情感从缝隙里出现。",
-        "篇章推进：用空间或时间移动组织全诗，结尾落在具体物象上。",
-        "声音与重复：用重复、呼告和短句回环制造音乐性。",
-        "视角与人称：通过人称变化或观看位置变化组织抒情。",
+        "整体声口与诗学气度：整体把握说话姿态、生命尺度、长短句呼吸与意象组织关系。",
+        "无标点断行与呼吸落差：聚焦行末极少标点、靠自然断行与行内空格蓄势，以及舒展长句与峭拔短行交替的声音结构。",
+        "日常现场与原初元素的嫁接：聚焦如何把具体处境与大地、黑夜、雨水、身体、时间等具有重量的元素直接碰撞，拒绝琐碎零件罗列。",
+        "命名句式、呼告姿态与变奏复沓：聚焦判断命名句、赤诚呼告，以及核心词跨节回返时如何改变语境与句法位置而非机械重复。",
+        "抒情直陈与具象承载的平衡：聚焦如何在质朴动作与直接生命感叹之间保持张力，以及结尾停在回响与承接上的方式。",
+        "质朴词域与反散文化句法：聚焦高频基础实词的反复锤炼、压缩并列句式，以及克制解释性连词和密集明喻的语言习惯。",
     ]
     candidates = []
     for index in range(size):
@@ -137,7 +143,7 @@ def initialize_population(llm, config, selection):
         try:
             candidates.append(make_prompt_candidate(
                 llm, config, selection, focus=focus, index=index, total=size,
-                mode="population", cache_tag=f"init-{index}",
+                mode="population", cache_tag=f"init-v3-{index}",
             ))
         except (LLMOutputError, RuntimeError) as exc:
             if isinstance(exc, RuntimeError) and not is_output_truncation_error(exc):
@@ -168,8 +174,8 @@ def reverse_once(llm, config, selection):
     try:
         return make_prompt_candidate(
             llm, config, selection,
-            focus="一次性通读全部参考作品，归纳最显著的共同写作规律。",
-            index=0, total=1, mode="one_shot_reverse", cache_tag="benchmark-b-reverse",
+            focus="整体归纳最显著、可跨题材独立复用的现代诗声口、呼吸与意象组织规律。",
+            index=0, total=1, mode="one_shot_reverse", cache_tag="benchmark-b-reverse-v3",
         )
     except (LLMOutputError, RuntimeError) as exc:
         if isinstance(exc, RuntimeError) and not is_output_truncation_error(exc):

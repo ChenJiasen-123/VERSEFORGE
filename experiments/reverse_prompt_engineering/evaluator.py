@@ -1,6 +1,7 @@
 """Phase 3: deterministic metrics + anonymous LLM-judge evaluation."""
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 import statistics
@@ -13,51 +14,49 @@ from .llm import BudgetExhausted, LLMOutputError, is_output_truncation_error
 from .validation import JUDGE_DIMENSIONS, STYLE_DIMENSIONS, validate_judge
 
 
-JUDGE_SYSTEM = """你是匿名诗歌评审。你会看到：
-1. 一组匿名参考诗，它们来自同一来源/风格；
-2. 一首匿名生成诗；
-3. 生成这首诗的题目、体裁与要求。
+JUDGE_SYSTEM = """你是匿名现代诗比较诗学评审。你会看到：
+1. 一组匿名参考诗（来自同一诗人语料）；
+2. 一首在全新题目下独立生成的匿名诗；
+3. 生成这首诗的题目、体裁与格式要求。
 
 你不知道、也不应猜测生成提示词、候选编号、实验分组、作者身份或生成策略；不要评论这些内容。
-你的任务是评估“生成诗在写作风格上与参考诗的接近程度”，而不是复述参考诗的内容。
+你的任务是严格评估“生成诗在深层写作风格、语言呼吸与诗学气度上与参考诗的接近程度”，同时识破机械按规则拼装的套路稿。
 
-评分维度（每项 0—5 分）：
-- lexical：字词选择与语言习惯。具体名词/动词与抽象词的比例、虚词和口语/书面语习惯、词域是否相近。不要因为题材相同就给高分。
-- syntax：句法结构与表达方式。短句/长句、跨行、排比、倒装、省略、问句、破折号、解释性从句的使用是否相近。
-- lineation：分行、节奏及韵律。行数、行长分布、分节、行尾落点、重复、标点节奏、跨行停顿。参考作品是现代自由诗，不要求古典格律。
-- imagery：意象组织与修辞手法。意象类型（自然/日常/身体/器物）、并置方式、重复呼告、比喻/拟人/通感，以及是否解释比喻。
-- emotion：情感表达方式。抒情出现的位置、强度、是否直说、情感与场景动作的关系、克制或外放的程度。
-- structure：语义组织与篇章结构。起承转合、空间/时间推进、视角变化、段落比例。
-- progression：推进感与发展动力。全诗是否有某种力量在推动：动作、空间、时间、情感、意象关系或视角是否发生变化；后一节是否改变、加深或回应前一节，而不是并列堆叠。判断的是“诗在往前走”，不是叙事是否完整。
-- concreteness：具象与抽象的比例。物象是否可触摸、是否用抽象名词承担抒情、具体细节的密度。
-- repetition：复沓、呼告、回环、句法重复、关键词复现的位置与次数。
-- addressivity：人称选择、呼告对象、我与世界/他者的关系。
-- mythic_register：神话、历史、文化原型与日常经验的比例；是否用原型提升抒情。
-- closure：结尾方式。具体物象、未完成疑问、格言/总结、回环等，以及结尾与全诗的关系。
-- literary_quality：文学质量。语言新鲜度、意象准确度、节奏控制、完成度、是否陈词滥调。不要因为风格相似就提高质量分。
-- topic_adherence：题意符合程度。是否回应题目、体裁和具体要求，是否跑题或只借题发挥。
-- originality：原创性。是否避免复制参考诗的成句或连续长片段，是否有自己的语言组织。不是“越不像越好”，而是不抄袭、不套作。
+评分维度（每项 0—5 分，可使用 0.5 分档，如 2.5、3.5、4.5）：
+- lexical：字词选择与语言肌理。高频核心实词的质朴度与重量感、动词力度、虚词节奏与书面/口语平衡是否接近参考诗。若只会堆砌琐碎工业零件词而缺乏参考诗的纯度，不超过 2.5。
+- syntax：句法结构与表达方式。直接命名/判断句、短主谓句、省略、倒装、排比与跨行衔接是否自然接近参考诗，而非散文交代句或机械填空句。
+- lineation：分行、节奏及呼吸。长短行落差、无标点断行、行内停顿、行尾落点是否形成真实呼吸。若每行末尾机械加逗号/句号呈分行散文状，不超过 2.5。
+- imagery：意象组织与并置张力。日常现场物象是否能与大地、黑夜、水火、天象、身体等具有重量的物象发生真实碰撞与变形，而非静态罗列清单或每节贴一个廉价明喻。
+- emotion：情感表达姿态。抒情是否兼具参考诗特有的赤诚/痛感与具体承载（可在动作与物象中直陈或呼告，不靠矫情形容词，也不流于干瘪冷漠的技术清点）。
+- structure：语义组织与篇章结构。节与节之间的起承、跳接、回环或视角打开是否接近参考诗。
+- progression：推进感与发展动力（单列诊断）。全诗是否有内在力量推动后一节加深或改变前一节，而非原地并列堆叠或机械按空间方位报流水账。
+- concreteness：具象与抽象的张力。具象物是否可触可感，抽象/存在性词汇出现时是否有具体物象或生命处境支撑。
+- repetition：复沓、呼告与变奏回环。复现短语、词根或呼告时是否随语境改变语义重量或句法位置。若多节首行死板照抄同一填空模板（如每节硬套“XX，XX，你……”），判为机械复沓，不超过 2.0。
+- addressivity：人称选择、说话位置、呼告对象及“我”与世界/他者的关系尺度。
+- mythic_register：元素尺度与精神高度。面对具体日常题目时，能否自然打开时间纵深、原初自然元素或存在/生命高度，而非困在狭隘琐碎的事务描写里。
+- closure：结尾方式。末行是否自然承接全诗建立的关系并留有余响，避免空洞格言升华或生硬明喻封死。
+- literary_quality：独立文学质量。语言准确度、声气连贯度、意象新鲜度与整体感染力。像“按清单拼装的规则练习作”不得高于 2.5；不要因题材讨巧虚抬分数。
+- topic_adherence：题意符合程度。是否准确回应题目核心场景与具体要求。
+- originality：原创性。是否避免照搬参考诗原句、专有名词或标志性成句组合，形成独立成篇的诗作。
 
 评分锚点：
-5 = 与参考高度一致/很强，证据充分；
-4 = 明显一致/较好；
-3 = 部分一致/中等，有可辨识差异；
-2 = 略有相似/较弱，多为表层；
-1 = 基本不同/很差；
-0 = 文本缺失或完全无法评价（正常文本不要用 0）。
+5.0 = 声口、呼吸与意象气度高度神似，浑然成篇，证据充分；
+4.0 = 多处核心特征明显一致，语言自然，偶有局部差距；
+3.0 = 部分表层特征相近，但整体声口偏普通现代诗或局部略显刻意；
+2.0 = 仅有零星表层模仿，或明显流于机械模板/分行散文；
+1.0 = 风格完全相悖或严重失控；
+0.0 = 文本缺失或完全无法评价（正常文本不用 0）。
 
 每个维度必须给出：
-- score：0—5 的数值；
-- evidence：至少一条来自生成诗的短引文（可加参考诗引文），不得编造；
-- rationale：说明相同点和差异点；
-- uncertainty：只能是英文 low / medium / high 之一。证据不足时必须标 high，不要假装确定。
+- score：0—5 的数值（支持 0.5 步长）；
+- evidence：1—2 条来自生成诗的短引文（不得编造）；
+- rationale：简明指出相同点与关键差距（不超过 70 个汉字）；
+- uncertainty：只能是 low / medium / high 之一。
 
 输出格式硬性要求：
-- 只输出一个 JSON 对象，不要 markdown，不要在对象前后添加解释。
+- 只输出一个合法 JSON 对象，不要 markdown，不要解释。
 - 顶层只能有 dimensions、overall_notes、confidence 三个键。
-- dimensions 中每个维度键只出现一次；不要重复 dimensions，不要输出第二个 JSON 对象。
-- evidence 最多 2 条，每条不超过 30 个汉字；rationale 不超过 80 个汉字。
-- 不要用未转义的双引号包裹引文；引文直接写成字符串内容。
+- 不要在字符串内部使用未转义的英文双引号。
 
 JSON 结构：
 {"dimensions": {"lexical": {"score": 0, "evidence": ["..."], "rationale": "...", "uncertainty": "low"}, "syntax": {"score": 0, "evidence": ["..."], "rationale": "...", "uncertainty": "low"}, "lineation": {"score": 0, "evidence": ["..."], "rationale": "...", "uncertainty": "low"}, "imagery": {"score": 0, "evidence": ["..."], "rationale": "...", "uncertainty": "low"}, "emotion": {"score": 0, "evidence": ["..."], "rationale": "...", "uncertainty": "low"}, "structure": {"score": 0, "evidence": ["..."], "rationale": "...", "uncertainty": "low"}, "progression": {"score": 0, "evidence": ["..."], "rationale": "...", "uncertainty": "low"}, "concreteness": {"score": 0, "evidence": ["..."], "rationale": "...", "uncertainty": "low"}, "repetition": {"score": 0, "evidence": ["..."], "rationale": "...", "uncertainty": "low"}, "addressivity": {"score": 0, "evidence": ["..."], "rationale": "...", "uncertainty": "low"}, "mythic_register": {"score": 0, "evidence": ["..."], "rationale": "...", "uncertainty": "low"}, "closure": {"score": 0, "evidence": ["..."], "rationale": "...", "uncertainty": "low"}, "literary_quality": {"score": 0, "evidence": ["..."], "rationale": "...", "uncertainty": "low"}, "topic_adherence": {"score": 0, "evidence": ["..."], "rationale": "...", "uncertainty": "low"}, "originality": {"score": 0, "evidence": ["..."], "rationale": "...", "uncertainty": "low"}}, "overall_notes": "...", "confidence": "low|medium|high"}
@@ -177,80 +176,103 @@ def _per_poem_fitness(config, deterministic, judge, form_ok, copy):
 
 def evaluate_candidate(llm, config, candidate, topics, selection, *, judge_llm=None,
                        repetitions=None, repetition_offset=0, kind="references"):
-    """Generate and evaluate a candidate on every supplied topic.
-
-    ``kind`` selects the reference set.  Optimization always uses ``references``;
-    final validation uses ``held_out``.
-    """
+    """Generate and evaluate a candidate on every supplied topic."""
     judge_llm = judge_llm or llm
     repetitions = int(repetitions if repetitions is not None else config["generation"]["repetitions"])
     ref_texts = [p["text"] for p in selection[kind]]
-    evaluations = []
-    for topic in topics:
-        for rep in range(repetition_offset, repetition_offset + repetitions):
-            cache_variant = f"{candidate['id']}:{topic['id']}:rep{rep}:{kind}"
-            gen = generate_poem(llm, config, candidate["prompt"], topic, cache_variant=cache_variant)
-            evaluation = {
-                "topic_id": topic["id"],
-                "topic": topic["topic"],
-                "repetition": rep,
-                "generation": gen,
-                "ok": False,
-                "created_at": datetime.now(timezone.utc).isoformat(),
-                "judge_model": getattr(judge_llm, "model", None),
-                "rubric_version": config["evaluation"]["rubric_version"],
-                "mock": bool(getattr(llm, "mock", False)),
-            }
-            if not gen["ok"]:
-                evaluation["error"] = "生成失败"
-                evaluations.append(evaluation)
-                continue
-            try:
-                deterministic = metrics.style_similarity(gen["text"], ref_texts)
-                copy = metrics.copy_diagnostics(
-                    gen["text"], ref_texts,
-                    lcs_chars=config["evaluation"]["copy_lcs_chars"],
-                    line_chars=config["evaluation"]["copy_line_chars"],
-                    rouge1_cap=config["evaluation"]["copy_rouge1_cap"],
-                )
-                rouge = [metrics.rouge1_char(gen["text"], ref) for ref in ref_texts]
-                judge, judge_meta = judge_poem(
-                    judge_llm, config, selection, topic, gen, kind=kind,
-                    cache_variant=f"{candidate['id']}:{topic['id']}:rep{rep}:{kind}:judge:v2",
-                )
-                components = _per_poem_fitness(config, deterministic, judge, gen["form_ok"], copy)
-                evaluation.update({
-                    "ok": True,
-                    "poem_id": hashlib.sha256(gen["text"].encode("utf-8")).hexdigest(),
-                    "deterministic": deterministic,
-                    "copy_diagnostics": copy,
-                    "rouge1_diagnostic": {
-                        "per_reference": rouge,
-                        "mean_f1": round(statistics.mean(x["f1"] for x in rouge), 6),
-                        "max_f1": round(max(x["f1"] for x in rouge), 6),
-                        "note": "仅作文本重合诊断；不把高 ROUGE-1 当作风格模仿成功。",
-                    },
-                    "judge": judge,
-                    "judge_meta": judge_meta,
-                    "components": components,
-                })
-            except BudgetExhausted:
+    copy_texts = list(ref_texts)
+    if kind == "held_out":
+        copy_texts.extend(p["text"] for p in selection["references"])
+    rubric_tag = config["evaluation"].get("rubric_version", "v2")
+    jobs = [
+        (topic, rep)
+        for topic in topics
+        for rep in range(repetition_offset, repetition_offset + repetitions)
+    ]
+
+    def _run_one(job):
+        topic, rep = job
+        cache_variant = f"{candidate['id']}:{topic['id']}:rep{rep}:{kind}"
+        gen = generate_poem(llm, config, candidate["prompt"], topic, cache_variant=cache_variant)
+        evaluation = {
+            "topic_id": topic["id"],
+            "topic": topic["topic"],
+            "repetition": rep,
+            "generation": gen,
+            "ok": False,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "judge_model": getattr(judge_llm, "model", None),
+            "rubric_version": rubric_tag,
+            "mock": bool(getattr(llm, "mock", False)),
+        }
+        if not gen["ok"]:
+            evaluation["error"] = "生成失败"
+            return evaluation
+        try:
+            deterministic = metrics.style_similarity(gen["text"], ref_texts)
+            copy = metrics.copy_diagnostics(
+                gen["text"], copy_texts,
+                lcs_chars=config["evaluation"]["copy_lcs_chars"],
+                line_chars=config["evaluation"]["copy_line_chars"],
+                rouge1_cap=config["evaluation"]["copy_rouge1_cap"],
+            )
+            copy["reference_sets"] = [kind, "references"] if kind == "held_out" else [kind]
+            rouge = [metrics.rouge1_char(gen["text"], ref) for ref in ref_texts]
+            judge, judge_meta = judge_poem(
+                judge_llm, config, selection, topic, gen, kind=kind,
+                cache_variant=f"{candidate['id']}:{topic['id']}:rep{rep}:{kind}:judge:{rubric_tag}",
+            )
+            components = _per_poem_fitness(config, deterministic, judge, gen["form_ok"], copy)
+            evaluation.update({
+                "ok": True,
+                "poem_id": hashlib.sha256(gen["text"].encode("utf-8")).hexdigest(),
+                "deterministic": deterministic,
+                "copy_diagnostics": copy,
+                "rouge1_diagnostic": {
+                    "per_reference": rouge,
+                    "mean_f1": round(statistics.mean(x["f1"] for x in rouge), 6),
+                    "max_f1": round(max(x["f1"] for x in rouge), 6),
+                    "note": "仅作文本重合诊断；不把高 ROUGE-1 当作风格模仿成功。",
+                },
+                "judge": judge,
+                "judge_meta": judge_meta,
+                "components": components,
+            })
+        except BudgetExhausted:
+            raise
+        except LLMOutputError as exc:
+            evaluation["error"] = f"{type(exc).__name__}: {exc}"
+        except RuntimeError as exc:
+            if not is_output_truncation_error(exc):
                 raise
-            except LLMOutputError as exc:
-                evaluation["error"] = f"{type(exc).__name__}: {exc}"
-            except RuntimeError as exc:
-                if not is_output_truncation_error(exc):
-                    raise
-                evaluation["error"] = f"评审输出被截断：{exc}"
-            except (ValueError, TypeError) as exc:
-                evaluation["error"] = f"{type(exc).__name__}: {exc}"
-            evaluations.append(evaluation)
+            evaluation["error"] = f"评审输出被截断：{exc}"
+        except (ValueError, TypeError) as exc:
+            evaluation["error"] = f"{type(exc).__name__}: {exc}"
+        return evaluation
+
+    is_mock = bool(getattr(llm, "mock", True))
+    if is_mock or len(jobs) <= 1 or not hasattr(llm, "call_json"):
+        evaluations = [_run_one(job) for job in jobs]
+    else:
+        workers = min(6, len(jobs))
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            evaluations = list(pool.map(_run_one, jobs))
     return aggregate_evaluations(candidate, evaluations, config)
+
+
+def selection_objective(result):
+    """Compare pass rates, then mean style score on passing poems."""
+    style = result.get("eligible_style")
+    return result.get("eligible_rate", 0.0), style if style is not None else -1.0
 
 
 def aggregate_evaluations(candidate, evaluations, config):
     ok = [row for row in evaluations if row.get("ok")]
+    eligible_styles = [row["components"]["style_score"] for row in ok if row["components"]["eligible"]]
     aggregate = {
+        "eligible_count": len(eligible_styles),
+        "eligible_rate": len(eligible_styles) / len(evaluations) if evaluations else 0.0,
+        "eligible_style": round(statistics.mean(eligible_styles), 4) if eligible_styles else None,
         "candidate_id": candidate["id"],
         "evaluations": evaluations,
         "evaluation_count": len(evaluations),
@@ -265,11 +287,12 @@ def aggregate_evaluations(candidate, evaluations, config):
         "form_ok_rate": 0.0,
         "copy_rate": 0.0,
         "score_std": None,
-        "aggregation": "mean of per-poem fitness; failed generations penalized; eligibility requires form, non-copy, topic, originality and quality floors",
+        "aggregation": "rank by eligible rate over all attempts, then mean style on eligible poems; fitness is a tiebreaker",
     }
     if not ok:
         return aggregate
     values = [row["components"]["fitness"] for row in ok]
+    score_std = round(statistics.pstdev(values), 4) if len(values) > 1 else 0.0
     aggregate.update({
         "fitness": round(statistics.mean(values), 4),
         "style_score": round(statistics.mean(row["components"]["style_score"] for row in ok), 4),
@@ -280,12 +303,25 @@ def aggregate_evaluations(candidate, evaluations, config):
         "originality": round(statistics.mean(row["components"]["originality"] for row in ok), 4),
         "form_ok_rate": round(sum(1 for row in ok if row["components"]["form_ok"]) / len(evaluations), 6),
         "copy_rate": round(sum(1 for row in ok if row["components"]["copy_flag"]) / len(evaluations), 6),
-        "score_std": round(statistics.pstdev(values), 4) if len(values) > 1 else 0.0,
+        "score_std": score_std,
         "mean_rouge1_f1": round(statistics.mean(row["rouge1_diagnostic"]["mean_f1"] for row in ok), 6),
     })
     fail_rate = (len(evaluations) - len(ok)) / len(evaluations) if evaluations else 1.0
     if fail_rate:
         aggregate["fitness"] = round(max(0.0, aggregate["fitness"] - 25.0 * fail_rate), 4)
+    if len(values) > 1 and score_std > 0:
+        aggregate["fitness"] = round(max(0.0, aggregate["fitness"] - 0.12 * score_std), 4)
+    ev = config["evaluation"]
+    prompt_len = len(candidate.get("prompt", ""))
+    over = max(0, prompt_len - int(ev.get("prompt_length_free", 0)))
+    length_penalty = min(
+        float(ev.get("prompt_length_penalty_max", 0.0)),
+        over / 100.0 * float(ev.get("prompt_length_penalty_per_100_chars", 0.0)),
+    )
+    aggregate["prompt_length_chars"] = prompt_len
+    aggregate["prompt_length_penalty"] = round(length_penalty, 4)
+    if length_penalty:
+        aggregate["fitness"] = round(max(0.0, aggregate["fitness"] - length_penalty), 4)
     aggregate["eligible"] = (
         len(ok) == len(evaluations) and
         all(row["components"]["eligible"] for row in ok)

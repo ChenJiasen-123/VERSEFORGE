@@ -1,0 +1,191 @@
+{
+  "reproduced": [
+    {
+      "feature": "无标点呼吸分行",
+      "generated_evidence": "五首生成诗行末几乎无标点，如 opt-01「白灯照着售货机」「照着它腹内一排排」「冷掉的甜」连续三行无行末标点。",
+      "reference_evidence": "参考作品1「亚洲铜，亚洲铜」「祖父死在这里，父亲死在这里，我也将死在这里」行末无标点；参考作品3「目击众神死亡的草原上野花一片」「远在远方的风比远方更远」行末无标点。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "行内空格制造顿挫",
+      "generated_evidence": "opt-02「黑板擦 泡胀了 躺在泥里」「旗杆还站着 绳索抽打自己」；opt-04「铁钩空着 晃」「像昨夜谁把一只手忘在梁上」。",
+      "reference_evidence": "参考作品2「万人都要将火熄灭 我一人独将此火高高举起」「此火为大 开花落英于神圣的祖国」；参考作品3「我的琴声呜咽 泪水全无」。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "呼告与第二人称直接说话",
+      "generated_evidence": "opt-01「售货机 你的灯管嗡嗡」「谁来买这最后一罐」；opt-02「洪水 你走时带走了一只铁皮桶」「扫帚 扫帚 水退到哪去了」；opt-03「嘿 桥墩 你守过多少这样的夜」「嘿 江水 你带走过多少名字」。",
+      "reference_evidence": "参考作品1「亚洲铜，亚洲铜」「你是唯一的一块埋人的地方」；参考作品5「我爱过的这糊涂的四姐妹啊」「请告诉四姐妹：这是绝望的麦子」；参考作品11「姐姐，今夜我在德令哈」。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "结尾回到具体安静动作或物象",
+      "generated_evidence": "opt-01「有人取走货」「弯腰 又直起」「灯白着 走廊空着」；opt-04「老王蹲下 把一片烂叶从土豆上摘掉」；opt-05「沙子埋住脚 又退开」。",
+      "reference_evidence": "参考作品4「走在路上」「放声歌唱」「大风刮过山岗」「上面是无边的天空」；参考作品9「只有水烟锅」「咕噜咕噜」「谁的心思也是」「半尺厚的黄土」「熟了麦子呀！」。",
+      "claim_type": "observation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "日常实物与大地/黑夜/时间等原初尺度碰撞",
+      "generated_evidence": "opt-01「夜更深 大地在楼外翻身」「你的压缩机又响一阵」；opt-04「城市在五公里外翻身」「高架桥墩 一列灯迷着眼」。",
+      "reference_evidence": "参考作品4「黑夜从大地上升起」「遮住了光明的天空」；参考作品5「荒凉的山冈上站着四姐妹」「所有的风只向她们吹」。",
+      "claim_type": "observation",
+      "confidence": "medium"
+    }
+  ],
+  "missing": [
+    {
+      "feature": "长短句张力（行长变异系数偏低）",
+      "generated_evidence": "opt-03 行长变异系数 0.13，远低于参考 p10 0.22；opt-02 行长变异系数 0.17，也低于 p10。opt-03 被 anti_slop 标记「uniform_line_lengths」。",
+      "reference_evidence": "参考行长变异系数中位数 0.34，p10 0.22；参考作品2 有「万人都要将火熄灭 我一人独将此火高高举起」与「和所有以梦为马的诗人一样」等长短悬殊行。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "复沓变奏与回返密度不足",
+      "generated_evidence": "opt-04 字重复率 0.20，低于参考 p10 0.28；相邻节字面回返率 0.06，低于参考 p10 0.07。opt-01 至 opt-05 均无跨节复沓回返。",
+      "reference_evidence": "参考作品2「和所有以梦为马的诗人一样」在九节中反复出现；参考作品3「我的琴声呜咽 泪水全无」三次回返；参考作品5「风后面是风」「天空上面是天空」「道路前面还是道路」连续回环。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "原初元素/时间生命尺度的精神开阔度",
+      "generated_evidence": "opt-01 虽有「大地在楼外翻身」，但整体仍困于走廊、售货机、硬币、拖鞋；opt-02 有「坟」但整体困于灾后清淤事务；opt-03 有「江水」「桥墩」但未打开死亡/时间/生命尺度。评审 weakest_dimension mythic_register 均值 2.5。",
+      "reference_evidence": "参考作品1「祖父死在这里，父亲死在这里，我也将死在这里」；参考作品2「众神创造物中只有我最易朽 带着不可抗拒的死亡的速度」；参考作品3「明月如镜高悬草原映照千年岁月」。",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "feature": "质朴而有重量的词域（虚词与「的/地/得」偏低）",
+      "generated_evidence": "opt-01「的/地/得/百字」4.38，低于参考 p10 4.73；opt-02 2.15；opt-03 3.97；opt-04 2.17；opt-05 3.01。opt-04 虚词字占比 0.15，低于参考 p10 0.19。",
+      "reference_evidence": "参考「的/地/得/百字」中位数 6.25，p10 4.73；参考作品10「从明天起，做一个幸福的人」「喂马，劈柴，周游世界」等句含自然虚词节奏。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "赤诚呼告的情绪强度",
+      "generated_evidence": "opt-03「嘿 桥墩 你守过多少这样的夜」「嘿 江水 你带走过多少名字」偏修辞性提问，情绪较冷；opt-01「售货机 你的灯管嗡嗡」「低低叫着什么人」呼告后未展开赤诚痛感。评审 emotion 均值 3.0。",
+      "reference_evidence": "参考作品11「姐姐，今夜我不关心人类，我只想你」；参考作品5「我爱过的这糊涂的四姐妹啊」「这是绝望的麦子」「请告诉四姐妹：这是绝望的麦子」。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "意象碰撞的强度与精神重量",
+      "generated_evidence": "opt-01「像谁咳出半口气」明喻略轻；opt-02「像一只翻过来的鞋」「像一面没有脸的鼓」两处明喻偏廉价；opt-03「对岸的灯火 一排含盐的星」明喻未与大地黑夜等重物碰撞。评审 imagery 均值 3.1。",
+      "reference_evidence": "参考作品1「那两只白鸽子，它是屈原遗落在沙滩上的白鞋子」；参考作品12「敦煌石窟像马肚子下」「挂着一只只木桶」「乳汁的声音滴破耳朵」。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    }
+  ],
+  "extraneous": [
+    {
+      "feature": "明喻滥用（像……）",
+      "generated_evidence": "opt-01「像谁咳出半口气」；opt-02「像一只翻过来的鞋」「像一面没有脸的鼓」；opt-03「一排含盐的星」；opt-04「像昨夜谁把一只手忘在梁上」「像秤杆里的死结」；opt-05「像过路人拍掉衣领的尘」。五首共出现至少 7 处明喻。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "解释性/总结性收束倾向",
+      "generated_evidence": "opt-03「城市在远处亮着 像忘了什么」带解释性；opt-05「风把这点卷回棚下」「沙子埋住脚 又退开」有格言化收束感。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "呼告句式填空化（同一句式换宾语）",
+      "generated_evidence": "opt-03「嘿 桥墩 你守过多少这样的夜」「嘿 江水 你带走过多少名字」两行同一「嘿 X 你 Y 过多少 Z」句式；opt-02「扫帚 扫帚 水退到哪去了」「回学校 回学校 书包挂在窗钩上」两处呼告复现但变奏有限。",
+      "claim_type": "observation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "工业零件清点感",
+      "generated_evidence": "opt-01「投币 一枚 两枚」「铁掉进铁」「压缩机又响一阵」；opt-04「铁钩」「冷藏车」「高架桥墩」「三轮车斗」「塑料布」密集罗列。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    }
+  ],
+  "prompt_issues": [
+    {
+      "quote": "极短行与极长行直接相撞，禁止行长均齐。",
+      "issue_type": "ineffective",
+      "explanation": "该条款只提出禁止，未给出可操作的节奏锚点；生成诗行长变异系数仍普遍低于参考 p10（opt-03 0.13、opt-02 0.17），说明「禁止均齐」不足以诱导长短张力。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "quote": "同一呼告语复现时，须让该词在不同语境中承担不同重量，禁止同一句式换动词的填空复沓。",
+      "issue_type": "template_inducing",
+      "explanation": "条款本身反对填空复沓，但「须让该词在不同语境中承担不同重量」是抽象要求，模型转而用「嘿 X 你 Y 过多少 Z」这类可套用句式来满足「复现」，反而生成 opt-03 两行同构呼告。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "quote": "从题目现场的一件实物出发，让它被死亡、时间、大地、黑夜这类原初尺度突然击中，不停在器物清点；不解释，只呈现与呼唤。",
+      "issue_type": "over_specific",
+      "explanation": "「被死亡、时间、大地、黑夜这类原初尺度突然击中」把碰撞方式规定为一次性「击中」，导致生成诗多在结尾补一句「大地在楼外翻身」式标签，而非让原初尺度贯穿全诗。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "quote": "抽象词必须被具体动作或实物接住，或直接出场承担原初尺度的分量，禁止悬空隐喻。",
+      "issue_type": "vague",
+      "explanation": "「直接出场承担原初尺度的分量」与「禁止悬空隐喻」边界模糊，模型难以判断何时抽象词可裸出；生成诗因此偏向清点实物，抽象精神维度反而收缩。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "quote": "节长随呼吸伸缩，单节保持紧凑，不铺成臃肿的长段。",
+      "issue_type": "conflicting",
+      "explanation": "「随呼吸伸缩」与「单节保持紧凑」互相拉扯；opt-02 第3节因行数超限被判 form_fail，说明「紧凑」被模型理解为固定短节，反而造成节长均齐。",
+      "claim_type": "observation",
+      "confidence": "medium"
+    },
+    {
+      "quote": "结尾沉降留白：末行回到具体、安静、可触摸的动作或物象上，让前面的高声部自然沉落，不以警句收束，也不解释主题。",
+      "issue_type": "redundant",
+      "explanation": "该条与总纲「不解释，只呈现与呼唤」及第5条「不作格言式总结」重复；冗余条款挤占指令注意力，且「高声部自然沉落」暗示前面必须有高声部，诱导呼告拔高。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    }
+  ],
+  "topic_overreliance": {
+    "assessment": "生成诗高度依赖题目给定的现场实物（售货机、黑板擦、渡轮、秤、加油站），实物清点充分，但原初尺度多为结尾附加标签，未从实物内部生长出来；题目现场越具体，诗越容易写成器物素描。",
+    "evidence": "opt-01 全诗围绕售货机、硬币、灯管、压缩机；opt-04 围绕铁钩、冷藏车、秤砣、土豆、烂叶；原初尺度仅以「大地在楼外翻身」「城市在五公里外翻身」等单句补入。",
+    "claim_type": "interpretation",
+    "confidence": "high"
+  },
+  "summary": "当前生成诗已自然复现无标点分行、行内空格顿挫、呼告与结尾沉降等表面特征，但核心瓶颈在于：长短句张力被压平（多首行长变异系数低于参考 p10）、复沓回返密度不足（字重复率与节间回返率偏低）、原初尺度多沦为结尾标签而非贯穿全诗的精神开阔度，且呼告句式出现「嘿 X 你 Y 过多少 Z」的填空化倾向。Prompt 病因在于「禁止均齐」「须承担不同重量」等条款只给否定与抽象要求，未给可操作的节奏与变奏锚点；「被原初尺度突然击中」把碰撞规定为一次性事件，反而诱导标签式升华；结尾条款与总纲重复冗余。",
+  "actionable_suggestions": [
+    "将「极短行与极长行直接相撞，禁止行长均齐」替换为可操作的节奏锚点：要求诗中至少有一处三字以内的独立短行紧接一处跨行连续的长句，并删去「禁止行长均齐」这类纯否定表述。",
+    "将「同一呼告语复现时，须让该词在不同语境中承担不同重量」改为「呼告语复现时，第二次出现须改变句法位置或语气（如从呼唤变为应答、从问句变为陈述），不得沿用同一句式框架」，直接阻断「嘿 X 你 Y 过多少 Z」式填空。",
+    "将总纲「让它被死亡、时间、大地、黑夜这类原初尺度突然击中」改为「让原初尺度从实物的动作、方位或关系中生长出来，贯穿至少两个节段，而非在结尾追加一句尺度标签」，删去「突然击中」的一次性暗示。",
+    "删去结尾条「让前面的高声部自然沉落」，保留「末行回到具体、安静、可触摸的动作或物象，不以警句收束」即可；同时删去与总纲重复的「不解释主题」，减少冗余条款对注意力的挤占。",
+    "将「抽象词必须被具体动作或实物接住，或直接出场承担原初尺度的分量」精炼为「抽象词须由同一节内的实物动作承接，不得单独悬置」，删去「直接出场承担原初尺度的分量」这一含糊选项，避免模型在清点实物与裸出抽象之间摇摆。"
+  ],
+  "analysis_model": "deepseek-flash",
+  "analysis_meta": {
+    "usage": {
+      "prompt_tokens": 6740,
+      "completion_tokens": 3697,
+      "total_tokens": 10437,
+      "prompt_tokens_details": {
+        "cached_tokens": 3200
+      },
+      "prompt_cache_hit_tokens": 3200,
+      "prompt_cache_miss_tokens": 3540
+    },
+    "cache_hit": false,
+    "request_settings": {
+      "max_tokens": 4000,
+      "response_format": "json_object",
+      "thinking": "disabled",
+      "temperature": 0.2
+    },
+    "model": "deepseek-flash",
+    "attempt": 1
+  },
+  "fallback": false,
+  "mock": false
+}

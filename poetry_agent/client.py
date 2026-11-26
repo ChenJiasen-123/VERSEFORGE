@@ -1,3 +1,4 @@
+import http.client
 import json
 import os
 import urllib.error
@@ -26,9 +27,9 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 class DeepSeekClient:
     mock = False
 
-    def __init__(self):
+    def __init__(self, model=None):
         self.key = os.environ.get("DEEPSEEK_API_KEY", "").strip()
-        self.model = os.environ.get("DEEPSEEK_MODEL", "deepseek-flash").strip()
+        self.model = (model or os.environ.get("DEEPSEEK_MODEL", "deepseek-flash")).strip()
         self.base = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com").rstrip("/")
         parsed = urlparse(self.base)
         if parsed.scheme != "https" or parsed.hostname != "api.deepseek.com" or parsed.port not in (None, 443) or parsed.username or parsed.query or parsed.fragment or parsed.path not in ("", "/v1"):
@@ -36,7 +37,7 @@ class DeepSeekClient:
         if not self.key:
             raise ValueError("未配置DEEPSEEK_API_KEY，请在项目.env中填写，或先用--mock体验")
 
-    def complete(self, system, user, timeout, max_tokens=4096, thinking=None):
+    def complete(self, system, user, timeout, max_tokens=4096, thinking=None, temperature=None):
         payload = {"model": self.model, "messages": [
             {"role": "system", "content": system}, {"role": "user", "content": user}],
             "stream": False, "max_tokens": max_tokens}
@@ -45,6 +46,10 @@ class DeepSeekClient:
             if thinking not in ('enabled', 'disabled'):
                 raise ValueError('thinking须为enabled或disabled')
             payload['thinking'] = {'type': thinking}
+        if temperature is not None:
+            if isinstance(temperature, bool) or not isinstance(temperature, (int, float)) or not 0 <= temperature <= 2:
+                raise ValueError('temperature须为0—2之间的数值')
+            payload['temperature'] = temperature
         request = urllib.request.Request(self.base + "/chat/completions",
             data=json.dumps(payload).encode("utf-8"), headers={
                 "Content-Type": "application/json", "Authorization": "Bearer " + self.key})
@@ -62,11 +67,12 @@ class DeepSeekClient:
                 raise RuntimeError("模型返回空正文")
             return {"content": content, "usage": data.get("usage", {}),
                     'request_settings': {'max_tokens': max_tokens, 'response_format': 'json_object',
-                                         'thinking': thinking or 'service_default'}}
+                                         'thinking': thinking or 'service_default',
+                                         'temperature': temperature if temperature is not None else 'service_default'}}
         except urllib.error.HTTPError as exc:
             hints = {401: "密钥无效", 402: "余额不足", 429: "请求限流", 400: "检查模型名称或请求参数"}
             raise RuntimeError(f"DeepSeek HTTP {exc.code}：{hints.get(exc.code, '请求失败，请检查服务状态')}（未自动重试）") from None
-        except (urllib.error.URLError, TimeoutError, OSError):
+        except (urllib.error.URLError, http.client.HTTPException, TimeoutError, OSError):
             raise RuntimeError("网络连接失败或超时；请确认网络后重试") from None
         except (KeyError, IndexError, TypeError, ValueError):
             raise RuntimeError("模型服务返回了无法解析的响应") from None

@@ -65,7 +65,13 @@ class Studio:
             phase = state
             self.update(identity, state)
         try:
-            options = {'independent_editor': True,'candidate_count':2} if self.runner is run_studio else {}
+            options = {
+                'independent_editor': data.get('auto_polish', 'off') == 'on',
+                'candidate_count': 2,
+                'style_mode': data.get('style_mode', 'rpe_v6'),
+                'expansion_mode': data.get('expansion_mode', 'expand_v1'),
+                'expansion_model': data.get('expansion_model', 'deepseek-reasoner'),
+            } if self.runner is run_studio else {}
             result = self.runner(data['prompt'], data['genre'], data['preference'], data.get('previous'),
                                  progress=progress, **options)
             self.update(identity, 'completed', result)
@@ -183,18 +189,36 @@ class Handler(BaseHTTPRequestHandler):
             data = json.loads(raw_body)
             if not isinstance(data, dict):
                 raise ValueError()
-            prompt, genre, preference = data.get('prompt'), data.get('genre', 'auto'), data.get('preference', '')
+            prompt, genre, preference = data.get('prompt'), data.get('genre', 'modern'), data.get('preference', '')
+            style_mode = data.get('style_mode', 'rpe_v6')
+            expansion_mode = data.get('expansion_mode', 'expand_v1')
+            expansion_model = data.get('expansion_model', 'deepseek-reasoner')
+            auto_polish = data.get('auto_polish', 'off')
             if not isinstance(prompt, str) or not 2 <= len(prompt.strip()) <= 10000 or not isinstance(preference, str) or len(preference) > 2000:
                 raise ValueError()
             if genre not in ('auto', 'modern', 'wujue', 'qijue', 'wulv', 'qilv', 'ci'):
                 raise ValueError()
+            if style_mode not in ('standard', 'rpe_v4', 'rpe_v6'):
+                raise ValueError()
+            if expansion_mode not in ('expand_v1', 'native_studio', 'none'):
+                raise ValueError()
+            if expansion_model not in ('default', 'deepseek-flash', 'deepseek-chat', 'deepseek-reasoner'):
+                raise ValueError()
+            if auto_polish not in ('on', 'off'):
+                raise ValueError()
             previous = data.get('previous')
             if previous is not None:
                 from poetry_agent.core import Poem
-                previous = {'title': Poem.parse(json.dumps(previous)).title, 'lines': Poem.parse(json.dumps(previous)).lines}
+                parsed_prev = Poem.parse(json.dumps(previous), allow_stanza_breaks=True)
+                previous = {'title': parsed_prev.title, 'lines': parsed_prev.lines}
                 if len(json.dumps(previous)) > 15000:
                     raise ValueError()
-            identity = self.studio.add({'prompt': prompt.strip(), 'genre': genre, 'preference': preference, 'previous': previous})
+            identity = self.studio.add({
+                'prompt': prompt.strip(), 'genre': genre, 'style_mode': style_mode,
+                'expansion_mode': expansion_mode, 'expansion_model': expansion_model,
+                'auto_polish': auto_polish,
+                'preference': preference, 'previous': previous,
+            })
             self.send(202, {'id': identity})
         except OverflowError as error:
             self.send(429, {'error': str(error)})

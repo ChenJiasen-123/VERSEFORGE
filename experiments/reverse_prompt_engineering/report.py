@@ -10,6 +10,7 @@ from .validation import JUDGE_DIMENSIONS
 
 
 DIMENSION_LABELS = {
+    "poetic_core": "诗核凝聚与刺破力",
     "lexical": "字词选择与语言习惯",
     "syntax": "句法结构与表达方式",
     "lineation": "分行、节奏及韵律",

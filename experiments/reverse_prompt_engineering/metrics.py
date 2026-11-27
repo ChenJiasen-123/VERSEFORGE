@@ -249,37 +249,57 @@ STYLE_WEIGHTS = {
     "pronouns": 0.06,
 }
 
-# Audited corpus-band features (selected by empirical AUC separating Haizi from
-# both baseline LLM outputs and neighbouring modern poets).
+# Audited corpus-band features (rpe-poetry-style-v6: centers Poetic Core persistence
+# via core_motif_span & core_lexical_focus, guards sculptural sharpness via comma_per_line
+# & line_length_cv, and suppresses scattered simile drift & inverted novelty noise).
+FEATURE_SCHEMA = "rpe-poetry-style-v6"
 BAND_WEIGHTS = {
-    "line_length_cv": 0.14,
-    "clause_length_cv": 0.08,
-    "unpunctuated_break_rate": 0.12,
-    "line_end_punct_rate": 0.10,
-    "repetition_ratio": 0.13,
-    "hapax_ratio": 0.08,
-    "stanza_return_rate": 0.08,
-    "anaphora_rate": 0.05,
-    "function_char_ratio": 0.07,
-    "modifier_de_per_100": 0.05,
-    "short_line_rate": 0.04,
-    "concrete_char_per_100": 0.03,
-    "stanza_length_cv": 0.03,
+    "core_motif_span": 0.11,
+    "line_length_cv": 0.11,
+    "unpunctuated_break_rate": 0.09,
+    "core_lexical_focus": 0.08,
+    "clause_length_cv": 0.07,
+    "comma_per_line": 0.07,
+    "line_end_punct_rate": 0.06,
+    "simile_stanza_rate": 0.06,
+    "repetition_ratio": 0.06,
+    "first_last_return": 0.05,
+    "primal_per_100": 0.05,
+    "mid_line_space_rate": 0.04,
+    "body_per_100": 0.04,
+    "copula_per_100": 0.03,
+    "vital_affect_per_100": 0.03,
+    "pronoun_per_100": 0.03,
+    "mid_stanza_novelty": 0.01,
+    "short_line_rate": 0.01,
 }
 
 MIN_FEATURE_SCALES = {
+    "core_motif_span": 0.10,
+    "core_lexical_focus": 0.02,
     "line_length_cv": 0.06,
     "clause_length_cv": 0.06,
+    "comma_per_line": 0.12,
+    "simile_stanza_rate": 0.12,
     "unpunctuated_break_rate": 0.08,
     "line_end_punct_rate": 0.08,
+    "mid_line_space_rate": 0.08,
     "repetition_ratio": 0.05,
     "hapax_ratio": 0.05,
     "stanza_return_rate": 0.04,
+    "first_last_return": 0.04,
+    "mid_stanza_novelty": 0.08,
     "anaphora_rate": 0.04,
     "function_char_ratio": 0.04,
     "modifier_de_per_100": 1.5,
+    "copula_per_100": 0.6,
     "short_line_rate": 0.06,
     "concrete_char_per_100": 2.0,
+    "body_per_100": 1.0,
+    "primal_per_100": 1.5,
+    "vital_affect_per_100": 1.0,
+    "abstract_per_100": 0.9,
+    "pronoun_per_100": 1.2,
     "stanza_length_cv": 0.08,
 }
 
@@ -332,8 +352,11 @@ def _build_reference_model(ref_tuple: tuple[str, ...]) -> dict:
     stylo_profiles = [stylometry.profile(text) for text in ref_tuple]
     bands = {}
     all_keys = set(BAND_WEIGHTS) | {
-        "repeated_line_rate", "connective_per_100", "simile_per_100",
-        "abstract_per_100", "median_line_length", "pronoun_per_100",
+        "repeated_line_rate", "connective_per_100", "simile_per_100", "simile_stanza_rate",
+        "abstract_per_100", "vital_affect_per_100", "median_line_length", "pronoun_per_100",
+        "concrete_char_per_100", "stanza_head_clone_rate", "net_cliche_per_100",
+        "simile_ending_flag", "tame_putdown_flag", "anaphora_rate", "modifier_de_per_100",
+        "stanza_length_cv", "hapax_ratio", "function_char_ratio", "stanza_return_rate",
     }
     for feat in all_keys:
         vals = sorted(float(sp[feat]) for sp in stylo_profiles)
@@ -405,6 +428,7 @@ def _anti_slop_diagnostics(gen_text: str, gen_stylo: dict, bands: dict) -> dict:
         numbered_heads = sum(
             1 for s in stz if s and re.match(r"^第[一二三四五六七八九十\d]+", s[0])
         )
+        head_clone_rate = float(gen_stylo.get("stanza_head_clone_rate", 0.0))
         if vocative_heads >= 3 or numbered_heads >= 3:
             penalty += 0.10
             flags.append({
@@ -412,6 +436,106 @@ def _anti_slop_diagnostics(gen_text: str, gen_stylo: dict, bands: dict) -> dict:
                 "detail": "至少三节首行机械套用同一呼告或编号填空模板",
                 "penalty": 10.0,
             })
+        elif head_clone_rate >= 0.50:
+            p = min(0.10, 0.05 + (head_clone_rate - 0.50) * 0.10)
+            penalty += p
+            flags.append({
+                "code": "stanza_head_template_cloning",
+                "detail": f"至少三节首行使用同一前导词顶格领起（同头克隆率 {head_clone_rate:.2f}），位置缺乏错落变奏",
+                "penalty": round(p * 100.0, 3),
+            })
+
+    space_cap = max(0.50, bands["mid_line_space_rate"]["p90"] + 0.06)
+    if gen_stylo.get("mid_line_space_rate", 0.0) > space_cap:
+        p = min(0.10, (gen_stylo["mid_line_space_rate"] - space_cap) * 0.28)
+        penalty += p
+        flags.append({
+            "code": "telegraph_mid_line_spacing",
+            "detail": f"行内空格断句率 {gen_stylo['mid_line_space_rate']:.2f} 过高（参考上界 {space_cap:.2f}），流于逐行劈半的碎电报体",
+            "penalty": round(p * 100.0, 3),
+        })
+
+    comma_cap = max(0.42, bands["comma_per_line"]["p90"] + 0.08)
+    if gen_stylo.get("comma_per_line", 0.0) > comma_cap:
+        p = min(0.11, (gen_stylo["comma_per_line"] - comma_cap) * 0.22)
+        penalty += p
+        flags.append({
+            "code": "mid_line_prose_commas",
+            "detail": f"每行逗号数 {gen_stylo['comma_per_line']:.2f} 过高（参考上界 {comma_cap:.2f}），退化为行内带逗的日常散文分句",
+            "penalty": round(p * 100.0, 3),
+        })
+
+    if (
+        gen_stylo.get("stanza_count", 1) >= 3
+        and gen_stylo.get("core_motif_span", 1.0) < 0.42
+        and gen_stylo.get("core_lexical_focus", 1.0) < 0.10
+    ):
+        p = min(0.09, 0.04 + (0.42 - gen_stylo["core_motif_span"]) * 0.25)
+        penalty += p
+        flags.append({
+            "code": "core_motif_dispersion",
+            "detail": (
+                f"主核意象跨节贯通率仅 {gen_stylo['core_motif_span']:.2f} 且核心实字凝聚度 {gen_stylo['core_lexical_focus']:.2f} 偏散，"
+                "各节更换外围道具而缺乏贯穿全篇的唯一诗核"
+            ),
+            "penalty": round(p * 100.0, 3),
+        })
+
+    sim_stz_rate = float(gen_stylo.get("simile_stanza_rate", 0.0))
+    sim_cap = max(0.85, bands["simile_per_100"]["p90"] + 0.35)
+    if (gen_stylo.get("stanza_count", 1) >= 2 and sim_stz_rate >= 0.50) or gen_stylo["simile_per_100"] > sim_cap:
+        p = min(0.10, max(0.04, (sim_stz_rate - 0.30) * 0.16, (gen_stylo["simile_per_100"] - sim_cap) * 0.06))
+        penalty += p
+        flags.append({
+            "code": "scattered_simile_drift",
+            "detail": (
+                f"贴喻节率 {sim_stz_rate:.2f}（明喻 {gen_stylo['simile_per_100']:.2f}/百字）偏高，"
+                "靠多节‘像……’更换散珠比喻代替唯一本体诗核"
+            ),
+            "penalty": round(p * 100.0, 3),
+        })
+
+    if gen_stylo.get("tame_putdown_flag", 0):
+        penalty += 0.05
+        flags.append({
+            "code": "tame_putdown_closure",
+            "detail": "结尾套用‘轻轻合上/放进抽屉/弯腰捡起/捏着’等万能轻放动作安全退场，回避诗核刺破与决断",
+            "penalty": 5.0,
+        })
+
+    body_cap = max(5.2, bands["body_per_100"]["p90"] + 1.4)
+    if (
+        gen_stylo.get("body_per_100", 0.0) > body_cap
+        and gen_stylo.get("vital_affect_per_100", 0.0) < 0.8
+        and gen_stylo.get("abstract_per_100", 0.0) < 0.5
+    ):
+        p = min(0.08, 0.03 + (gen_stylo["body_per_100"] - body_cap) * 0.025)
+        penalty += p
+        flags.append({
+            "code": "cold_anatomical_inventory",
+            "detail": (
+                f"身体器官词密度 {gen_stylo['body_per_100']:.2f}/百字 超过参考上界 {body_cap:.2f} "
+                f"且赤诚情感/生命直陈词近乎清零（{gen_stylo.get('vital_affect_per_100', 0.0):.2f}/百字），流于有物无情的冷硬词壳清点"
+            ),
+            "penalty": round(p * 100.0, 3),
+        })
+
+    if gen_stylo.get("net_cliche_per_100", 0.0) > 0:
+        p = min(0.08, gen_stylo["net_cliche_per_100"] * 0.04)
+        penalty += p
+        flags.append({
+            "code": "net_lyric_cliche",
+            "detail": f"出现当代网文抒情套话词（{gen_stylo['net_cliche_per_100']:.2f}/百字）",
+            "penalty": round(p * 100.0, 3),
+        })
+
+    if gen_stylo.get("simile_ending_flag", 0) and bands["simile_ending_flag"]["p90"] == 0:
+        penalty += 0.04
+        flags.append({
+            "code": "simile_ending",
+            "detail": "末行以明喻收尾封死余响（参考诗末行零明喻）",
+            "penalty": 4.0,
+        })
 
     conn_cap = max(1.4, bands["connective_per_100"]["p90"] * 1.35)
     if gen_stylo["connective_per_100"] > conn_cap:
@@ -423,22 +547,12 @@ def _anti_slop_diagnostics(gen_text: str, gen_stylo: dict, bands: dict) -> dict:
             "penalty": round(p * 100.0, 3),
         })
 
-    sim_cap = max(2.0, bands["simile_per_100"]["p90"] + 1.2)
-    if gen_stylo["simile_per_100"] > sim_cap:
-        p = min(0.08, (gen_stylo["simile_per_100"] - sim_cap) * 0.05)
-        penalty += p
-        flags.append({
-            "code": "simile_overuse",
-            "detail": f"明喻标记 {gen_stylo['simile_per_100']:.2f}/百字 偏密",
-            "penalty": round(p * 100.0, 3),
-        })
-
-    if gen_stylo["line_count"] >= 8 and gen_stylo["line_length_cv"] < 0.16 and bands["line_length_cv"]["median"] > 0.25:
-        p = min(0.08, (0.16 - gen_stylo["line_length_cv"]) * 0.6)
+    if gen_stylo["line_count"] >= 8 and gen_stylo["line_length_cv"] < 0.20 and bands["line_length_cv"]["median"] > 0.25:
+        p = min(0.09, (0.20 - gen_stylo["line_length_cv"]) * 0.65)
         penalty += p
         flags.append({
             "code": "uniform_line_lengths",
-            "detail": f"行长变异系数 {gen_stylo['line_length_cv']:.2f} 过平，缺少长短句呼吸对比",
+            "detail": f"行长变异系数 {gen_stylo['line_length_cv']:.2f} 过平，缺少奔涌长句与陡峭短行的呼吸对比",
             "penalty": round(p * 100.0, 3),
         })
 
@@ -509,8 +623,8 @@ def style_similarity(generated_text: str, reference_texts: list[str]) -> dict:
         "band_components": band_components,
         "per_reference": rows,
         "mean_components": mean_components,
-        "feature_schema": "rpe-poetry-style-v3",
-        "notes": "满分100；综合语料分位带对齐(0.52)、字符1-2gram TF-IDF词域共鸣(0.26)、逐篇结构特征(0.22)并扣除机械套路惩罚。",
+        "feature_schema": FEATURE_SCHEMA,
+        "notes": "满分100；v6聚焦诗核贯通与刀锋骨力：语料分位带对齐(0.52：含主核意象跨节贯通率core_motif_span、核心实字凝聚度core_lexical_focus、长短句落差、零行内散文逗号与零贴喻漂移)、字符1-2gram TF-IDF共鸣(0.26)、逐篇结构特征(0.22)，并严惩散珠贴喻、无核漂移、行内逗号散文化及套路轻放收尾。",
     }
 
 
@@ -521,11 +635,14 @@ def corpus_stylometry_summary(reference_texts: list[str]) -> dict:
     model = _build_reference_model(tuple(reference_texts))
     bands = model["bands"]
     selected = (
-        "median_line_length", "line_length_cv", "short_line_rate",
-        "unpunctuated_break_rate", "line_end_punct_rate",
-        "repetition_ratio", "stanza_return_rate", "anaphora_rate",
-        "function_char_ratio", "pronoun_per_100", "abstract_per_100",
-        "connective_per_100", "simile_per_100",
+        "core_motif_span", "core_lexical_focus",
+        "median_line_length", "line_length_cv", "clause_length_cv", "short_line_rate",
+        "unpunctuated_break_rate", "line_end_punct_rate", "comma_per_line", "mid_line_space_rate",
+        "repetition_ratio", "stanza_return_rate", "first_last_return",
+        "anaphora_rate", "function_char_ratio", "copula_per_100",
+        "body_per_100", "primal_per_100", "pronoun_per_100",
+        "vital_affect_per_100", "abstract_per_100", "connective_per_100",
+        "simile_per_100", "simile_stanza_rate",
     )
     return {
         key: {

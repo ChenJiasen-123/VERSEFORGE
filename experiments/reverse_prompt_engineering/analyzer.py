@@ -19,10 +19,14 @@ ANALYZER_SYSTEM = """你是比较诗学的细读者与提示词诊断专家。�
 你的任务是结合文本细读与定量诊断，精准定位“为什么当前生成诗还不够像参考诗，或哪里写成了僵硬的规则练习作”，并审查 Prompt 本身的病因。不要猜测作者身份。
 
 请重点检查：
-1. 已经自然复现的风格特征。
-2. 得分偏低或尚未复现的核心维度（尤其关注：无标点呼吸分行、长短句张力、质朴而有重量的词域、原初元素/时间生命尺度与日常物件的碰撞、赤诚呼告与变奏回返）。
-3. 生成诗暴露出的“AI 规则套路病”：如行末句句加标点像散文、多节死板套同一呼告填空句式、清点琐碎工业零件而无精神开阔度、滥用解释性连词或明喻。
-4. Prompt 病因审查：哪些条款无效、含糊、互相冲突、规定过死（导致填空模板化），或冗余膨胀。
+1. 已经自然复现的风格特征（尤其是无标点刀锋骨力与重物象变形）。
+2. 核心短板“诗核缺失（poetic_core）”的四大病灶：
+   - 散珠无绳：每节换一套“像……”明喻或外围喻体（如一会儿像河、一会儿像土、一会儿像线头），全篇缺少唯一贯穿到底的主意象轴与核心悖论；
+   - 同心圆平铺与轻放退场：四节绕着题目物件换角度描摹，中后段缺少刺破表象的认知翻转/重锤决断，结尾套用“轻轻合上/放进抽屉/锁车门/弯腰捡起”安全退场；
+   - 虚假呼告：在无人物铺垫的器物/场景题里强行生造面目模糊的“你”凑深情；
+   - 散文化或电报体失衡：要么行内加逗号退化成温吞日常口语流水句，要么逐行空格硬劈成等长两半。
+3. Prompt 病因审查：哪些条款只管局部造句却没要求确立唯一诗核与破壁点、哪些条款强制呼告诱发虚假“你”、哪些“安静回到小动作”条款导致千篇一律轻放结尾。
+4. 给出 3—5 条高优先级、可直接转化为“替换/删减/精炼 Prompt”的修改建议（严禁建议写后自检计数或硬编码全诗总行/总节数）。
 5. 给出 3—5 条高优先级、可直接转化为“替换/删减/精炼 Prompt”的修改建议（优先删改僵硬配额，不要建议增加写后计数自检，也不要建议规定全诗总行数/总节数）。
 
 证据规则：
@@ -72,8 +76,6 @@ def _evaluation_digest(evaluation: dict) -> dict:
     dim_means = {}
     weak_notes = {}
     for dim in STYLE_DIMENSIONS:
-        if dim == "progression":
-            continue
         scores = [
             item["judge"]["dimensions"][dim]["score"]
             for item in ok_rows if "judge" in item and dim in item["judge"].get("dimensions", {})
@@ -147,8 +149,9 @@ def analyze_candidate(llm, config, candidate, evaluation, selection):
         "evaluation_digest": _evaluation_digest(evaluation),
         "generated_poems": generated,
         "analysis_dimensions": [
-            "lexical", "syntax", "lineation", "imagery", "emotion", "structure",
-            "mythic_register", "repetition", "prompt_instruction_quality", "topic_overreliance",
+            "poetic_core", "lexical", "syntax", "lineation", "imagery", "emotion",
+            "structure", "progression", "concreteness", "mythic_register", "repetition",
+            "addressivity", "closure", "prompt_instruction_quality", "topic_overreliance",
         ],
         "output_schema": "见系统消息",
     }
@@ -161,7 +164,7 @@ def analyze_candidate(llm, config, candidate, evaluation, selection):
             temperature=config["population"]["analysis_temperature"],
             thinking=config["population"].get("thinking"),
             validator=validate_analysis,
-            cache_variant=f"{candidate['id']}:analysis:v3",
+            cache_variant=f"{candidate['id']}:analysis:v6",
         )
         data["analysis_model"] = meta.get("model")
         data["analysis_meta"] = meta

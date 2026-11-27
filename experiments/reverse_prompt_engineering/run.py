@@ -54,9 +54,12 @@ def estimate_experiment(config, selection):
     confirm_calls = est_confirmed_candidates * T * confirm_reps * 2
     bench_enabled = bool(config["benchmark"]["enabled"])
     bench_calls = (1 + 3 * Tt * Rt * 2) if bench_enabled else 0
-    init_calls = m * (1 + 2 * T * R)
+    is_seeded = bool(config["population"].get("seed_prompts_path"))
+    init_prompt_calls = 0 if is_seeded else m
+    init_calls = init_prompt_calls + m * (2 * T * R)
+    pairwise_calls = (k + 1) * 2 * min(T, int(config["evaluation"].get("pairwise_max_pairs", 7)))
     per_gen_calls = m * (2 + 2 * T * R) + x * (1 + 2 * T * R)
-    expected_calls = init_calls + k * per_gen_calls + confirm_calls + bench_calls
+    expected_calls = init_calls + k * per_gen_calls + confirm_calls + pairwise_calls + bench_calls
 
     ref_chars = sum(len(p["text"]) for p in selection["references"])
     test_ref_chars = sum(len(p["text"]) for p in selection["held_out"])
@@ -288,6 +291,7 @@ def main(argv=None):
     parser.add_argument("--generations", type=int, help="覆盖 population.generations")
     parser.add_argument("--population-size", type=int, help="覆盖 population.size")
     parser.add_argument("--seed", type=int, help="覆盖 experiment.seed")
+    parser.add_argument("--seed-from", help="从已有 final_population.json 或种子列表热启动初始种群")
     parser.add_argument("--output-root", help="覆盖 experiment.output_root")
     args = parser.parse_args(argv)
 
@@ -303,6 +307,8 @@ def main(argv=None):
             config["population"]["size"] = args.population_size
         if args.seed is not None:
             config["experiment"]["seed"] = args.seed
+        if args.seed_from is not None:
+            config["population"]["seed_prompts_path"] = args.seed_from
         if args.output_root is not None:
             config["experiment"]["output_root"] = args.output_root
         from experiments.reverse_prompt_engineering.config import validate_config

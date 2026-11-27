@@ -1,10 +1,10 @@
-# RPE-GA 中文诗歌逆向提示词实验配置（v3：经语料审计的分布指标 + 独立 Judge + 受控交叉与精简约束）
+# RPE-GA 中文诗歌逆向提示词实验配置（v6：锻造唯一“诗核”主轴与中后段破壁力 + 严禁散珠贴喻/散文逗号/虚假呼告/轻放退场）
 experiment:
   name: haizi-rpe-ga
-  seed: 20261126
+  seed: 20261129
   output_root: experiments/reverse_prompt_engineering/runs
   language: zh
-  notes: "v3：语料分位带+TF-IDF+反套路确定性指标；deepseek-chat独立匿名评审；数据锚定初始化、诊断驱动变异、精英语义交叉、种群去克隆与轮内双样本确认。"
+  notes: "v6：升级rpe-poetry-style-v6（新增主核意象跨节贯通率core_motif_span、核心实字凝聚度core_lexical_focus、贴喻节率simile_stanza_rate、行内逗号防散文化comma_per_line与套路轻放收尾惩罚tame_putdown_closure，下调反转噪声mid_stanza_novelty至0.01）+ rpe-poetry-zh-v5（新增首位核心维度poetic_core权重0.18，下调addressivity至0.02遏制虚假呼告）。"
 
 corpus:
   path: var/haizi/corpus.jsonl
@@ -29,7 +29,7 @@ topics:
       topic: 深夜医院走廊尽头的自动售货机
       genre: modern
       max_lines: 20
-      requirements: "12—20行，分2—4节；每节1—6行；写深夜、机器与人的疲惫；不得出现任何诗人姓名。"
+      requirements: "12—20行，分2—4节；每节1—6行；写深夜陪护人、机器与漫长守候；不得出现任何诗人姓名。"
     - id: opt-02
       topic: 洪水退去后的乡村小学操场
       genre: modern
@@ -41,15 +41,30 @@ topics:
       max_lines: 20
       requirements: "12—20行，分2—4节；每节1—6行；写夜班工人、江水与城市灯光；不得出现任何诗人姓名。"
     - id: opt-04
-      topic: 凌晨四点的农产品批发市场
+      topic: 拆迁街区最后一家亮灯的理发店
       genre: modern
       max_lines: 20
-      requirements: "12—20行，分2—4节；每节1—6行；写夜班搬运、湿冷地面与城市将醒；不得出现任何诗人姓名。"
+      requirements: "12—20行，分2—4节；每节1—6行；写旧镜子、热水与夜晚来客；不得出现任何诗人姓名。"
     - id: opt-05
-      topic: 沙漠公路旁的废弃加油站
+      topic: 冬夜给远方亲人写一封不会寄出的信
       genre: modern
       max_lines: 20
-      requirements: "12—20行，分2—4节；每节1—6行；写风沙、铁皮棚与过路人的短暂停留；不得出现任何诗人姓名。"
+      requirements: "12—20行，分2—4节；每节1—6行；写出切肤思念与克制或炽热的呼唤；不得出现任何诗人姓名。"
+    - id: opt-06
+      topic: 深夜醒来突然意识到父母与自己都已不再年轻
+      genre: modern
+      max_lines: 20
+      requirements: "12—20行，分2—4节；每节1—6行；写时间重量、亲缘痛感与生命直视；不得出现任何诗人姓名。"
+    - id: opt-07
+      topic: 列车驶过故乡小站却没有下车的夜晚
+      genre: modern
+      max_lines: 20
+      requirements: "12—20行，分2—4节；每节1—6行；写窗外灯火、擦肩而过的土地与无法回头的怅痛；不得出现任何诗人姓名。"
+    - id: opt-08
+      topic: 大风天在路口与深爱的人道别，把祝福咽回心里
+      genre: modern
+      max_lines: 20
+      requirements: "12—20行，分2—4节；每节1—6行；写风中的告别、未说出口的话与滚烫心声；不得出现任何诗人姓名。"
   test:
     - id: test-01
       topic: 搬家日留下的空房间
@@ -62,42 +77,42 @@ topics:
       max_lines: 20
       requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
     - id: test-03
-      topic: 旧火车站行李寄存处的雨伞
-      genre: modern
-      max_lines: 20
-      requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
-    - id: test-04
-      topic: 城市天台上的小型菜园
-      genre: modern
-      max_lines: 20
-      requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
-    - id: test-05
-      topic: 河滩上被风吹走的帐篷
-      genre: modern
-      max_lines: 20
-      requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
-    - id: test-06
       topic: 海边灯塔的最后一位守塔人
       genre: modern
       max_lines: 20
       requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
-    - id: test-07
-      topic: 老式电影院散场后的放映室
-      genre: modern
-      max_lines: 20
-      requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
-    - id: test-08
+    - id: test-04
       topic: 雪后山村的有线广播站
       genre: modern
       max_lines: 20
       requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+    - id: test-05
+      topic: 水库泄洪前夜的观测站
+      genre: modern
+      max_lines: 20
+      requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+    - id: test-06
+      topic: 除夕夜独自守着一桌热饭等待迟迟未归的人
+      genre: modern
+      max_lines: 20
+      requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+    - id: test-07
+      topic: 整理逝去长辈留下的旧工具箱，在铁锈里认出他的一生
+      genre: modern
+      max_lines: 20
+      requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+    - id: test-08
+      topic: 写给多年未见、如今各自沉默在人海里的旧友
+      genre: modern
+      max_lines: 20
+      requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
     - id: test-09
-      topic: 城市地下通道里的修鞋摊
+      topic: 重病初愈后第一次走出病房晒到春天的太阳
       genre: modern
       max_lines: 20
       requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
     - id: test-10
-      topic: 水库泄洪前夜的观测站
+      topic: 失败后独自在夜路行走，对黑夜说出活下去的愿望
       genre: modern
       max_lines: 20
       requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
@@ -139,26 +154,30 @@ evaluation:
   judge_temperature: 0.0
   judge_max_tokens: 3800
   judge_thinking: disabled
-  rubric_version: rpe-poetry-zh-v2
-  deterministic_style_weight: 0.40
-  judge_style_weight: 0.60
+  rubric_version: rpe-poetry-zh-v5
+  deterministic_style_weight: 0.42
+  judge_style_weight: 0.58
   quality_weight: 0.15
-  prompt_length_free: 480
+  prompt_length_free: 520
   prompt_length_penalty_per_100_chars: 3.0
   prompt_length_penalty_max: 8.0
   style_dimension_weights:
-    progression: 0.00
-    imagery: 0.14
-    emotion: 0.13
-    lexical: 0.12
-    syntax: 0.11
+    poetic_core: 0.18
+    imagery: 0.12
+    emotion: 0.11
     lineation: 0.11
-    mythic_register: 0.09
-    structure: 0.09
-    repetition: 0.07
-    closure: 0.06
-    addressivity: 0.04
-    concreteness: 0.04
+    syntax: 0.09
+    progression: 0.09
+    lexical: 0.08
+    mythic_register: 0.07
+    structure: 0.05
+    closure: 0.04
+    repetition: 0.03
+    addressivity: 0.02
+    concreteness: 0.01
+  pairwise_tiebreak_margin: 2.5
+  pairwise_max_pairs: 7
+  pairwise_bonus_cap: 1.2
   topic_threshold: 3.0
   originality_threshold: 3.0
   quality_floor: 2.0

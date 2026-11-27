@@ -1,8 +1,13 @@
 # RPE-GA 中文诗歌逆向提示词工程实验
 
-这是一个**独立**的实验模块，位于 `experiments/reverse_prompt_engineering/`，不改变 VERSEFORGE 原有的诗歌创作工作流。
+这里有两项中文诗歌提示词实验，都用遗传算法生成、评估和选择候选。创作台可分别启用扩写提示词与风格提示词。
 
-目标：给定一组真实诗人的参考作品，通过实际生成实验搜索一份可复用的自然语言 **Style Prompt**，使 DeepSeek 在**新的创作题目**下写出在语言组织、句法、分行节奏、意象修辞、情感表达和篇章结构上接近参考作品的诗。
+| 实验 | 遗传算法优化什么 | 留出集如何比较 |
+|---|---|---|
+| Step 2 题目扩写 | 把题目转成构思，确定物象切口、尺度、发话位置和转折。评价依据是按该构思写出的诗。 | 固定归档的 v4 写诗提示词。比较原生简报首选方向、一次反推扩写、GA 扩写，每组每次生成一首。工作台另有多方向选稿流程。 |
+| Step 3 写诗风格 | 控制用词、句法、分行、情感和篇章推进。v5 加重情感维度，并检查行内空格和长短行变化。 | 在相同测试题下比较直接点名模仿、一次反推风格、GA 风格。先比合格率，再比合格作品的平均风格分。 |
+
+两项实验各自输出一份提示词和一组留出对照。两份提示词组合后的工作台表现需要单独测量。
 
 > 这不是恢复诗人的真实创作指令，也不训练/微调任何模型。它寻找的是“具有相似风格控制效果的 Prompt”。
 
@@ -59,6 +64,15 @@ var/haizi/corpus.jsonl
 ## 3. 快速开始
 
 在仓库根目录运行：
+
+2026-11-27 两个真实实验的续跑命令如下。风格实验沿用首次运行的四代配置和种子；扩写实验使用归档的 v4 写诗提示词与 v5 评分。此前扩写目录 `live-haizi-expand-v1-01` 中的评估采用 v4 评分。新目录复用了请求内容、模型和采样参数均相同的缓存响应，重新计算候选得分。
+
+```powershell
+python -m experiments.reverse_prompt_engineering.run --mode live --authorize-spend --resume --run-id live-haizi-v5-emotion-01 --generations 4 --seed-from experiments/reverse_prompt_engineering/seeds_v5.json
+python -m experiments.reverse_prompt_engineering.expansion_ga --mode live --resume --run-id live-haizi-expand-v1-v5score-01
+```
+
+风格实验从保存的状态继续。扩写实验按原配置从初始化开始重放，命中缓存的请求免去再次调用；每次新增调用记录在对应目录的 `ledger.jsonl`。
 
 ```powershell
 # 1) 只估算调用次数与 token，不联网

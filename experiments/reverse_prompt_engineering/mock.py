@@ -88,6 +88,90 @@ class MockRPELLM:
             data = self._mutation_payload(payload, seed)
         elif kind == "rpe_crossover_prompt":
             data = self._crossover_payload(payload, seed)
+        elif kind == "rpe_pairwise_poem":
+            p1 = (payload.get("poem_1") or {}).get("text", "")
+            p2 = (payload.get("poem_2") or {}).get("text", "")
+            h1, h2 = _h("pw", p1), _h("pw", p2)
+            winner = "tie" if h1 == h2 else ("1" if h1 > h2 else "2")
+            data = {
+                "winner": winner,
+                "confidence": "medium",
+                "evidence_1": p1.splitlines()[0] if p1.splitlines() else "",
+                "evidence_2": p2.splitlines()[0] if p2.splitlines() else "",
+                "rationale": "Mock 双盲成对比较：基于文本稳定哈希裁定，保证交换顺序完全对称。",
+                "mock": True,
+            }
+        elif kind == "rpe_scene_grounding":
+            topic = str(payload.get("user_input") or "无题")
+            data = {
+                "starting_element": f"{topic[:6]}前的冷木门与掌心盐粒",
+                "primal_tension": "将眼前微小触感直接推入黑夜与大地的沉重尺度",
+                "speaker_stance": "第一人称直呼黑夜与自己，赤诚克制",
+                "progression_seed": "由静默守候转向直面远方与黎明",
+                "avoid_traps": "不写日常琐事流水账与廉价明喻",
+            }
+        elif kind in ("rpe_mutate_scene_grounding", "rpe_crossover_scene_grounding"):
+            base = str(payload.get("parent_prompt") or (payload.get("parent_a") or {}).get("prompt") or "").strip()
+            suffix = f"\n5. 强化时间纵深与身体承重，变体{seed % 11 + 1}，绝不编造日常琐碎因果链。"
+            prompt = (base[:360] + suffix) if base else (
+                "你是前置诗学立意器：\n1. 只取一件素朴实物与身体触感起跳。\n"
+                "2. 直接接入黑夜、大地与时间纵深。\n3. 设定第一人称赤诚呼告位置。\n"
+                f"4. 拒绝琐碎生活故事脚本，保留纵深推进空间（变体{seed % 11 + 1}）。"
+            )
+            data = {"prompt": prompt, "changes": [{"op": "adjust", "target": "尺度", "reason": "Mock"}], "summary": "Mock Step-2 变异"}
+        elif kind in ("rpe_init_expansion", "rpe_reverse_expansion_once"):
+            idx = int(payload.get("candidate_index") or 0)
+            prompt = (
+                "现代诗前置构思扩写原则（只管选物、尺度与关系，不涉语言排版）：\n"
+                f"1. 从题目核心经验里提取一件最质朴的基础实物或身体触感作为起跳切口（视角{idx + 1}）。\n"
+                "2. 立即建立该具身切口与黑夜、大地、水火、季节或生命时间纵深的悬殊对峙关系。\n"
+                "3. 确立第一人称赤诚直接的发话位置与可呼唤的他者或自然对象。\n"
+                "4. 给出中后段关系加深或视角沉降的方向势能，绝不编排买卖通勤等日常琐事因果流水账。\n"
+            )
+            data = {
+                "prompt": prompt,
+                "design_notes": "Mock 从参考诗世界建构归纳的扩写原则。",
+                "covered_dimensions": ["imagery", "mythic_register", "progression", "addressivity"],
+                "mock": True,
+            }
+        elif kind == "rpe_expand_topic":
+            topic = str(payload.get("topic") or "无题")
+            data = {
+                "entry_anchor": f"{topic[:6]}时刻掌心微凉的木门与灰",
+                "world_scale": "门内微弱呼吸与门外整片黑夜及大地纵深正面对峙",
+                "stance_and_relation": "第一人称在暗处直呼远方与未抵达的明天",
+                "arc_turn": "从独自静守转向推门承受时间与风的重量",
+                "avoid": "避开日常职场家务流水账与空泛哲理口号",
+            }
+        elif kind == "rpe_analyze_expansion":
+            data = self._analysis_payload(payload, seed)
+        elif kind == "rpe_mutate_expansion":
+            parent = str(payload.get("parent_prompt") or "").strip()
+            line4 = f"4. 强化时间折叠与身体承重，留出中后段尺度陡转余地（变体{seed % 9 + 1}），拒绝世俗故事链。"
+            prompt = re.sub(r"^4\..*$", line4, parent, count=1, flags=re.MULTILINE) if "4." in parent else (parent + "\n" + line4)
+            if prompt == parent:
+                prompt = parent + "\n5. 保持起跳切口素朴克制，避免堆砌杂乱场景。"
+            data = {
+                "prompt": prompt,
+                "changes": [{"op": "replace", "target": "第4条推进与留白", "reason": "Mock 扩写变异"}],
+                "preserved": ["素朴切口与原初尺度对峙"],
+                "summary": "Mock 扩写变异改进推进势能。",
+            }
+        elif kind == "rpe_crossover_expansion":
+            prompt = (
+                "现代诗前置构思融合原则：\n"
+                "1. 锁定单一素朴实物或身体触感起跳，剥离世俗生活琐事流水账。\n"
+                "2. 让微小切口直接对撞黑夜、大地、水火或一生的时间跨度。\n"
+                "3. 明确第一人称切近呼告的关系位置，使抽象情绪获得物理重量。\n"
+                f"4. 设定中后段视角陡转或安静回落的关系势能（融合变体{seed % 7 + 1}），不规定逐句剧情。\n"
+            )
+            data = {
+                "prompt": prompt,
+                "from_parent_a": ["素朴切口与尺度对峙"],
+                "from_parent_b": ["发话关系与转折势能"],
+                "resolved_conflicts": ["合并重复的反琐事条款"],
+                "summary": "Mock 扩写语义重组。",
+            }
         else:
             data = {"error": f"mock 未支持 kind={kind}"}
         content = json.dumps(data, ensure_ascii=False)
@@ -167,8 +251,9 @@ class MockRPELLM:
         evidence = lines[:2] or ["（无正文）"]
         dims = {}
         names = [
-            "lexical", "syntax", "lineation", "imagery", "emotion", "structure", "progression",
-            "concreteness", "repetition", "addressivity", "mythic_register", "closure",
+            "poetic_core", "lexical", "syntax", "lineation", "imagery", "emotion",
+            "structure", "progression", "concreteness", "repetition", "addressivity",
+            "mythic_register", "closure",
             "literary_quality", "topic_adherence", "originality",
         ]
         base = 3.2 + (seed % 12) / 10.0

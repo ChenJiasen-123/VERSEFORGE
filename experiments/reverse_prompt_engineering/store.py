@@ -125,6 +125,18 @@ def _render_live_block(run_dir: Path, state: dict) -> str:
     return "\n".join(lines)
 
 
+def _write_run_progress(run_dir: Path, block: str) -> Path:
+    """Persist one run's live report beside its state, without editing shared report content."""
+    run_dir = Path(run_dir)
+    path = run_dir / "live_progress.md"
+    title = f"# 实时进度：{run_dir.name}"
+    content = f"{title}\n\n> 本文件只记录此运行目录的进度。\n\n{block}\n"
+    tmp = path.with_suffix(".md.tmp")
+    tmp.write_text(content, encoding="utf-8")
+    tmp.replace(path)
+    return path
+
+
 class ExperimentStore:
     def __init__(self, run_dir, *, config, selection, topics, mode, resume=False):
         self.path = Path(run_dir)
@@ -196,18 +208,7 @@ class ExperimentStore:
         if self.is_mock:
             return
         try:
-            ea_path = self.path.resolve().parents[3] / "EAReport.md"
-            if not ea_path.exists():
-                return
-            body = ea_path.read_text(encoding="utf-8")
-            start = body.find(LIVE_START)
-            end = body.find(LIVE_END)
-            if start == -1 or end == -1 or end < start:
-                return
-            updated = body[:start] + _render_live_block(self.path, state) + body[end + len(LIVE_END):]
-            tmp = ea_path.with_suffix(".md.tmp")
-            tmp.write_text(updated, encoding="utf-8")
-            tmp.replace(ea_path)
+            _write_run_progress(self.path, _render_live_block(self.path, state))
         except OSError:
             pass
 

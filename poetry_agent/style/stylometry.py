@@ -21,7 +21,7 @@ import statistics
 import unicodedata
 from collections import Counter
 
-VERSION = "modern-stylometry-v1"
+VERSION = "modern-stylometry-v2"
 
 PUNCT = frozenset("，。！？；：、,.!?;:…—·-（）()《》〈〉“”‘’\"'")
 LINE_END_PUNCT = frozenset("，。！？；：、,.!?;:…—")
@@ -74,22 +74,53 @@ CONCRETE_CHARS = frozenset(
     "手眼耳鼻口舌唇齿肩背腰膝足身心衣鞋帽碗杯盘刀剑锤钉绳线布纸张笔书琴鼓钟桥街路巷场院田麦稻谷米豆菜果"
 )
 
+BODY_CHARS = frozenset(
+    "头额发眉眼目耳鼻口唇舌齿牙咽喉颈肩臂肘腕手掌指拳胸怀肋心肺肝胃腹腰背脊骨血肉皮肌腿膝脚足趾泪汗尸身躯体"
+)
+
+PRIMAL_CHARS = frozenset(
+    "天地日月星夜暗光火水海河江泪血雨雪风雷云山石土泥沙尘草木根花叶骨铁盐灰王神死生"
+)
+
+VITAL_AFFECT_WORDS = (
+    "姐姐", "弟弟", "母亲", "父亲", "兄弟", "姐妹", "亲人", "爱人", "人类",
+    "孤独", "悲伤", "痛苦", "幸福", "死亡", "生命", "命运", "思念", "怀念",
+    "自由", "灵魂", "青春", "远方", "故乡", "家乡", "安慰", "呜咽", "泪水",
+    "眼泪", "哭泣", "歌唱", "沉默", "荒凉", "疼痛", "热爱", "眷恋", "绝望",
+    "活着", "一生", "今夜", "惜别", "离别",
+)
+
+NET_CLICHE_WORDS = (
+    "流年", "治愈", "红尘", "烟火气", "岁月静好", "温柔以待",
+    "星河", "破碎感", "救赎", "氛围感", "宿命感", "双向奔赴",
+)
+
+TAME_PUTDOWN_RE = re.compile(
+    r"(?:弯腰|蹲下|轻轻合上|又轻轻合上|又放下|放回盘里|放进抽屉|锁上车门|系紧鞋带|捡起这|捏着一粒|一根根数完|贴回旧书)"
+)
+
 NUMERIC_FEATURES = (
     "line_count", "stanza_count", "mean_line_length", "median_line_length",
     "line_length_cv", "short_line_rate", "long_line_rate",
     "line_end_punct_rate", "line_end_comma_rate", "unpunctuated_break_rate",
+    "mid_line_space_rate",
     "line_start_function_rate", "line_end_function_rate",
     "char_ttr", "hapax_ratio", "repetition_ratio",
     "function_char_ratio", "pronoun_per_100", "abstract_per_100",
-    "generic_per_100", "connective_per_100", "question_rate", "exclaim_rate",
-    "imperative_rate", "copula_per_100", "simile_per_100",
+    "vital_affect_per_100",
+    "generic_per_100", "net_cliche_per_100", "connective_per_100",
+    "question_rate", "exclaim_rate",
+    "imperative_rate", "copula_per_100", "simile_per_100", "simile_stanza_rate",
     "punct_per_100", "comma_per_line", "dash_ellipsis_per_100",
     "clause_mean_length", "clause_length_cv",
     "stanza_length_cv", "repeated_line_rate", "anaphora_rate",
-    "stanza_return_rate", "first_last_return",
+    "stanza_return_rate", "first_last_return", "mid_stanza_novelty",
+    "core_motif_span", "core_lexical_focus",
+    "stanza_head_clone_rate",
     "modifier_de_per_100", "concrete_char_per_100",
+    "body_per_100", "primal_per_100",
     "last_line_length", "last_line_end_punct", "summary_ending_flag",
-    "simile_ending_flag",
+    "simile_ending_flag", "tame_putdown_flag",
 )
 
 FEATURE_LABELS = {
@@ -103,6 +134,7 @@ FEATURE_LABELS = {
     "line_end_punct_rate": "行末标点率",
     "line_end_comma_rate": "行末逗号/顿号率",
     "unpunctuated_break_rate": "无标点断行率",
+    "mid_line_space_rate": "行内空格顿挫率",
     "line_start_function_rate": "行首虚词率",
     "line_end_function_rate": "行末虚词率",
     "char_ttr": "字种比（TTR）",
@@ -111,29 +143,39 @@ FEATURE_LABELS = {
     "function_char_ratio": "虚词字占比",
     "pronoun_per_100": "代词/百字",
     "abstract_per_100": "抽象/情绪词/百字",
+    "vital_affect_per_100": "赤诚情感与亲缘生命词/百字",
     "generic_per_100": "通用抒情词/百字",
+    "net_cliche_per_100": "网文套话词/百字",
     "connective_per_100": "解释性连词/百字",
     "question_rate": "问句行率",
     "exclaim_rate": "感叹句行率",
     "imperative_rate": "祈使/呼告标记行率",
     "copula_per_100": "判断词“是”/百字",
     "simile_per_100": "明喻标记/百字",
+    "simile_stanza_rate": "贴喻漂移节率",
     "punct_per_100": "标点/百字",
     "comma_per_line": "每行逗号数",
     "dash_ellipsis_per_100": "破折号/省略号/百字",
-    "clause_mean_length": "分句平均长度",
-    "clause_length_cv": "分句长度变异系数",
+    "clause_mean_length": "分句平均长度（含空格停顿）",
+    "clause_length_cv": "分句长度变异系数（含空格停顿）",
     "stanza_length_cv": "节长变异系数",
     "repeated_line_rate": "重复行率",
     "anaphora_rate": "相邻行同头率",
     "stanza_return_rate": "相邻节字面回返率",
     "first_last_return": "首尾节字面回返率",
+    "mid_stanza_novelty": "后继节词域推进新颖率",
+    "core_motif_span": "主核意象跨节贯通率",
+    "core_lexical_focus": "核心实字凝聚度",
+    "stanza_head_clone_rate": "跨节首词同头克隆率",
     "modifier_de_per_100": "的/地/得/百字",
     "concrete_char_per_100": "具体字面词/百字",
+    "body_per_100": "身体触感词/百字",
+    "primal_per_100": "原初元素词/百字",
     "last_line_length": "末行长度",
     "last_line_end_punct": "末行有标点",
     "summary_ending_flag": "末行总结/判断标记",
     "simile_ending_flag": "末行明喻标记",
+    "tame_putdown_flag": "套路轻放收尾标记",
 }
 
 
@@ -190,7 +232,7 @@ def _jaccard(a: set[str], b: set[str]) -> float:
 
 
 def _clauses(text: str) -> list[str]:
-    chunks = re.split(r"[\n，。！？；：、,.!?;:…—·\-]+", text)
+    chunks = re.split(r"[\n\s，。！？；：、,.!?;:…—·\-]+", text)
     return [han_only(chunk) for chunk in chunks if han_only(chunk)]
 
 
@@ -212,6 +254,9 @@ def profile(text: str) -> dict:
     line_end_comma = sum(1 for line in lines if line and line[-1] in COMMA)
     unpunctuated_breaks = sum(
         1 for line in lines[:-1] if line and line[-1] not in LINE_END_PUNCT
+    )
+    mid_space_lines = sum(
+        1 for line in lines if re.search(r"[\u3400-\u9fff]\s+[\u3400-\u9fff]", line)
     )
     line_starts = [han_only(line)[:1] for line in han_lines if han_only(line)]
     line_ends = [han_only(line)[-1:] for line in han_lines if han_only(line)]
@@ -236,7 +281,74 @@ def profile(text: str) -> dict:
     ]
     first_last = _jaccard(_char_set("\n".join(stanza_rows[0])), _char_set("\n".join(stanza_rows[-1]))) if len(stanza_rows) > 1 else 0.0
 
+    # Order-sensitive stanza progression: consecutive new lexical introduction
+    if len(stanza_rows) >= 2:
+        prog_sets = [_char_set("\n".join(row)) for row in stanza_rows if _char_set("\n".join(row))]
+    elif len(han_lines) >= 2:
+        half = max(1, len(han_lines) // 2)
+        prog_sets = [set("".join(han_lines[:half])), set("".join(han_lines[half:]))]
+    else:
+        prog_sets = [_char_set(text)] if _char_set(text) else []
+    seen_chars: set[str] = set()
+    stanza_novelties = []
+    for cset in prog_sets:
+        if cset:
+            stanza_novelties.append(len(cset - seen_chars) / len(cset))
+            seen_chars |= cset
+    mid_stanza_novelty = statistics.mean(stanza_novelties[1:]) if len(stanza_novelties) > 1 else 0.65
+
+    # Punctuation-agnostic stanza-head prefix cloning (catches space-separated vocatives)
+    head_tokens = []
+    for row in stanza_rows:
+        if row:
+            first_seg = re.split(r"[\s，,。！？；：、—…]+", row[0].strip())[0]
+            prefix = han_only(first_seg)[:3]
+            if prefix:
+                head_tokens.append(prefix)
+    if len(head_tokens) >= 3:
+        top_head_count = Counter(head_tokens).most_common(1)[0][1]
+        stanza_head_clone_rate = (top_head_count - 1) / (len(head_tokens) - 1)
+    else:
+        stanza_head_clone_rate = 0.0
+
+    # Poetic Core features: cross-stanza content 2-gram persistence & content-char concentration
+    n_stz = max(1, len(stanza_rows))
+    stz_bigrams = []
+    for row in stanza_rows:
+        s_han = han_only("\n".join(row))
+        bgs = {
+            s_han[i:i + 2]
+            for i in range(max(0, len(s_han) - 1))
+            if s_han[i] not in FUNCTION_CHARS and s_han[i + 1] not in FUNCTION_CHARS
+        }
+        stz_bigrams.append(bgs)
+    bg_doc_freq = Counter(bg for bgs in stz_bigrams for bg in bgs)
+    if n_stz >= 2:
+        top2 = [v for _, v in bg_doc_freq.most_common(2)]
+        while len(top2) < 2:
+            top2.append(1)
+        core_motif_span = sum(top2) / (2 * n_stz)
+    else:
+        content_bgs = [
+            han[i:i + 2]
+            for i in range(max(0, len(han) - 1))
+            if han[i] not in FUNCTION_CHARS and han[i + 1] not in FUNCTION_CHARS
+        ]
+        bg_counts = Counter(content_bgs)
+        top2 = [min(3, v) for _, v in bg_counts.most_common(2)]
+        core_motif_span = sum(top2) / 6.0 if top2 else 0.0
+
+    content_chars = [c for c in han if c not in FUNCTION_CHARS]
+    content_counter = Counter(content_chars)
+    core_lexical_focus = sum(v for _, v in content_counter.most_common(3)) / max(1, len(content_chars))
+
+    simile_stanzas = sum(
+        1 for row in stanza_rows if any(m in "\n".join(row) for m in SIMILE_MARKERS)
+    )
+    simile_stanza_rate = _safe_div(simile_stanzas, n_stz) if stanza_rows else 0.0
+
     last_line = lines[-1] if lines else ""
+    tail_two = "\n".join(lines[-2:]) if lines else ""
     last_han = han_only(last_line)
     summary_ending = int(
         len(last_han) >= 4
@@ -244,6 +356,7 @@ def profile(text: str) -> dict:
         and not last_line[-1:] in {"？", "?"}
     )
     simile_ending = int(any(marker in last_line for marker in SIMILE_MARKERS))
+    tame_putdown = int(bool(TAME_PUTDOWN_RE.search(tail_two)))
 
     return {
         "line_count": line_count,
@@ -256,6 +369,7 @@ def profile(text: str) -> dict:
         "line_end_punct_rate": round(_safe_div(line_end_punct, line_count), 6),
         "line_end_comma_rate": round(_safe_div(line_end_comma, line_count), 6),
         "unpunctuated_break_rate": round(_safe_div(unpunctuated_breaks, max(1, line_count - 1)), 6),
+        "mid_line_space_rate": round(_safe_div(mid_space_lines, line_count), 6),
         "line_start_function_rate": round(_safe_div(sum(1 for c in line_starts if c in FUNCTION_CHARS), line_count), 6),
         "line_end_function_rate": round(_safe_div(sum(1 for c in line_ends if c in FUNCTION_CHARS), line_count), 6),
         "char_ttr": round(_safe_div(len(unigrams), total), 6),
@@ -264,13 +378,16 @@ def profile(text: str) -> dict:
         "function_char_ratio": round(_safe_div(sum(1 for c in han if c in FUNCTION_CHARS), total), 6),
         "pronoun_per_100": round(_safe_div(_count_terms(han, PRONOUNS), total) * 100, 6),
         "abstract_per_100": round(_safe_div(_count_terms(han, ABSTRACT_WORDS), total) * 100, 6),
+        "vital_affect_per_100": round(_safe_div(_count_terms(han, VITAL_AFFECT_WORDS), total) * 100, 6),
         "generic_per_100": round(_safe_div(_count_terms(han, GENERIC_WORDS), total) * 100, 6),
+        "net_cliche_per_100": round(_safe_div(_count_terms(han, NET_CLICHE_WORDS), total) * 100, 6),
         "connective_per_100": round(_safe_div(_count_terms(han, CONNECTIVES), total) * 100, 6),
         "question_rate": round(_safe_div(question_lines, line_count), 6),
         "exclaim_rate": round(_safe_div(exclaim_lines, line_count), 6),
         "imperative_rate": round(_safe_div(imperative_lines, line_count), 6),
         "copula_per_100": round(_safe_div(han.count("是"), total) * 100, 6),
         "simile_per_100": round(_safe_div(_count_terms(han, SIMILE_MARKERS), total) * 100, 6),
+        "simile_stanza_rate": round(simile_stanza_rate, 6),
         "punct_per_100": round(_safe_div(sum(1 for c in text if c in PUNCT or unicodedata.category(c).startswith("P")), total) * 100, 6),
         "comma_per_line": round(_safe_div(sum(1 for c in text if c in COMMA), line_count), 6),
         "dash_ellipsis_per_100": round(_safe_div(sum(1 for c in text if c in DASH_ELLIPSIS), total) * 100, 6),
@@ -281,12 +398,19 @@ def profile(text: str) -> dict:
         "anaphora_rate": round(_safe_div(anaphora, max(1, line_count - 1)), 6),
         "stanza_return_rate": round(statistics.mean(stanza_returns), 6) if stanza_returns else 0.0,
         "first_last_return": round(first_last, 6),
+        "mid_stanza_novelty": round(mid_stanza_novelty, 6),
+        "core_motif_span": round(core_motif_span, 6),
+        "core_lexical_focus": round(core_lexical_focus, 6),
+        "stanza_head_clone_rate": round(stanza_head_clone_rate, 6),
         "modifier_de_per_100": round(_safe_div(han.count("的") + han.count("地") + han.count("得"), total) * 100, 6),
         "concrete_char_per_100": round(_safe_div(sum(1 for c in han if c in CONCRETE_CHARS), total) * 100, 6),
+        "body_per_100": round(_safe_div(sum(1 for c in han if c in BODY_CHARS), total) * 100, 6),
+        "primal_per_100": round(_safe_div(sum(1 for c in han if c in PRIMAL_CHARS), total) * 100, 6),
         "last_line_length": len(last_han),
         "last_line_end_punct": int(bool(last_line) and last_line[-1] in LINE_END_PUNCT),
         "summary_ending_flag": summary_ending,
         "simile_ending_flag": simile_ending,
+        "tame_putdown_flag": tame_putdown,
     }
 
 

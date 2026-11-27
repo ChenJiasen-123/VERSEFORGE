@@ -4,6 +4,7 @@ import json
 import re
 import time
 from dataclasses import asdict, dataclass, field
+from pathlib import Path
 from .aesthetics import review, compare_bidirectional as compare, failure_code
 from .rhyme_data import qijue_evidence
 from .qijue_profiles import specification
@@ -72,7 +73,7 @@ class Poem:
     lines: list[str]
 
     @classmethod
-    def parse(cls, content: str):
+    def parse(cls, content: str, *, allow_stanza_breaks: bool = False):
         text = content.strip()
         if text.startswith("```"):
             text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text)
@@ -85,7 +86,24 @@ class Poem:
         title, lines = obj.get("title"), obj.get("lines")
         if not isinstance(title, str) or not title.strip() or "\n" in title:
             raise ValueError("模型输出缺少有效标题")
-        if not isinstance(lines, list) or not lines or any(
+        if not isinstance(lines, list) or not lines:
+            raise ValueError("模型输出须包含非空单行字符串数组lines")
+        if allow_stanza_breaks:
+            if any(not isinstance(line, str) or "\n" in line or "\r" in line for line in lines):
+                raise ValueError("模型输出须包含单行字符串数组lines")
+            normalized = []
+            for raw in lines:
+                s = raw.strip()
+                if s:
+                    normalized.append(s)
+                elif normalized and normalized[-1] != "":
+                    normalized.append("")
+            while normalized and normalized[-1] == "":
+                normalized.pop()
+            if not normalized:
+                raise ValueError("模型输出须包含非空单行字符串数组lines")
+            return cls(title.strip(), normalized)
+        if any(
             not isinstance(line, str) or not line.strip() or "\n" in line or "\r" in line for line in lines
         ):
             raise ValueError("模型输出须包含非空单行字符串数组lines")
@@ -96,8 +114,9 @@ def check(poem: Poem, task: Task) -> list[str]:
     issues = []
     body = "\n".join(poem.lines)
     if task.genre == "modern":
-        if len(poem.lines) > task.max_lines:
-            issues.append(f"正文{len(poem.lines)}行，超过{task.max_lines}行")
+        nonempty_count = sum(1 for line in poem.lines if line.strip())
+        if nonempty_count > task.max_lines:
+            issues.append(f"正文{nonempty_count}行，超过{task.max_lines}行")
     elif task.genre == 'ci':
         issues.extend(check_ci_shape(poem.lines, task.ci_profile))
         ci_report = ci_evidence(poem.lines, task.ci_profile)
@@ -229,7 +248,42 @@ def metrical_revision_feedback(poem, task):
             'instruction': 'P为平、Z为仄。failed是所选谱与当前资料下明确不符，修改时保护其他已通过位置并兼顾诗意。unknown仅表示缺字或读音、归部未决，不等于错字，不要为消除unknown而机械换字；不得自行选择合谱读音冒充语境核验。每稿仍须重新检查；不构成完整合律认证。'}
 
 
-def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision_scope='local', *, use_examples=False, generation_thinking=None, example_relations_only=False):
+OPTIMAL_STYLE_PROMPT_PATH = (
+    Path(__file__).resolve().parent.parent
+    / "experiments"
+    / "reverse_prompt_engineering"
+    / "optimal_style_prompt.txt"
+)
+
+OPTIMAL_EXPANSION_PROMPT_PATH = (
+    Path(__file__).resolve().parent.parent
+    / "experiments"
+    / "reverse_prompt_engineering"
+    / "optimal_expansion_prompt.txt"
+)
+
+
+def load_optimal_style_prompt(path: Path | None = None) -> str:
+    target = Path(path or OPTIMAL_STYLE_PROMPT_PATH)
+    return target.read_text(encoding="utf-8").strip()
+
+
+def load_optimal_expansion_prompt(path: Path | None = None) -> str:
+    target = Path(path or OPTIMAL_EXPANSION_PROMPT_PATH)
+    return target.read_text(encoding="utf-8").strip()
+
+
+def style_engine_system_prompt(style_prompt: str) -> str:
+    return (
+        SYSTEM
+        + "\n现代诗必须分节呼吸：节与节之间必须用独立的空字符串\"\"占一个lines数组元素表示空行（空字符串不计入正文行数上限；如题目要求分2—4节，绝不可把全诗连成单节）。\n\n"
+        + "【核心风格引擎指令（在不违背原题明示硬要求的前提下全程严格执行；不要解释或引用本风格指令）】\n"
+        + style_prompt.strip()
+        + "\n"
+    )
+
+
+def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision_scope='local', *, use_examples=False, generation_thinking=None, example_relations_only=False, style_prompt: str | None = None):
     if revision_scope not in ('local', 'rewrite'):
         raise ValueError('revision_scope须为local或rewrite')
     if type(max_revisions) is not int or not 0 <= max_revisions <= 2:
@@ -240,15 +294,19 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
         raise ValueError('审美示例实验仅支持启用审读规则的现代诗')
     if generation_thinking not in (None, 'enabled', 'disabled'):
         raise ValueError('生成思考模式须为enabled、disabled或不指定')
-    examples, examples_metadata = load_examples() if use_examples else (None, None)
+    use_rpe_style = bool(style_prompt and task.genre == 'modern')
+    examples, examples_metadata = (None, None) if use_rpe_style else (load_examples() if use_examples else (None, None))
     if examples is not None and example_relations_only:
         examples={'instruction':'学习关系的作用，不复刻数字、道具、动作链或结尾结构。',
                   'principles':['让动作的后果获得可经历的形态，而非用物件代换抽象名词。',
                                 '幽默可来自经验和自我评价错位，不必靠拟人或反转。',
                                 '声音可以参与邀请、等待和选择，不能只作气氛装饰。']}
         examples_metadata={**examples_metadata,'exposure':'relation_analysis_without_original_fragments'}
-    extra = MODERN_AESTHETIC if task.genre == 'modern' else CLASSICAL_AESTHETIC
-    system = SYSTEM + extra if aesthetic else SYSTEM
+    if use_rpe_style:
+        system = style_engine_system_prompt(style_prompt)
+    else:
+        extra = MODERN_AESTHETIC if task.genre == 'modern' else CLASSICAL_AESTHETIC
+        system = SYSTEM + extra if aesthetic else SYSTEM
     started = time.monotonic()
     history = []
     prior = None
@@ -280,14 +338,20 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
         scope_report = None
         transition = None
         try:
-            settings = {'thinking': generation_thinking} if generation_thinking is not None and not client.mock else {}
+            effective_thinking = generation_thinking if generation_thinking is not None else ('enabled' if use_rpe_style else None)
+            settings = {}
+            if not getattr(client, 'mock', False):
+                if effective_thinking is not None:
+                    settings['thinking'] = effective_thinking
+                if use_rpe_style and effective_thinking == 'enabled':
+                    settings['max_tokens'] = 65536
             response = client.complete(system, json.dumps(payload, ensure_ascii=False), timeout=remaining, **settings)
         except RuntimeError:
             if not history:
                 raise
             break
         try:
-            poem = Poem.parse(response["content"])
+            poem = Poem.parse(response["content"], allow_stanza_breaks=use_rpe_style)
             issues = check(poem, task)
             if prior and prior.get('draft'):
                 previous_evidence = _metrical_target_and_report(prior['draft'], task)
@@ -351,10 +415,10 @@ def compose(task, client, max_revisions=2, budget=120, aesthetic=False, revision
                 record['failure_code'] = failure_code(exc)
             comparisons.append(record)
     return {"task": asdict(task), "model": client.model,
-            "prompt_version": {'modern': 'modern-aesthetic-0.5', 'qijue': 'qijue-aesthetic-0.1', 'wujue': 'wujue-aesthetic-0.1', 'wulv': 'lushi-aesthetic-0.1', 'qilv': 'lushi-aesthetic-0.1', 'ci': 'ci-aesthetic-0.2'}[task.genre] if aesthetic else "2",
+            "prompt_version": "rpe-ga-v6-optimal" if use_rpe_style else ({'modern': 'modern-aesthetic-0.5', 'qijue': 'qijue-aesthetic-0.1', 'wujue': 'wujue-aesthetic-0.1', 'wulv': 'lushi-aesthetic-0.1', 'qilv': 'lushi-aesthetic-0.1', 'ci': 'ci-aesthetic-0.2'}[task.genre] if aesthetic else "2"),
             "aesthetic_experiment": aesthetic,
             'aesthetic_examples': examples_metadata,
-            'generation_thinking': generation_thinking or 'service_default',
+            'generation_thinking': (generation_thinking or ('enabled' if use_rpe_style else 'service_default')),
             "revision_scope": revision_scope,
             "mode": "mock" if client.mock else "live",
             "status": "constraints_passed" if best and not best["issues"] else "needs_review",

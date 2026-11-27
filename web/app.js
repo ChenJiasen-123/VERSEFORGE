@@ -30,7 +30,7 @@ function render(job) {
  const expOut=result.expansion_output;
  if (expOut && expOut.enabled && expOut.adopted_anchor) {
   $('expansion-card').hidden=false;
-  $('expansion-meta').textContent=`模型：${expOut.model || 'deepseek-flash'} · 采纳支点 #${(expOut.selected_index || 0)+1}`;
+  $('expansion-meta').textContent=`模型：${expOut.model || 'deepseek-reasoner'} · 采纳支点 #${(expOut.selected_index || 0)+1}`;
   const fields=[['起跳切口',expOut.adopted_anchor.entry_anchor],['尺度关系',expOut.adopted_anchor.world_scale],['发话姿态',expOut.adopted_anchor.stance_and_relation],['推进转折',expOut.adopted_anchor.arc_turn],['避俗边界',expOut.adopted_anchor.avoid]];
   const nodes=[];
   for (const [label,val] of fields) {
@@ -71,7 +71,7 @@ function render(job) {
    const ver=se.prompt_version || 'v6';
    const thinkTag=se.generation_thinking==='enabled'?' + Thinking':'';
    const polishTag=result.editorial?' · 自动打磨：开启':' · 自动打磨：关闭';
-   $('style-summary').textContent=`前置扩写：${expLabels[se.expansion_mode] || '开启 RPE-GA 诗学扩写'}${se.expansion_mode==='none'?'':`（${se.expansion_model || 'deepseek-flash'}）`} · 写诗引擎：RPE-GA ${ver}${thinkTag}（${se.prompt_id}）${polishTag} · 终稿风格分 ${fd.score.toFixed(2)} / 100`;
+   $('style-summary').textContent=`前置扩写：${expLabels[se.expansion_mode] || '开启 RPE-GA 诗学扩写'}${se.expansion_mode==='none'?'':`（${se.expansion_model || 'deepseek-reasoner'}）`} · 写诗引擎：RPE-GA ${ver}${thinkTag}（${se.prompt_id}）${polishTag} · 终稿风格分 ${fd.score.toFixed(2)} / 100`;
    const coreNote=fd.core_motif_span!=null?` · 主核贯通 ${(fd.core_motif_span*100).toFixed(0)}%`:'';
    const items=[
     `终稿结构与呼吸：${fd.stanza_count} 节 ${fd.line_count} 行 · 无标点断行率 ${(fd.unpunctuated_break_rate*100).toFixed(0)}% · 行内空格率 ${(fd.mid_line_space_rate*100).toFixed(0)}%${coreNote}`,
@@ -142,7 +142,7 @@ async function history() {
    const button=document.createElement('button');button.type='button';button.className='history-item';
    const title=document.createElement('strong');title.textContent=row.title || row.prompt.split('\n')[0].slice(0,42);
    const meta=document.createElement('span');meta.textContent=new Date(row.created*1000).toLocaleString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+' · '+(row.status==='completed'?'已保存':row.status==='failed'?'未完成':'创作中');
-   button.append(title,meta);button.addEventListener('click',async()=>{if(state.busy)return;error('');try {const job=await api('/api/jobs/'+row.id);$('prompt').value=job.prompt;$('genre').value=job.request?.genre || 'auto';$('expansion-mode').value=job.request?.expansion_mode==='none'?'none':'expand_v1';$('expansion-model').value=job.request?.expansion_model || 'default';syncExpansionField();$('style-mode').value=job.request?.style_mode || 'rpe_v4';$('auto-polish').value=job.request?.auto_polish==='off'?'off':'on';$('preference').value=job.request?.preference || '';count();if(job.status==='completed')render(job);else if(job.status==='failed')error(job.error);else {state.job=job.id;setBusy(true,job.status);poll(job.id);}}catch(e){error(e.message);}});$(target).append(button);
+   button.append(title,meta);button.addEventListener('click',async()=>{if(state.busy)return;error('');try {const job=await api('/api/jobs/'+row.id);$('prompt').value=job.prompt;$('genre').value=job.request?.genre || 'modern';$('expansion-mode').value=job.request?.expansion_mode==='none'?'none':'expand_v1';$('expansion-model').value=(job.request?.expansion_model==='default'?'deepseek-flash':job.request?.expansion_model) || 'deepseek-reasoner';syncExpansionField();$('style-mode').value=(job.request?.style_mode==='rpe_v4'?'rpe_v6':job.request?.style_mode) || 'rpe_v6';$('auto-polish').value=job.request?.auto_polish==='on'?'on':'off';$('preference').value=job.request?.preference || '';count();if(job.status==='completed')render(job);else if(job.status==='failed')error(job.error);else {state.job=job.id;setBusy(true,job.status);poll(job.id);}}catch(e){error(e.message);}});$(target).append(button);
   }
  }
 }

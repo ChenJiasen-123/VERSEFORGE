@@ -66,11 +66,11 @@ class Studio:
             self.update(identity, state)
         try:
             options = {
-                'independent_editor': data.get('auto_polish', 'on') == 'on',
+                'independent_editor': data.get('auto_polish', 'off') == 'on',
                 'candidate_count': 2,
-                'style_mode': data.get('style_mode', 'rpe_v4'),
+                'style_mode': data.get('style_mode', 'rpe_v6'),
                 'expansion_mode': data.get('expansion_mode', 'expand_v1'),
-                'expansion_model': data.get('expansion_model', 'default'),
+                'expansion_model': data.get('expansion_model', 'deepseek-reasoner'),
             } if self.runner is run_studio else {}
             result = self.runner(data['prompt'], data['genre'], data['preference'], data.get('previous'),
                                  progress=progress, **options)
@@ -189,11 +189,11 @@ class Handler(BaseHTTPRequestHandler):
             data = json.loads(raw_body)
             if not isinstance(data, dict):
                 raise ValueError()
-            prompt, genre, preference = data.get('prompt'), data.get('genre', 'auto'), data.get('preference', '')
-            style_mode = data.get('style_mode', 'rpe_v4')
+            prompt, genre, preference = data.get('prompt'), data.get('genre', 'modern'), data.get('preference', '')
+            style_mode = data.get('style_mode', 'rpe_v6')
             expansion_mode = data.get('expansion_mode', 'expand_v1')
-            expansion_model = data.get('expansion_model', 'default')
-            auto_polish = data.get('auto_polish', 'on')
+            expansion_model = data.get('expansion_model', 'deepseek-reasoner')
+            auto_polish = data.get('auto_polish', 'off')
             if not isinstance(prompt, str) or not 2 <= len(prompt.strip()) <= 10000 or not isinstance(preference, str) or len(preference) > 2000:
                 raise ValueError()
             if genre not in ('auto', 'modern', 'wujue', 'qijue', 'wulv', 'qilv', 'ci'):

@@ -21,7 +21,7 @@ def main():
   jobs += [{**j,'result_directory':str(raw/'jobs'/j['key'])} for j in r['jobs']]
   binding.update(arms=binding['arms']+['raw_classical_evolution'],jobs=jobs,
    role='four_arm_reading_union; raw route is a separate multi-change variant, not a genetic-operator ablation',
-   entry_source_sha256=r['entry_source_sha256'],linked_experiments=binding['linked_experiments']+[r['experiment_sha256']])
+   entry_source_sha256=r['entry_source_sha256'],poetics_sha256=r['poetics_sha256'],linked_experiments=binding['linked_experiments']+[r['experiment_sha256']])
  binding['experiment_sha256']=digest({k:v for k,v in binding.items() if k!='experiment_sha256'})
  a.out.mkdir(parents=True,exist_ok=True);path=a.out/'experiment-binding.json'
  if path.exists() and json.loads(path.read_text(encoding='utf-8'))!=binding:raise ValueError('union binding changed')

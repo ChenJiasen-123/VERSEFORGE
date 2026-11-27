@@ -1,7 +1,8 @@
 """Recompute mechanical consistency from actual saved poems, not report flags."""
 import argparse,json,sys
 from pathlib import Path
-from experiments.classical_evolution.engine import make_task,known_checks,gates
+from experiments.classical_evolution.engine import make_task,known_checks,eligible
+from experiments.classical_evolution.store import digest
 from experiments.classical_evolution.protocol import validate_reviews
 from poetry_agent.style.corpus import write as atomic_write
 
@@ -18,17 +19,29 @@ def audit(directory):
   task=make_task(topic)
   kernel_binding=json.loads((kernel/'binding.json').read_text(encoding='utf-8')) if (kernel/'binding.json').exists() else binding
   sources=kernel_binding.get('sources',{})
+  expected_sources={sid:b.get('sources',b.get('source_library',{}))[sid] for sid in topic['source_ids']}
+  if sources!=expected_sources:
+   violations.append({'job':j['key'],'issue':'source cards differ from registered library'})
   if raw:
    if binding.get('entry_source_sha256')!=b.get('entry_source_sha256'):
     violations.append({'job':j['key'],'issue':'mixed raw entry versions'})
+   if binding.get('source_library')!=b.get('sources',b.get('source_library')):
+    violations.append({'job':j['key'],'issue':'raw source library differs from registration'})
+   if b.get('poetics_sha256') and digest(binding.get('poetics_knowledge'))!=b['poetics_sha256']:
+    violations.append({'job':j['key'],'issue':'raw poetics differ from registration'})
    if r.get('selected') and (topic['task']['genre']!=gold['task']['genre'] or bool(topic.get('allusion_required'))!=bool(gold.get('allusion_required'))):
     violations.append({'job':j['key'],'issue':'raw interpretation differs from explicit gold genre/allusion constraint'})
   if binding['code_sha256']!=b['code_sha256']:violations.append({'job':j['key'],'issue':'mixed implementation versions'})
   ledger=json.loads((job/'call-ledger.json').read_text(encoding='utf-8'))
   if len(ledger)!=r['budget']['calls'] or len(ledger)>b['config']['max_calls']:
    violations.append({'job':j['key'],'issue':'call budget/count mismatch'})
+  if sum(int((row.get('usage') or {}).get('total_tokens') or 0) for row in ledger)!=r['budget']['tokens']:
+   violations.append({'job':j['key'],'issue':'known token count mismatch'})
   c=r.get('selected');mechanical=None
+  if not c and r.get('poem'):
+   violations.append({'job':j['key'],'issue':'output poem without selected qualified candidate'})
   if c:
+   if not eligible(c,topic):violations.append({'job':j['key'],'issue':'selected candidate fails saved eligibility gates'})
    mechanical=known_checks(c['poem'],task)
    if mechanical['hard_issues']:violations.append({'job':j['key'],'issue':'selected poem has known hard failures','details':mechanical['hard_issues']})
    if r['poem']!=c['poem']:violations.append({'job':j['key'],'issue':'selected/output poem mismatch'})

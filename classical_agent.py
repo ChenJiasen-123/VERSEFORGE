@@ -8,25 +8,42 @@ from poetry_agent.client import DeepSeekClient,load_env
 from poetry_agent.core import SYSTEM
 from poetry_agent.studio import interpret_modular
 from poetry_agent.requirement_checks import safe_review
-from experiments.classical_evolution.engine import ClassicalEvolution,DEFAULT_CONFIG,known_checks
+from experiments.classical_evolution.engine import ClassicalEvolution,DEFAULT_CONFIG,known_checks,eligible,rank_key
 from experiments.classical_evolution.protocol import validate_reviews
 from experiments.classical_evolution.store import RunStore,RecordedClient,code_digest,digest
 ROOT=Path(__file__).resolve().parent
-VERSION='raw-classical-agent-0.2'
+VERSION='raw-classical-agent-0.3'
+
+TASK_SEMANTICS='''
+解释原题时区分限制范围和逐项覆盖：“只能写其形、声、用、痕”规定允许的描写范围，不等于四项必须全部出现；原题明说逐项须有时才逐项核对。
+原题给定的人物关系也是阅读语境，不要求诗中复述身份标签；结合实际动作、称谓、语意与给定典源判断有无支持，不把“没有逐字说出身份”等同于违题。正文若与题定关系矛盾或没有支持，则如实指出。
+对面落笔、移情可以不用典源，不能因为没有典源就否定这些表达路径。用典仍只认给定已核材料及正文实际建立的对应，不自行补造出处。
+'''
+
+READER_CALIBRATION='''
+表达审读须区分“复述发生了什么”和“读出了怎样的体验、关系或判断”。古雅词汇、合题、物象数量本身不加表达分。
+expression：0=关系无法成立；1=大部分只将题面换成古语或堆叠景物，局部可取；2=正文建立可感的关系，多数句子共同起作用；3=表达集中准确，有自己的发现；4=关系与语言高度完成。
+progression看各句使经验如何变化、深入、受阻或回应，不把换地点、加景物本身当作推进。朴素喜悦、平稳展开、直抒和必要复沓都可能有效，不强制反转、冲突、故事或金句。
+diction看实际句法和语意搭配，压缩可以含蓄，但不能替生硬短语补造事件。指出具体原文的对象或语义问题；不要只说“略直、可更含蓄”，也不为解释清楚而要求改成白话。
+给experience、problem和suggestion填写上述实际阅读，而不是复述作者可能想写什么；评分可以低，不能为保证出稿把明显未成立处评过门槛。
+'''
 
 class NamedClient:
     def __init__(self,api,prefix,suffix=''):self.api,self.prefix,self.suffix=api,prefix,suffix;self.n=0;self.model=api.model;self.mock=api.mock
     def complete(self,system,user,**kw):
         self.n+=1
-        return self.api.call(f'{self.prefix}-{self.n:02d}',system+self.suffix,json.loads(user),
+        return self.api.call(f'{self.prefix}-{self.n:02d}',system+TASK_SEMANTICS+self.suffix,json.loads(user),
             thinking=kw.get('thinking') or 'disabled',max_tokens=min(kw.get('max_tokens',8192),16384))
 
 class KernelClient:
     def __init__(self,api,poetics=''):self.api=api;self.poetics=poetics;self.action=None;self.model=api.model;self.mock=api.mock
     def complete(self,system,user,**kw):
         if self.action is None:raise ValueError('missing kernel action identity')
+        system=TASK_SEMANTICS+system
         if self.action.startswith(('initial-plans','reviewed-plans','write-')):
             system=self.poetics+'\n'+system
+        elif self.action.startswith('read-'):
+            system=READER_CALIBRATION+system
         r=self.api.call('kernel-'+self.action,system,json.loads(user),thinking=kw.get('thinking') or 'disabled',max_tokens=kw.get('max_tokens',8192))
         return {**r,'response_metadata':r.get('provider',{})}
 
@@ -119,12 +136,30 @@ def run_raw(prompt,directory,client,*,hint='qijue',library=None,config=None,prog
             progress('独立复核原题')
             second,_=interpret_raw(prompt,hint,api,'independent-parse')
             store.save('independent-brief.json',second)
-            final=safe_review(prompt,r['poem'],second['requirements'] or [prompt],NamedClient(api,'independent-requirement-check'))
-            result['independent_requirement_check']=final
-            mechanical=known_checks(r['poem'],task)
-            if not final['confirmed'] or mechanical['hard_issues']:
-                result.update(status='needs_review',poem=None,selected=None,best_unfinished=r['selected'])
-            result['latest_review_complete']=not bool((r.get('selected') or {}).get('review_fallback'))
+            reviewed=kernel.store.load('final-blind-reviews.json') or []
+            others=sorted((p for p in reviewed if eligible(p,topic)),key=lambda p:rank_key(p,topic),reverse=True)
+            queue=[r['selected']]+others;seen=set();attempts=[];approved=None
+            for candidate in queue:
+                # Do not solicit another verdict on the same body under a new title or punctuation.
+                body_key=digest([re.sub(r'[\s，。！？、；：,.!?;:]+','',line) for line in candidate['poem']['lines']])
+                if body_key in seen:continue
+                seen.add(body_key)
+                mechanical=known_checks(candidate['poem'],task)
+                check_client=NamedClient(api,f'independent-requirement-check-{len(attempts)+1:02d}',
+                    suffix='\n用典核对只用以下已核典源，不另猜出处：'+json.dumps(sources,ensure_ascii=False))
+                final=safe_review(prompt,candidate['poem'],second['requirements'] or [prompt],check_client)
+                attempts.append({'candidate_id':candidate['id'],'check':final,'known_hard_issues':mechanical['hard_issues']})
+                if final['confirmed'] and not mechanical['hard_issues']:
+                    approved=candidate;break
+                if len(attempts)>=3:break
+            result['postcheck_attempts']=attempts
+            result['independent_requirement_check']=attempts[-1 if approved else 0]['check']
+            if approved:
+                status='candidate_with_unresolved_readings' if approved['checks']['meter']['status']=='unknown' else 'candidate_ready'
+                result.update(status=status,poem=approved['poem'],selected=approved,best_unfinished=None)
+                result['latest_review_complete']=not bool(approved.get('review_fallback'))
+            else:
+                result.update(status='needs_review',poem=None,selected=None,best_unfinished=r['selected'],latest_review_complete=False)
         result['budget']=api.summary();result['literary_quality_verified']=False
     except (ValueError,KeyError,TypeError,RuntimeError) as exc:
         store.event('raw_entry_incomplete',failure_type=type(exc).__name__)

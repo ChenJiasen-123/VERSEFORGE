@@ -28,6 +28,16 @@ class FinalFail(FixtureClient):
             self.requests.append((system,d,kw));return {'content':'{"reviews":[]}','usage':{'total_tokens':1}}
         return super().complete(system,user,**kw)
 
+class VariedRawFixture(RawFixture):
+    def __init__(self):super().__init__();self.writes=0
+    def complete(self,system,user,**kw):
+        d=json.loads(user);r=super().complete(system,user,**kw)
+        if 'operator' in d:
+            obj=json.loads(r['content'])
+            obj['poem']['lines'][-1]=['认取灯前旧画眉','归来认取旧画眉','灯前还认旧画眉'][self.writes%3]
+            self.writes+=1;r['content']=json.dumps(obj,ensure_ascii=False)
+        return r
+
 class RawEntryTests(unittest.TestCase):
     def test_raw_prompt_parses_selects_sources_and_rechecks_without_manual_task(self):
         c=RawFixture()
@@ -50,6 +60,39 @@ class RawEntryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             r=run_raw(TOPIC['prompt'],directory,c,library=SOURCES,config={'generations':0,'max_calls':4})
         self.assertLessEqual(len(c.requests),4);self.assertIsNone(r['poem'])
+
+    def test_rejected_winner_can_fall_back_to_a_different_already_reviewed_ancestor(self):
+        c=VariedRawFixture();mechanical={'hard_issues':[],'meter':{'status':'unknown','findings':[]}}
+        with tempfile.TemporaryDirectory() as directory, \
+             patch('experiments.classical_evolution.engine.known_checks',return_value=mechanical), \
+             patch('classical_agent.known_checks',return_value=mechanical), \
+             patch('classical_agent.safe_review',side_effect=[{'complete':True,'confirmed':False},{'complete':True,'confirmed':True}]) as check:
+            r=run_raw(TOPIC['prompt'],directory,c,library=SOURCES,config={'generations':0,'pairwise':False})
+            original=json.loads((Path(directory)/'kernel/result.json').read_text(encoding='utf-8'))
+        self.assertEqual(check.call_count,2);self.assertEqual(c.writes,3)
+        self.assertNotEqual(r['selected']['id'],original['selected']['id'])
+        self.assertTrue(r['independent_requirement_check']['confirmed'])
+        self.assertFalse(r['postcheck_attempts'][0]['check']['confirmed'])
+
+    def test_same_body_cannot_be_resubmitted_for_a_more_favorable_postcheck(self):
+        mechanical={'hard_issues':[],'meter':{'status':'unknown','findings':[]}}
+        with tempfile.TemporaryDirectory() as directory, \
+             patch('experiments.classical_evolution.engine.known_checks',return_value=mechanical), \
+             patch('classical_agent.known_checks',return_value=mechanical), \
+             patch('classical_agent.safe_review',return_value={'complete':True,'confirmed':False}) as check:
+            r=run_raw(TOPIC['prompt'],directory,RawFixture(),library=SOURCES,config={'generations':0,'pairwise':False})
+        self.assertEqual(check.call_count,1);self.assertEqual(r['status'],'needs_review')
+        self.assertIsNone(r['poem']);self.assertIsNotNone(r['best_unfinished'])
+
+    def test_postcheck_stops_after_three_distinct_rejected_bodies(self):
+        mechanical={'hard_issues':[],'meter':{'status':'unknown','findings':[]}}
+        with tempfile.TemporaryDirectory() as directory, \
+             patch('experiments.classical_evolution.engine.known_checks',return_value=mechanical), \
+             patch('classical_agent.known_checks',return_value=mechanical), \
+             patch('classical_agent.safe_review',return_value={'complete':True,'confirmed':False}) as check:
+            r=run_raw(TOPIC['prompt'],directory,VariedRawFixture(),library=SOURCES,config={'generations':0,'pairwise':False})
+        self.assertEqual(check.call_count,3);self.assertEqual(len(r['postcheck_attempts']),3)
+        self.assertEqual(r['status'],'needs_review')
 
     def test_required_allusion_with_no_matching_source_stops_before_writing(self):
         c=RawFixture()
@@ -102,5 +145,11 @@ class RawEntryTests(unittest.TestCase):
             result['independent_requirement_check']['confirmed']=False
             (job/'result.json').write_text(json.dumps(result),encoding='utf-8')
             self.assertIn('raw output lacks independent original-prompt confirmation',[v['issue'] for v in audit(root)['violations']])
+            result['selected']['review']['requirements'][0]['status']='unknown'
+            (job/'result.json').write_text(json.dumps(result),encoding='utf-8')
+            self.assertIn('selected candidate fails saved eligibility gates',[v['issue'] for v in audit(root)['violations']])
+            binding['source_library']['s']['text']='changed source'
+            (job/'binding.json').write_text(json.dumps(binding),encoding='utf-8')
+            self.assertIn('raw source library differs from registration',[v['issue'] for v in audit(root)['violations']])
 
 if __name__=='__main__':unittest.main()

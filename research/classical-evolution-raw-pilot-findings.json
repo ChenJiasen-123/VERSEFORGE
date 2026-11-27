@@ -1,0 +1,58 @@
+{
+  "study": "runs/classical-evolution-raw-pilot-01",
+  "version": "raw-classical-agent-0.2",
+  "code_commit": "14fc41a",
+  "basis": "pilot poems and reviews only; held-out poem packet unopened",
+  "findings": [
+    {
+      "job": "pilot-01-r1-raw_classical_evolution",
+      "kind": "overconstrained_range",
+      "evidence": "独立复核将“只能写形、声、用、痕”理解为必须包含用，返回uncertain；原题未要求逐项覆盖。"
+    },
+    {
+      "job": "pilot-03-r1-raw_classical_evolution",
+      "kind": "weak_expression",
+      "evidence": "趋津踏晓风／棹去已难同／舸转江波白／空挥袖向东：关系可读但大部分仍复述题面，审读experience仅复述诗句。",
+      "assistant_score": 1
+    },
+    {
+      "job": "pilot-04-r1-raw_classical_evolution",
+      "kind": "diction_inflation",
+      "evidence": "旧卡空留去意篇：旧卡和去意篇的语义联系不足，不能靠作者构思补足；曳尾涂中虽自许／泥途也费买鞋钱有可取的代价关系。",
+      "assistant_score": 1
+    },
+    {
+      "job": "pilot-02-r1-raw_classical_evolution",
+      "kind": "context_overconstraint_and_guessed_source",
+      "poem": {
+        "title": "拆征衣",
+        "lines": [
+          "征衣拆洗落残沙",
+          "莫是河边骨返家",
+          "紧握残沙偏漏尽",
+          "犹留指缝是天涯"
+        ]
+      },
+      "evidence": "末轮质疑未明确标注妻子身份，又猜王建《凉州词》出处；题目语境与征衣、归骨关系已有支持，用典认定应限给定陈陶典源。",
+      "assistant_score": 3,
+      "source_relation": "河边骨承载沙场亡者与闺中人的距离，残沙在指缝漏尽是当下触不到归人的动作，不是逐句复写典源。"
+    }
+  ],
+  "planned_revision": [
+    "明确限制范围与逐项覆盖之别",
+    "审读按实际表达与推进校准，不给古雅措辞或合题本身高分",
+    "对面落笔、移情并不以存在典源为前提",
+    "末轮驳回一稿后仅在已审、正文不同且仍合格的祖稿中依序复核，最多三稿；不重复询问同一稿以挑赞同意见"
+  ],
+  "preserve_original_results": true,
+  "terminal_results": 4,
+  "selected_outputs": 2,
+  "mechanical_audit_violations": 0,
+  "revision_implementation": {
+    "version": "raw-classical-agent-0.3",
+    "offline_tests": "11 raw-entry tests + 1 legacy-control test passed",
+    "live_verification": "pending; separate pilot02 registered",
+    "source_scope": "given source cards also supplied to final requirement checker",
+    "new_live_batch_not_started": true
+  }
+}

@@ -45,17 +45,18 @@
   "source_snapshot": "runs/classical-evolution-source-snapshot-01.json",
   "remaining": [
     "主批次48次已终态并完成机械复核；保持冻结版本，完成待办对照与独立阅读",
-    "48次全部终态后运行review_classical_evolution.py和audit_classical_evolution.py",
     "主批次结束后执行control_classical_evolution.py补24次旧三候选流程；保留原48次对照，不重复生成已有新算法24份样本。",
     "用snapshot_classical_evolution.py verify核对依赖未变",
     "阅读隐藏组别的实际诗作，记录助手判断，与模型判断及用户偏好验证分开",
-    "汇总12题重复结果、失败、资源代价和不确定项；按原标准审计完成状态"
+    "汇总12题重复结果、失败、资源代价和不确定项；按原标准审计完成状态",
+    "原题入口0.3四题实跑，保留0.2失败记录；通过后再冻结端到端十二题×两次",
+    "所有拟比较流程完成后再打开统一盲读包；当前未阅读held-out诗作"
   ],
   "warning": "四题模型盲评两轮均1胜1负2平；不代表新流程整体优于旧流程。目标尚未完成，保持active。",
   "audit_tools_commit": "b5fece2",
   "regression_session_id": null,
   "held_out_terminal_results": 48,
-  "completion_state": "active: primary 48 audited; four-topic raw-entry pilot running",
+  "completion_state": "active: supplementary24 running; raw-entry0.3 implemented and offline-tested, not live-verified",
   "followup_review_items": [
     "检查盲读失败/预算耗尽时是否保住此前已核的父稿，不把新稿未审冒充已审；若需修正，另记版本，不在冻结测试中途改程序。",
     "当前配置请求deepseek-reasoner，已保存的实际服务返回模型名为deepseek-flash；两臂一致，汇总时明确记录。"
@@ -63,7 +64,7 @@
   "supplementary_control": {
     "directory": "runs/classical-evolution-multicandidate-control-01",
     "additional_runs": 24,
-    "state": "registered before reading held-out poems; not started until primary terminal",
+    "state": "running: process 40555",
     "reason": "兑现现有多候选改稿基线，当前默认单候选对照不够充分",
     "intervention": "旧studio仅将candidate_count从1改为3，其余保留",
     "registration": "experiment-binding.json",
@@ -71,16 +72,20 @@
   },
   "combined_unique_runs_expected": 72,
   "blind_reading_plan": "全部计划批次结束后合并唯一结果，隐藏组别逐首阅读。无成稿的失败仍计入总分母，不伪造诗作数量。",
-  "verified_related_tests": 110,
+  "verified_related_tests": 113,
   "active_sessions": {
-    "raw_entry_pilot": 80316
+    "multicandidate_control": 40555
   },
   "raw_entry_validation": {
     "directory": "runs/classical-evolution-raw-pilot-01",
-    "state": "four-topic live pilot running",
+    "state": "version0.2 pilot terminal 4/4; selected2/4; no mechanical inconsistency; range-interpretation and review weaknesses found",
     "purpose": "automatic raw-prompt interpretation and verified-source selection; separate from typed-core benchmark",
     "fallback": "preserve prior validated review only for exact unchanged poem body",
-    "auditor": "复核实际自动谱体、原题禁字、独立要求确认、嵌套演化谱系与全局预算"
+    "auditor": "复核实际自动谱体、原题禁字、独立要求确认、嵌套演化谱系与全局预算",
+    "next_directory": "runs/classical-evolution-raw-pilot-02",
+    "next_version": "raw-classical-agent-0.3",
+    "next_state": "registered; waits for current control batch before network calls",
+    "revision": "范围不强制全覆盖；语境人物不强制标签复述；表达/句法审读校准；最多三份不同已核稿末轮回选"
   },
   "primary_mechanical_audit": {
     "terminal_results": 48,

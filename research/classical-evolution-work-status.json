@@ -1,0 +1,54 @@
+{
+  "goal_scope": [
+    "复用现有遗传算法的可复用部分，古诗专用表达/用典/硬检查",
+    "三候选两代、保留父稿、构思交叉、定向变异",
+    "四题对照并检查父子稿与选稿依据",
+    "冻结代码、题集、模型、典源",
+    "十二题每题两次，与旧流程比较，完整保留失败",
+    "对实际成稿作盲读与机械复核，报告稳定性、耗时、调用量及局限"
+  ],
+  "implementation_commit": "b0d5c18",
+  "completed": [
+    "古诗CLI入口与可追溯演化记录",
+    "共享RPE种群选择/配对内核",
+    "两轮四题对照各8次",
+    "冻结及完整依赖快照"
+  ],
+  "pilot02_stats": {
+    "baseline_studio": {
+      "runs": 4,
+      "selected_outputs": 4,
+      "all_readings_resolved": 0,
+      "calls": 39,
+      "known_tokens": 186382,
+      "median_elapsed_seconds": 99.187
+    },
+    "classical_evolution": {
+      "runs": 4,
+      "selected_outputs": 4,
+      "all_readings_resolved": 0,
+      "calls": 78,
+      "known_tokens": 427729,
+      "median_elapsed_seconds": 459.055
+    }
+  },
+  "pilot02_blind_comparison": {
+    "baseline_studio": 1,
+    "classical_evolution": 1,
+    "tie": 2
+  },
+  "stability_proven": false,
+  "held_out_directory": "runs/classical-evolution-held-01",
+  "held_out_expected_runs": 48,
+  "active_exec_session_id": 75196,
+  "freeze": "runs/classical-evolution-freeze-01.json",
+  "source_snapshot": "runs/classical-evolution-source-snapshot-01.json",
+  "remaining": [
+    "轮询已有会话75196，不因观察超时重启；冻结后不修改生成相关源码或资料",
+    "48次全部终态后运行review_classical_evolution.py和audit_classical_evolution.py",
+    "用snapshot_classical_evolution.py verify核对依赖未变",
+    "阅读隐藏组别的实际诗作，记录助手判断，与模型判断及用户偏好验证分开",
+    "汇总12题重复结果、失败、资源代价和不确定项；按原标准审计完成状态"
+  ],
+  "warning": "四题模型盲评两轮均1胜1负2平；不代表新流程整体优于旧流程。目标尚未完成，保持active。"
+}

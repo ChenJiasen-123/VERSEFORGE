@@ -1,0 +1,106 @@
+{
+  "objective": "完成古诗演化入口、四题试验、十二题各两次固定验收与旧多候选流程对照，交付成稿和可追溯记录；按实际结果判断稳定性。",
+  "source_turns": [
+    "01a21d7a-7f79-7c12-93ba-2550f2dc84e4",
+    "01a21d66-e660-7391-b378-7c49cb0d7e4e"
+  ],
+  "requirements": [
+    {
+      "requirement": "复用既有种群选择与交叉配对，古诗专用评判",
+      "state": "implemented_and_tested",
+      "evidence": [
+        "experiments/evolution/selection.py",
+        "experiments/classical_evolution/engine.py",
+        "tests/test_classical_evolution.py"
+      ]
+    },
+    {
+      "requirement": "三候选、两代；构思交叉、定向变异、保留父稿",
+      "state": "observed_in_primary_runs",
+      "evidence": [
+        "runs/classical-evolution-held-01/lineage-statistics.json",
+        "runs/classical-evolution-held-01/mechanical-audit.json"
+      ]
+    },
+    {
+      "requirement": "四题对照及父子稿与选稿理由",
+      "state": "complete_for_frozen_core",
+      "evidence": [
+        "runs/classical-evolution-pilot-02/作品与运行汇总.txt",
+        "runs/classical-evolution-pilot-02/演化过程/索引.txt"
+      ]
+    },
+    {
+      "requirement": "冻结后十二道陌生题、每题独立两次，不丢失败",
+      "state": "primary48_terminal",
+      "evidence": [
+        "runs/classical-evolution-freeze-01.json",
+        "runs/classical-evolution-source-snapshot-01.json",
+        "runs/classical-evolution-held-01/experiment-binding.json",
+        "runs/classical-evolution-held-01/descriptive-report.json"
+      ]
+    },
+    {
+      "requirement": "与现有多候选改稿流程比较",
+      "state": "in_progress",
+      "evidence": [
+        "runs/classical-evolution-multicandidate-control-01/experiment-binding.json"
+      ],
+      "live_session": 40555
+    },
+    {
+      "requirement": "原题自动审题、表达规划、选典、创作、审读与多轮打磨",
+      "state": "implemented_but_end_to_end_validation_incomplete",
+      "evidence": [
+        "classical_agent.py",
+        "runs/classical-evolution-raw-pilot-01/descriptive-report.json",
+        "research/classical-evolution-raw-pilot-findings.json"
+      ],
+      "next": "修正版四题实跑后，再冻结端到端十二题各两次；旧版失败不覆盖。"
+    },
+    {
+      "requirement": "至少22/24通过明确硬检查；待核音单列",
+      "state": "core_selected23_of24_but_full_entry_not_yet_validated",
+      "evidence": [
+        "runs/classical-evolution-held-01/mechanical-audit.json"
+      ],
+      "unknown_readings": "全部23份所选稿仍有未决项，不能声称全谱合律。"
+    },
+    {
+      "requirement": "用典专项每首核查，无明显误用、复述、硬贴",
+      "state": "pending_assistant_source_audit",
+      "evidence": [
+        "experiments/classical_evolution/sources.json"
+      ],
+      "model_proxy_only": 12
+    },
+    {
+      "requirement": "盲读至少18/24值得保留，非整首推倒",
+      "state": "pending_actual_blind_reading",
+      "evidence": [
+        "research/classical-evolution-blind-rubric.json"
+      ],
+      "no_substitution": "模型keep数量不能代替逐首实际阅读。"
+    },
+    {
+      "requirement": "有明确错误如实标未完成；无需用户代改；记录失败、资源与时间",
+      "state": "core_recorded_raw_entry_checks_pending",
+      "evidence": [
+        "runs/classical-evolution-held-01/descriptive-report.json",
+        "tests/test_classical_raw_entry.py"
+      ]
+    },
+    {
+      "requirement": "实际读诗并对照修改是否有效，报告失败和局限",
+      "state": "pending_final_reading_and_report",
+      "evidence": [
+        "export_classical_evolution.py",
+        "review_classical_evolution.py",
+        "report_classical_evolution.py"
+      ]
+    }
+  ],
+  "goal_complete": false,
+  "no_new_success_definition": "保留22/24硬检查、18/24文学可留和逐首用典核查目标；不以代码跑通或模型自评替代。",
+  "ordering": "试验数据完成后隐藏组别阅读，提交阅读意见后揭盲汇总；端到端版本独立记账，不冒称等算力或单一因素消融。"
+}

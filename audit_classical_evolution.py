@@ -15,11 +15,15 @@ def audit(directory):
   gold=next(t for t in b['topics'] if t['id']==j['topic_id'])
   raw=j['arm']=='raw_classical_evolution'
   kernel=job/'kernel' if raw else job
-  topic=r.get('effective_topic',gold) if raw else gold
+  effective=r.get('effective_topic')
+  if raw and effective is None and (job/'effective-topic.json').exists():
+   effective=json.loads((job/'effective-topic.json').read_text(encoding='utf-8'))
+  topic=(effective or gold) if raw else gold
   task=make_task(topic)
   kernel_binding=json.loads((kernel/'binding.json').read_text(encoding='utf-8')) if (kernel/'binding.json').exists() else binding
   sources=kernel_binding.get('sources',{})
-  expected_sources={sid:b.get('sources',b.get('source_library',{}))[sid] for sid in topic['source_ids']}
+  expected_ids=topic['source_ids'] if not raw or effective else []
+  expected_sources={sid:b.get('sources',b.get('source_library',{}))[sid] for sid in expected_ids}
   if sources!=expected_sources:
    violations.append({'job':j['key'],'issue':'source cards differ from registered library'})
   if raw:

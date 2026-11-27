@@ -3,6 +3,30 @@ import argparse,json,statistics,math,hashlib,random
 from pathlib import Path
 from poetry_agent.style.corpus import write as atomic_write
 
+def validate_source_readings(binding,submitted,directory):
+ jobs={j['key']:j for j in binding['jobs']};seen={};library=binding['sources']
+ for row in submitted.get('readings',[]):
+  key=row['job']
+  if key not in jobs or key in seen:raise ValueError('unknown or duplicate source-audit job')
+  job=jobs[key];folder=Path(job.get('result_directory') or directory/'jobs'/key)
+  r=json.loads((folder/'result.json').read_text(encoding='utf-8'));candidate=r.get('selected')
+  if not candidate:raise ValueError('source audit must identify a selected output')
+  poem=candidate['poem'];quotes=row.get('poem_evidence')
+  if not isinstance(quotes,list) or not quotes or any(not isinstance(q,str) or not q or not any(q in line for line in poem['lines']) for q in quotes):
+   raise ValueError('source-audit poem evidence absent from body')
+  ids=row.get('source_ids');references=row.get('source_quotes')
+  if not isinstance(ids,list) or len(ids)!=len(set(ids)) or any(i not in library for i in ids):raise ValueError('invalid audited source ids')
+  if not isinstance(references,list) or len(references)!=len(ids) or {q.get('source_id') for q in references}!=set(ids):raise ValueError('source quotation coverage mismatch')
+  for q in references:
+   if not isinstance(q.get('quote'),str) or not q['quote'] or q['quote'] not in library[q['source_id']]['text']:raise ValueError('source quote absent from registered card')
+  for k in ('supported','misuse','retelling','forced'):
+   if type(row.get(k)) is not bool:raise ValueError('missing source-audit judgment')
+  for k in ('relation','compression','reason'):
+   if not isinstance(row.get(k),str) or not row[k].strip():raise ValueError('missing source-audit explanation')
+  if row['supported'] and (not ids or any(row[k] for k in ('misuse','retelling','forced'))):raise ValueError('source support contradicts recorded misuse/retelling/forced judgment')
+  seen[key]=row
+ return seen
+
 def report(directory):
  binding=json.loads((directory/'experiment-binding.json').read_text(encoding='utf-8'))
  jobs=binding['jobs'];rows=[];missing=[];blind=[];mapping=[]
@@ -75,7 +99,7 @@ def report(directory):
     '模型盲评不是用户偏好验证；稳定性结论需结合实际诗作与独立阅读']}
  source_path=directory/'assistant-source-audit.json'
  source_audit=json.loads(source_path.read_text(encoding='utf-8')) if source_path.exists() else None
- source_rows={r['job']:r for r in (source_audit or {}).get('readings',[])}
+ source_rows=validate_source_readings(binding,source_audit,directory) if source_audit else {}
  acceptance={}
  for arm,stats in by_arm.items():
   required_outputs=[r['key'] for r in rows if r['arm']==arm and r['output'] and r['allusion_required']]

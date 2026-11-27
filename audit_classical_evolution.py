@@ -11,7 +11,18 @@ def audit(directory):
   job=Path(j.get('result_directory') or directory/'jobs'/j['key']);p=job/'result.json'
   if not p.exists():violations.append({'job':j['key'],'issue':'missing terminal result'});continue
   r=json.loads(p.read_text(encoding='utf-8'));binding=json.loads((job/'binding.json').read_text(encoding='utf-8'))
-  topic=next(t for t in b['topics'] if t['id']==j['topic_id']);task=make_task(topic)
+  gold=next(t for t in b['topics'] if t['id']==j['topic_id'])
+  raw=j['arm']=='raw_classical_evolution'
+  kernel=job/'kernel' if raw else job
+  topic=r.get('effective_topic',gold) if raw else gold
+  task=make_task(topic)
+  kernel_binding=json.loads((kernel/'binding.json').read_text(encoding='utf-8')) if (kernel/'binding.json').exists() else binding
+  sources=kernel_binding.get('sources',{})
+  if raw:
+   if binding.get('entry_source_sha256')!=b.get('entry_source_sha256'):
+    violations.append({'job':j['key'],'issue':'mixed raw entry versions'})
+   if r.get('selected') and (topic['task']['genre']!=gold['task']['genre'] or bool(topic.get('allusion_required'))!=bool(gold.get('allusion_required'))):
+    violations.append({'job':j['key'],'issue':'raw interpretation differs from explicit gold genre/allusion constraint'})
   if binding['code_sha256']!=b['code_sha256']:violations.append({'job':j['key'],'issue':'mixed implementation versions'})
   ledger=json.loads((job/'call-ledger.json').read_text(encoding='utf-8'))
   if len(ledger)!=r['budget']['calls'] or len(ledger)>b['config']['max_calls']:
@@ -21,13 +32,19 @@ def audit(directory):
    mechanical=known_checks(c['poem'],task)
    if mechanical['hard_issues']:violations.append({'job':j['key'],'issue':'selected poem has known hard failures','details':mechanical['hard_issues']})
    if r['poem']!=c['poem']:violations.append({'job':j['key'],'issue':'selected/output poem mismatch'})
-   try:validate_reviews({'reviews':[c['review']]},[c],{f'r{i+1}':q for i,q in enumerate(topic['requirements'])},binding['sources'])
+   try:validate_reviews({'reviews':[c['review']]},[c],{f'r{i+1}':q for i,q in enumerate(topic['requirements'])},sources)
    except (ValueError,KeyError,TypeError):violations.append({'job':j['key'],'issue':'invalid selected review evidence'})
    if mechanical['meter']['status']=='unknown' and r['status']!='candidate_with_unresolved_readings':
     violations.append({'job':j['key'],'issue':'unknown reading not disclosed'})
-  if j['arm']=='classical_evolution':
-   state=json.loads((job/'state.json').read_text(encoding='utf-8'));archive={p['id']:p for p in state['archive']}
-   if r.get('completed_generations')!=b['config']['generations']:
+   if raw:
+    if not (r.get('independent_requirement_check') or {}).get('confirmed'):
+     violations.append({'job':j['key'],'issue':'raw output lacks independent original-prompt confirmation'})
+    body=''.join(c['poem']['lines'])
+    if any(w in body for w in gold['task'].get('forbidden_words',[])):
+     violations.append({'job':j['key'],'issue':'raw output contains original forbidden word'})
+  if j['arm'] in ('classical_evolution','raw_classical_evolution') and (kernel/'state.json').exists():
+   state=json.loads((kernel/'state.json').read_text(encoding='utf-8'));archive={p['id']:p for p in state['archive']}
+   if r.get('completed_generations')!=b['config']['generations'] and c:
     violations.append({'job':j['key'],'issue':'requested evolution generations incomplete'})
    for p in archive.values():
     observed=known_checks(p['poem'],task)
@@ -44,6 +61,8 @@ def audit(directory):
    if provider.get('model'):providers.add(provider['model'])
   rows.append({'job':j['key'],'recomputed_hard_clear':mechanical is not None and not mechanical['hard_issues'],
     'meter_status':mechanical['meter']['status'] if mechanical else None,'provider_models':sorted(providers),
+    'completed_generations':r.get('completed_generations'),
+    'raw_interpretation_is_automatic':raw,
     'literary_quality_verified':False})
  result={'expected_runs':len(b['jobs']),'terminal_results':len(rows),'violations':violations,'rows':rows,
   'mechanical_consistency_verified':not violations,'scope':'Recomputed hard constraints, recorded review quotations, lineage, versions and call counts. Not literary quality or source interpretation certification.'}

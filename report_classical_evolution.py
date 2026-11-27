@@ -73,6 +73,24 @@ def report(directory):
     '读音待核不计入全谱确认，模型语义判断不等于已认证',
     '失败和未出稿始终留在分母，不能只比较最好几首',
     '模型盲评不是用户偏好验证；稳定性结论需结合实际诗作与独立阅读']}
+ source_path=directory/'assistant-source-audit.json'
+ source_audit=json.loads(source_path.read_text(encoding='utf-8')) if source_path.exists() else None
+ source_rows={r['job']:r for r in (source_audit or {}).get('readings',[])}
+ acceptance={}
+ for arm,stats in by_arm.items():
+  required_outputs=[r['key'] for r in rows if r['arm']==arm and r['output'] and r['allusion_required']]
+  source_complete=source_audit is not None and all(j in source_rows for j in required_outputs)
+  allusion_valid=source_complete and all(source_rows[j].get('supported') is True for j in required_outputs)
+  score=stats.get('assistant_blind_worth_selected_output')
+  checks={'all_runs_finished':stats['terminal_runs']==stats['expected_runs'],
+   'at_least_22_selected_without_known_hard_errors':stats['selected_outputs']>=22,
+   'at_least_18_selected_worth_keeping':score>=18 if score is not None else None,
+   'submitted_allusion_exercises_checked':source_complete,
+   'submitted_allusions_supported':allusion_valid if source_complete else None,
+   'mechanical_audit_complete':bool(audit) and audit.get('terminal_results')==len(jobs) and not audit.get('violations')}
+  acceptance[arm]={'checks':checks,'research_targets_met':all(v is True for v in checks.values()),
+   'scope':'仅本次绝句题集和给定资料；不认证任意题材、完整历史读音、用户审美偏好或正式赛时表现'}
+ result['research_acceptance']=acceptance
  atomic_write(directory/'descriptive-report.json',result)
  lines=['古诗演化对照｜描述性报告','',f"完成 {len(rows)}/{len(jobs)} 次流程；模型请求名称：{binding['model']}。",'']
  for arm,s in by_arm.items():
@@ -82,7 +100,7 @@ def report(directory):
    f"调用 {s['calls']}；已知tokens {s['known_tokens']}；usage未知调用 {s['usage_unknown_calls']}。",
    f"单次中位耗时 {s['median_seconds']} 秒；经验90分位 {s['p90_seconds']} 秒。",'']
  if paired:lines += ['交换顺序的模型盲评：'+json.dumps(paired['literary_wins'],ensure_ascii=False),'']
- lines += ['文学盲读状态：'+reading_status['status']+'；不以模型keep代理人工阅读。','',*result['limits']]
+ lines += ['文学盲读状态：'+reading_status['status']+'；这里是助手逐首评阅，不是用户评分。','',*result['limits']]
  (directory/'统计与局限.txt').write_text('\n'.join(lines),encoding='utf-8')
  return result
 if __name__=='__main__':

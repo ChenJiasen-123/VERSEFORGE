@@ -5,10 +5,12 @@ OPS={'initial':'初稿','crossover':'融合构思后整首重写','meter_repair'
 def export(directory):
  b=json.loads((directory/'experiment-binding.json').read_text(encoding='utf-8'));out=directory/'演化过程';out.mkdir(exist_ok=True);index=[]
  for job in b['jobs']:
-  if job['arm']!='classical_evolution':continue
+  if job['arm'] not in ('classical_evolution','raw_classical_evolution'):continue
   folder=Path(job.get('result_directory') or directory/'jobs'/job['key']);rp=folder/'result.json'
   if not rp.exists():continue
-  r=json.loads(rp.read_text(encoding='utf-8'));state=json.loads((folder/'state.json').read_text(encoding='utf-8'))
+  r=json.loads(rp.read_text(encoding='utf-8'));kernel=folder/'kernel' if job['arm']=='raw_classical_evolution' else folder
+  if not (kernel/'state.json').exists():continue
+  state=json.loads((kernel/'state.json').read_text(encoding='utf-8'))
   topic=next(t for t in b['topics'] if t['id']==job['topic_id']);selected=(r.get('selected') or {}).get('id')
   lines=[topic['prompt'],'',f"最终状态：{r['status']}",f"最终采用稿：{selected or '未选出合格候选'}",'']
   for p in state['archive']:

@@ -24,17 +24,69 @@ function list(id, rows) {
 }
 function render(job) {
  const result=job.result;
- if (!result || result.status==='unsupported') {state.poem=null;$('poem').hidden=true;$('empty').hidden=false;$('understanding').hidden=true;$('meter-review').hidden=true;$('copy').disabled=$('download').disabled=$('again').disabled=true;error(result?.message || job.error || '没有得到作品。');return;}
+ if (!result || result.status==='unsupported') {state.poem=null;$('poem').hidden=true;$('expansion-card').hidden=true;$('empty').hidden=false;$('understanding').hidden=true;$('style-review').hidden=true;$('meter-review').hidden=true;$('copy').disabled=$('download').disabled=$('again').disabled=true;error(result?.message || job.error || '没有得到作品。');return;}
  state.poem=result.poem; state.job=job.id;
  $('empty').hidden=true; $('poem').hidden=false;
+ const expOut=result.expansion_output;
+ if (expOut && expOut.enabled && expOut.adopted_anchor) {
+  $('expansion-card').hidden=false;
+  $('expansion-meta').textContent=`模型：${expOut.model || 'deepseek-reasoner'} · 采纳支点 #${(expOut.selected_index || 0)+1}`;
+  const fields=[['起跳切口',expOut.adopted_anchor.entry_anchor],['尺度关系',expOut.adopted_anchor.world_scale],['发话姿态',expOut.adopted_anchor.stance_and_relation],['推进转折',expOut.adopted_anchor.arc_turn],['避俗边界',expOut.adopted_anchor.avoid]];
+  const nodes=[];
+  for (const [label,val] of fields) {
+   if (!val) continue;
+   const dt=document.createElement('dt');dt.textContent=label;
+   const dd=document.createElement('dd');dd.textContent=val;
+   nodes.push(dt,dd);
+  }
+  $('expansion-grid').replaceChildren(...nodes);
+  const others=(expOut.all_anchors || []).map((a,i)=>({a,i})).filter(x=>x.i!==expOut.selected_index && x.a?.entry_anchor);
+  $('other-anchors-wrap').hidden=!others.length;
+  if (others.length) {
+   list('other-anchors', others.map(x=>`备选 #${x.i+1}：${x.a.entry_anchor}｜${x.a.world_scale}｜${x.a.arc_turn}`));
+  }
+ } else {
+  $('expansion-card').hidden=true;
+ }
  $('poem-title').textContent=result.poem.title;
- $('poem-lines').replaceChildren(...result.poem.lines.map(text => {const p=document.createElement('p');p.textContent=text;return p;}));
+ $('poem-lines').replaceChildren(...result.poem.lines.map(text => {
+  if (!text) {const gap=document.createElement('div');gap.className='stanza-gap';gap.setAttribute('aria-hidden','true');return gap;}
+  const p=document.createElement('p');p.textContent=text;return p;
+ }));
  $('copy').disabled=false; $('download').disabled=false; $('again').disabled=state.busy || !state.configured;
  $('saved').textContent='已保存至本机';
  const brief=result.brief;
  if (brief) {
   $('understanding').hidden=false;list('requirements',brief.requirements || []);list('optional-examples',brief.examples || []);
-  $('direction').textContent=brief.directions?.[brief.selected_direction] || '';
+  const dirs=(brief.directions || []).map((d,i)=>(i===brief.selected_direction?'【主选方向 '+(i+1)+'】':'【候选方向 '+(i+1)+'】')+d);
+  list('all-directions',dirs);
+  $('direction').textContent='首候选出发方向：'+(brief.directions?.[brief.selected_direction] || '');
+ }
+ const se=result.style_engine;
+ $('style-review').hidden=!se;
+ if (se) {
+  if (se.mode==='rpe_v4' && se.final_diagnostics) {
+   const fd=se.final_diagnostics;
+   const expLabels={expand_v1:'开启 RPE-GA 诗学扩写',none:'关闭（原题直出）'};
+   const ver=se.prompt_version || 'v6';
+   const thinkTag=se.generation_thinking==='enabled'?' + Thinking':'';
+   const polishTag=result.editorial?' · 自动打磨：开启':' · 自动打磨：关闭';
+   $('style-summary').textContent=`前置扩写：${expLabels[se.expansion_mode] || '开启 RPE-GA 诗学扩写'}${se.expansion_mode==='none'?'':`（${se.expansion_model || 'deepseek-reasoner'}）`} · 写诗引擎：RPE-GA ${ver}${thinkTag}（${se.prompt_id}）${polishTag} · 终稿风格分 ${fd.score.toFixed(2)} / 100`;
+   const coreNote=fd.core_motif_span!=null?` · 主核贯通 ${(fd.core_motif_span*100).toFixed(0)}%`:'';
+   const items=[
+    `终稿结构与呼吸：${fd.stanza_count} 节 ${fd.line_count} 行 · 无标点断行率 ${(fd.unpunctuated_break_rate*100).toFixed(0)}% · 行内空格率 ${(fd.mid_line_space_rate*100).toFixed(0)}%${coreNote}`,
+    `分项计量：语料分位带对齐 ${fd.corpus_band_score.toFixed(2)} · 词域共鸣 ${fd.tfidf_lexical_score.toFixed(2)} · 反套路扣分 ${fd.anti_slop_penalty.toFixed(2)}`,
+   ];
+   if (fd.attribution?.label) items.push(`外部三诗人语料近邻归属：${fd.attribution.label}（投票占比 ${(fd.attribution.confidence*100).toFixed(1)}%）`);
+   (se.candidates || []).forEach(c => {
+    if (c.style_v4_score != null) items.push(`初稿候选 ${c.candidate}${c.candidate===se.selected_candidate?'（胜出）':''}：《${c.title || '无题'}》 · v4 风格分 ${c.style_v4_score.toFixed(2)} · 方向：${c.direction}`);
+   });
+   (fd.anti_slop_flags || []).forEach(f => items.push(`反套路提示：${f.detail}（-${f.penalty}）`));
+   list('style-details', items);
+  } else {
+   $('style-summary').textContent=se.note || '标准流程模式';
+   list('style-details', []);
+  }
  }
  const checks=result.checks || {};
  const meter=checks.final_meter;
@@ -90,7 +142,7 @@ async function history() {
    const button=document.createElement('button');button.type='button';button.className='history-item';
    const title=document.createElement('strong');title.textContent=row.title || row.prompt.split('\n')[0].slice(0,42);
    const meta=document.createElement('span');meta.textContent=new Date(row.created*1000).toLocaleString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+' · '+(row.status==='completed'?'已保存':row.status==='failed'?'未完成':'创作中');
-   button.append(title,meta);button.addEventListener('click',async()=>{if(state.busy)return;error('');try {const job=await api('/api/jobs/'+row.id);$('prompt').value=job.prompt;$('genre').value=job.request?.genre || 'auto';$('preference').value=job.request?.preference || '';count();if(job.status==='completed')render(job);else if(job.status==='failed')error(job.error);else {state.job=job.id;setBusy(true,job.status);poll(job.id);}}catch(e){error(e.message);}});$(target).append(button);
+   button.append(title,meta);button.addEventListener('click',async()=>{if(state.busy)return;error('');try {const job=await api('/api/jobs/'+row.id);$('prompt').value=job.prompt;$('genre').value=job.request?.genre || 'modern';$('expansion-mode').value=job.request?.expansion_mode==='none'?'none':'expand_v1';$('expansion-model').value=(job.request?.expansion_model==='default'?'deepseek-flash':job.request?.expansion_model) || 'deepseek-reasoner';syncExpansionField();$('style-mode').value=(job.request?.style_mode==='rpe_v4'?'rpe_v6':job.request?.style_mode) || 'rpe_v6';$('auto-polish').value=job.request?.auto_polish==='on'?'on':'off';$('preference').value=job.request?.preference || '';count();if(job.status==='completed')render(job);else if(job.status==='failed')error(job.error);else {state.job=job.id;setBusy(true,job.status);poll(job.id);}}catch(e){error(e.message);}});$(target).append(button);
   }
  }
 }
@@ -101,11 +153,14 @@ async function poll(id) {
   setBusy(true,job.status);state.poll=setTimeout(()=>poll(id),1200);
  }catch(e){setBusy(false);error(e.message+' 作品记录保留在本机，刷新后可继续查看。');}
 }
+function syncExpansionField() {$('expansion-model-field').hidden = $('expansion-mode').value === 'none';}
+$('expansion-mode').addEventListener('change', syncExpansionField);
+syncExpansionField();
 async function generate(previous = null) {
  if(state.busy)return;
  if(!$('compose-form').reportValidity())return;
  error('');setBusy(true,'queued');$('saved').textContent='';
- try {const job=await api('/api/jobs',{method:'POST',body:JSON.stringify({prompt:$('prompt').value,genre:$('genre').value,preference:$('preference').value,previous})});state.job=job.id;await history();await poll(job.id);}
+ try {const job=await api('/api/jobs',{method:'POST',body:JSON.stringify({prompt:$('prompt').value,genre:$('genre').value,expansion_mode:$('expansion-mode').value,expansion_model:$('expansion-model').value,style_mode:$('style-mode').value,auto_polish:$('auto-polish').value,preference:$('preference').value,previous})});state.job=job.id;await history();await poll(job.id);}
  catch(e){setBusy(false);error(e.message);}
 }
 function plainText() {return state.poem ? state.poem.title+'\n\n'+state.poem.lines.join('\n') : '';}
@@ -115,5 +170,5 @@ $('prompt').addEventListener('input',count);
 document.querySelectorAll('[data-example]').forEach(button=>button.addEventListener('click',()=>{if(state.busy)return;$('prompt').value=samples[button.dataset.example];count();$('prompt').focus();}));
 $('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(plainText());$('saved').textContent='已复制作品';}catch{error('浏览器暂未允许复制，可选中文字复制，或下载文字。');}});
 $('download').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([plainText()],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=state.poem.title.replace(/[<>:"/\\|?*]/g,'_')+'.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
-$('new').addEventListener('click',()=>{if(state.busy)return;state.poem=null;$('prompt').value='';$('preference').value='';count();$('poem').hidden=true;$('empty').hidden=false;$('understanding').hidden=true;$('meter-review').hidden=true;$('result-note').hidden=true;$('saved').textContent='';$('copy').disabled=$('download').disabled=$('again').disabled=true;error('');$('prompt').focus();});
+$('new').addEventListener('click',()=>{if(state.busy)return;state.poem=null;$('prompt').value='';$('preference').value='';count();$('poem').hidden=true;$('expansion-card').hidden=true;$('empty').hidden=false;$('understanding').hidden=true;$('style-review').hidden=true;$('meter-review').hidden=true;$('result-note').hidden=true;$('saved').textContent='';$('copy').disabled=$('download').disabled=$('again').disabled=true;error('');$('prompt').focus();});
 (async()=>{try{const session=await api('/api/session');state.csrf=session.csrf;state.configured=session.configured;$('connection').textContent=session.configured?'本地创作服务已就绪':'创作服务尚未配置';$('connection').classList.toggle('ready',session.configured);setBusy(false);await history();}catch(e){state.configured=false;setBusy(false);$('connection').textContent='本地服务未连接';error(e.message);}})();

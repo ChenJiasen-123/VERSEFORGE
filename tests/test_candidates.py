@@ -43,3 +43,14 @@ class CandidateTests(unittest.TestCase):
         self.assertEqual(result['selected_candidate'], 1)
         self.assertEqual(len(result['candidate_runs']), 2)
         self.assertEqual(result['candidate_selection'][0]['failure_code'], 'quote_not_found')
+
+    def test_first_candidate_runtime_error_falls_through_to_second_candidate(self):
+        second = {'poem': {'title': '乙', 'lines': ['乙']}, 'issues': []}
+        client = MockClient()
+        client.mock = False
+        with patch('poetry_agent.candidates.compose', side_effect=[RuntimeError('模型输出未正常结束（length），本次输出未采用'), second]):
+            result = compose_candidates(Task('题'), client, count=2)
+        self.assertEqual(result['poem'], second['poem'])
+        self.assertEqual(len(result['candidate_runs']), 1)
+        self.assertEqual(result['candidate_selection'][0]['error'], 'generation_failed')
+        self.assertIn('length', result['candidate_selection'][0]['detail'])

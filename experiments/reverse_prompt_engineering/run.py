@@ -3,7 +3,7 @@
 Examples (from the repository root):
   python experiments/reverse_prompt_engineering/run.py --mode estimate
   python experiments/reverse_prompt_engineering/run.py --mode mock
-  python experiments/reverse_prompt_engineering/run.py --mode live --authorize-spend --max-api-calls 320
+  python experiments/reverse_prompt_engineering/run.py --mode live --authorize-spend --max-api-calls 1200
   python experiments/reverse_prompt_engineering/run.py --mode live --authorize-spend --resume --run-id <id>
 
 The default mode is ``estimate`` and performs no network calls.  Live mode
@@ -32,7 +32,7 @@ from experiments.reverse_prompt_engineering.llm import (
     BudgetExhausted, make_live_llms, restore_budget_from_ledger,
 )
 from experiments.reverse_prompt_engineering.mock import make_mock_llm
-from experiments.reverse_prompt_engineering.mutator import MUTATOR_SYSTEM
+from experiments.reverse_prompt_engineering.mutator import CROSSOVER_SYSTEM, MUTATOR_SYSTEM
 from experiments.reverse_prompt_engineering.optimizer import Optimizer
 from experiments.reverse_prompt_engineering.report import write_reports
 from experiments.reverse_prompt_engineering.store import ExperimentStore, default_run_id
@@ -41,58 +41,68 @@ from experiments.reverse_prompt_engineering.store import ExperimentStore, defaul
 def estimate_experiment(config, selection):
     m = config["population"]["size"]
     k = config["population"]["generations"]
+    x = int(config["population"].get("crossover_count", 0))
     T = len(config["topics"]["optimization"])
     R = config["generation"]["repetitions"]
     Tt = len(config["topics"]["test"])
     Rt = config["benchmark"]["repetitions"]
-    topk = config["evaluation"].get("confirmation_top_k", 0) if k > 0 else 0
+    topk = min(config["evaluation"].get("confirmation_top_k", 0), m)
     confirm_reps = config["evaluation"].get("confirmation_repetitions", 0)
-    confirm_calls = topk * T * confirm_reps * 2
+    in_run_k = min(int(config["population"].get("in_run_confirm_top_k", 0)), m) if confirm_reps > 0 else 0
+    # Upper estimate of unique elite confirmations across evolution + final shortlist
+    est_confirmed_candidates = max(topk, in_run_k + min(k, m)) if confirm_reps > 0 else 0
+    confirm_calls = est_confirmed_candidates * T * confirm_reps * 2
     bench_enabled = bool(config["benchmark"]["enabled"])
     bench_calls = (1 + 3 * Tt * Rt * 2) if bench_enabled else 0
-    init_calls = m
-    per_gen_calls = m * (2 + 2 * T * R)
-    expected_calls = init_calls + k * per_gen_calls + confirm_calls + bench_calls
+    is_seeded = bool(config["population"].get("seed_prompts_path"))
+    init_prompt_calls = 0 if is_seeded else m
+    init_calls = init_prompt_calls + m * (2 * T * R)
+    pairwise_calls = (k + 1) * 2 * min(T, int(config["evaluation"].get("pairwise_max_pairs", 7)))
+    per_gen_calls = m * (2 + 2 * T * R) + x * (1 + 2 * T * R)
+    expected_calls = init_calls + k * per_gen_calls + confirm_calls + pairwise_calls + bench_calls
 
     ref_chars = sum(len(p["text"]) for p in selection["references"])
     test_ref_chars = sum(len(p["text"]) for p in selection["held_out"])
-    init_input = ref_chars + len(INIT_SYSTEM) + 1200
-    analysis_input = ref_chars + len(ANALYZER_SYSTEM) + 6000 + 1200
-    mutation_input = len(MUTATOR_SYSTEM) + 3000
-    generation_input = len(GENERATOR_SYSTEM) + 1200
+    init_input = ref_chars + len(INIT_SYSTEM) + 1600
+    analysis_input = ref_chars + len(ANALYZER_SYSTEM) + 6500 + 1200
+    mutation_input = len(MUTATOR_SYSTEM) + 3200
+    crossover_input = len(CROSSOVER_SYSTEM) + 2400
+    generation_input = len(GENERATOR_SYSTEM) + 1000
     judge_input = ref_chars + len(JUDGE_SYSTEM) + 1200
     bench_judge_input = test_ref_chars + len(JUDGE_SYSTEM) + 1200
 
+    total_eval_candidates = m + k * (m + x)
     call_types = [
-        ("initialization", init_calls, init_input, config["population"]["init_max_tokens"]),
+        ("initialization", m, init_input, config["population"]["init_max_tokens"]),
         ("analysis", m * k, analysis_input, config["population"]["analysis_max_tokens"]),
         ("mutation", m * k, mutation_input, config["population"]["mutation_max_tokens"]),
-        ("generation", m * k * T * R, generation_input, config["generation"]["max_tokens"]),
-        ("judge", m * k * T * R, judge_input, config["evaluation"]["judge_max_tokens"]),
-        ("confirmation_generation", topk * T * confirm_reps, generation_input, config["generation"]["max_tokens"]),
-        ("confirmation_judge", topk * T * confirm_reps, judge_input, config["evaluation"]["judge_max_tokens"]),
+        ("crossover", x * k, crossover_input, config["population"]["mutation_max_tokens"]),
+        ("generation", total_eval_candidates * T * R, generation_input, config["generation"]["max_tokens"]),
+        ("judge", total_eval_candidates * T * R, judge_input, config["evaluation"]["judge_max_tokens"]),
+        ("confirmation_generation", est_confirmed_candidates * T * confirm_reps, generation_input, config["generation"]["max_tokens"]),
+        ("confirmation_judge", est_confirmed_candidates * T * confirm_reps, judge_input, config["evaluation"]["judge_max_tokens"]),
         ("benchmark_reverse", 1 if bench_enabled else 0, init_input, config["population"]["init_max_tokens"]),
         ("benchmark_generation", 3 * Tt * Rt if bench_enabled else 0, generation_input, config["benchmark"]["max_tokens"]),
         ("benchmark_judge", 3 * Tt * Rt if bench_enabled else 0, bench_judge_input, config["evaluation"]["judge_max_tokens"]),
     ]
     input_tokens = sum(calls * math.ceil(input_chars / 1.2) for _, calls, input_chars, _ in call_types)
-    output_low = sum(calls * out_max * 0.5 for _, calls, _, out_max in call_types)
+    output_low = sum(calls * out_max * 0.45 for _, calls, _, out_max in call_types)
     output_high = sum(calls * out_max for _, calls, _, out_max in call_types)
     upper_factor = 1 + config["budget"]["max_parse_retries"]
-    prompt_calls = init_calls + m * k + (1 if bench_enabled else 0)
+    prompt_calls = m + (m + x) * k + (1 if bench_enabled else 0)
     upper_calls = expected_calls * upper_factor + prompt_calls * config["population"]["max_prompt_repair_attempts"]
     result = {
         "note": "估算值；真实 token 取决于模型分词与输出长度。未发起任何 API 调用。",
         "parameters": {
-            "population_size": m, "generations": k, "optimization_topics": T,
-            "generation_repetitions": R, "test_topics": Tt,
-            "benchmark_repetitions": Rt, "confirmation_top_k": topk,
-            "confirmation_repetitions": confirm_reps,
+            "population_size": m, "generations": k, "crossover_count": x,
+            "optimization_topics": T, "generation_repetitions": R,
+            "test_topics": Tt, "benchmark_repetitions": Rt,
+            "confirmation_top_k": topk, "confirmation_repetitions": confirm_reps,
         },
         "expected_api_calls": expected_calls,
         "upper_bound_api_calls_with_parse_retries": upper_calls,
         "call_breakdown": {
-            "initialization": init_calls,
+            "initialization_and_eval": init_calls,
             "per_generation": per_gen_calls,
             "all_generations": k * per_gen_calls,
             "confirmation": confirm_calls,
@@ -185,6 +195,8 @@ def run_experiment(config, mode, *, project_root=PROJECT_ROOT, run_id=None, resu
         if old != new:
             raise ValueError("断点续跑配置与首次运行不一致（除 budget 外）；请使用原配置或新建运行")
     state = store.load_state() if (resume and store.has_state()) else store.new_state()
+    if state.get("schema_version") != "rpe-ga-zh-v2":
+        raise ValueError("此断点使用旧评分口径，继续搜索请使用新的 run-id；旧产物可单独离线复核。")
     if state.get("mode") != mode:
         raise ValueError(f"断点续跑模式不一致：首次是 {state.get('mode')}，本次是 {mode}")
     state["generation_model"] = llm.model
@@ -196,7 +208,7 @@ def run_experiment(config, mode, *, project_root=PROJECT_ROOT, run_id=None, resu
         )
     else:
         state.setdefault("limitations", []).append(
-            "评审模型与生成模型不同，但现有客户端仍只调用 DeepSeek；可能共享训练家族偏差，需要人工抽查。"
+            f"评审模型（{judge_llm.model}）与生成模型（{llm.model}）不同，但仍属同一供应商家族，建议结合离线统计与人工盲评。"
         )
     if state.get("is_mock"):
         state.setdefault("limitations", []).append(
@@ -229,6 +241,7 @@ def run_experiment(config, mode, *, project_root=PROJECT_ROOT, run_id=None, resu
         benchmark = json.loads(existing_benchmark.read_text(encoding="utf-8"))
         state["benchmark"] = {
             "completed": True,
+            "qualified_comparison": benchmark.get("qualified_comparison"),
             "ranking_by_style_score": benchmark.get("ranking_by_style_score"),
             "comparison": benchmark.get("comparison"),
             "usage_total": benchmark.get("usage_total"),
@@ -278,6 +291,7 @@ def main(argv=None):
     parser.add_argument("--generations", type=int, help="覆盖 population.generations")
     parser.add_argument("--population-size", type=int, help="覆盖 population.size")
     parser.add_argument("--seed", type=int, help="覆盖 experiment.seed")
+    parser.add_argument("--seed-from", help="从已有 final_population.json 或种子列表热启动初始种群")
     parser.add_argument("--output-root", help="覆盖 experiment.output_root")
     args = parser.parse_args(argv)
 
@@ -293,6 +307,8 @@ def main(argv=None):
             config["population"]["size"] = args.population_size
         if args.seed is not None:
             config["experiment"]["seed"] = args.seed
+        if args.seed_from is not None:
+            config["population"]["seed_prompts_path"] = args.seed_from
         if args.output_root is not None:
             config["experiment"]["output_root"] = args.output_root
         from experiments.reverse_prompt_engineering.config import validate_config
@@ -320,7 +336,9 @@ def main(argv=None):
         print(f"状态：{state.get('status')}")
         if state.get("final_prompt"):
             print("\n最优 Style Prompt：\n" + state["final_prompt"]["prompt"])
-            print(f"\n适应度：{state['final_prompt'].get('fitness')}；报告：report.md")
+            print(f"\n合格率：{state['final_prompt'].get('eligible_rate')}；"
+                  f"合格风格分：{state['final_prompt'].get('eligible_style')}；"
+                  f"适应度：{state['final_prompt'].get('fitness')}；报告：report.md")
         if state.get("llm_summary"):
             print(f"API：{state['llm_summary']['calls']} 次；"
                   f"token：{state['llm_summary']['total_tokens']}；"

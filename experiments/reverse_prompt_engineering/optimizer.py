@@ -1,19 +1,26 @@
-"""RPE-GA optimizer: initialization, evaluation, mutation, (μ+λ) selection.
+"""RPE-GA optimizer: initialization, evaluation, targeted mutation, semantic
+crossover, similarity-niched (μ+λ) selection, and progressive elite confirmation.
 
-No crossover is performed.  Exactly one child is produced per parent.  All
-selection is on prompt fitness, never on edited poems.
+All selection is strictly on prompt-level generation performance, never by
+editing generated poems.
 """
 from __future__ import annotations
 
 import hashlib
+import json
 import statistics
 from datetime import datetime, timezone
+from pathlib import Path
 
 from .analyzer import analyze_candidate
-from .evaluator import aggregate_evaluations, evaluate_candidate
+from .evaluator import (
+    aggregate_evaluations, evaluate_candidate, pairwise_compare_candidates, selection_objective,
+)
 from .initializer import initialize_population
 from .llm import BudgetExhausted, LLMOutputError, is_output_truncation_error
-from .mutator import mutate_candidate
+from .metrics import prompt_similarity
+from .mutator import crossover_candidates, mutate_candidate
+from .validation import validate_prompt
 
 
 def utc_now():
@@ -39,15 +46,22 @@ class Optimizer:
         self.size = config["population"]["size"]
 
     # -- candidate records --------------------------------------------
-    def _new_candidate(self, record, *, generation, index, kind, parent=None):
+    def _new_candidate(self, record, *, generation, index, kind, parent=None, extra_parents=None):
         prompt = record.get("prompt", "")
         cid = f"g{generation:02d}-{kind}{index:02d}-{_short_hash(prompt)}"
+        if extra_parents:
+            parent_ids = [p["id"] for p in extra_parents]
+            parent_id = "+".join(parent_ids)
+        else:
+            parent_ids = [parent["id"]] if parent else []
+            parent_id = parent["id"] if parent else None
         candidate = {
             "id": cid,
             "prompt": prompt,
             "generation": generation,
-            "origin": record.get("origin") or ("initializer" if parent is None else "mutation"),
-            "parent_id": parent["id"] if parent else None,
+            "origin": record.get("origin") or ("initializer" if parent is None and not extra_parents else "mutation"),
+            "parent_id": parent_id,
+            "parent_ids": parent_ids,
             "source_index": index,
             "created_at": utc_now(),
             "valid": bool(record.get("valid")),
@@ -64,10 +78,12 @@ class Optimizer:
             "analysis": None,
             "mutation": None,
         }
-        if parent is not None:
+        if parent is not None or extra_parents:
             candidate["mutation"] = {
+                "strategy": record.get("strategy", ""),
                 "changes": record.get("changes", []),
                 "preserved": record.get("preserved", []),
+                "resolved_conflicts": record.get("resolved_conflicts", []),
                 "summary": record.get("summary", ""),
                 "valid": record.get("valid"),
                 "validation": record.get("validation"),
@@ -81,7 +97,8 @@ class Optimizer:
             "judge_style_score", "literary_quality_score", "topic_adherence",
             "originality", "form_ok_rate", "copy_rate", "score_std",
             "mean_rouge1_f1", "evaluation_count", "successful_evaluations",
-            "failed_evaluations",
+            "failed_evaluations", "eligible_count", "eligible_rate", "eligible_style",
+            "prompt_length_chars", "prompt_length_penalty",
         ):
             candidate[key] = evaluation.get(key)
 
@@ -95,14 +112,186 @@ class Optimizer:
         self.store.write_json(f"evaluations/{candidate['id']}.json", evaluation)
         return evaluation
 
+    def _extend_evaluation_to_reps(self, candidate, target_reps: int) -> int:
+        """Ensure candidate has at least ``target_reps`` repetitions per optimization topic."""
+        if target_reps <= 0 or not candidate.get("evaluation"):
+            return 0
+        old_evaluations = candidate["evaluation"].get("evaluations", [])
+        topic_count = len(self.topics["optimization"])
+        if topic_count <= 0:
+            return 0
+        current_reps = len(old_evaluations) // topic_count
+        needed = target_reps - current_reps
+        if needed <= 0:
+            return 0
+        max_rep = max((row.get("repetition", -1) for row in old_evaluations), default=-1)
+        extra = evaluate_candidate(
+            self.llm, self.config, candidate, self.topics["optimization"], self.selection,
+            judge_llm=self.judge_llm, repetitions=needed,
+            repetition_offset=max_rep + 1, kind="references",
+        )
+        merged = old_evaluations + extra.get("evaluations", [])
+        evaluation = aggregate_evaluations(candidate, merged, self.config)
+        self._apply_evaluation(candidate, evaluation)
+        self.store.write_json(f"evaluations/{candidate['id']}.json", evaluation)
+        return len(extra.get("evaluations", []))
+
+    def _resolve_elite_ties(self, state, candidates):
+        """Run symmetric AB+BA pairwise comparison when top-2 confirmed elites are within noise margin."""
+        margin = float(self.config["evaluation"].get("pairwise_tiebreak_margin", 0.0))
+        if margin <= 0 or self.judge_llm is None or not hasattr(self.judge_llm, "call_json"):
+            return candidates
+        for c in candidates:
+            c["pairwise_tiebreak_bonus"] = 0.0
+        ranked = [c for c in self._rank(candidates) if c.get("fitness") is not None and (c.get("eligible_rate") or 0) > 0]
+        if len(ranked) < 2:
+            return candidates
+        c1, c2 = ranked[0], ranked[1]
+        if c1.get("eligible_rate") != c2.get("eligible_rate"):
+            return candidates
+        s1, s2 = c1.get("eligible_style"), c2.get("eligible_style")
+        if s1 is None or s2 is None or abs(float(s1) - float(s2)) > margin:
+            return candidates
+        result = pairwise_compare_candidates(
+            self.judge_llm, self.config, c1, c2, self.selection, kind="references",
+        )
+        c1["pairwise_tiebreak_bonus"] = result["bonus_a"]
+        c2["pairwise_tiebreak_bonus"] = round(-result["bonus_a"], 4)
+        c1["pairwise_summary"] = {
+            "opponent": c2["id"],
+            "consistent_wins": result["consistent_wins_a"],
+            "consistent_losses": result["consistent_wins_b"],
+            "ties_or_flips": result["ties_or_order_flips"],
+            "order_flips": result["order_flips"],
+            "bonus": result["bonus_a"],
+        }
+        c2["pairwise_summary"] = {
+            "opponent": c1["id"],
+            "consistent_wins": result["consistent_wins_b"],
+            "consistent_losses": result["consistent_wins_a"],
+            "ties_or_flips": result["ties_or_order_flips"],
+            "order_flips": result["order_flips"],
+            "bonus": round(-result["bonus_a"], 4),
+        }
+        state.setdefault("pairwise_tiebreaks", []).append({
+            "generation": state.get("generation", 0),
+            "created_at": utc_now(),
+            **{k: v for k, v in result.items() if k != "details"},
+        })
+        if self.store:
+            self.store.write_json(
+                f"evaluations/pairwise_{c1['id']}_vs_{c2['id']}.json", result,
+            )
+            self.store.append_event({
+                "event": "pairwise_tiebreak",
+                "candidate_a": c1["id"],
+                "candidate_b": c2["id"],
+                "consistent_wins_a": result["consistent_wins_a"],
+                "consistent_wins_b": result["consistent_wins_b"],
+                "order_flips": result["order_flips"],
+                "bonus_a": result["bonus_a"],
+            })
+        return self._rank(candidates)
+
+    def _confirm_leaders_in_run(self, state, candidates=None):
+        """Confirm top-k elites during evolution so 1-sample flukes cannot freeze progress."""
+        in_run_k = min(int(self.config["population"].get("in_run_confirm_top_k", 0)), self.size)
+        confirm_reps = int(self.config["evaluation"].get("confirmation_repetitions", 0))
+        if in_run_k <= 0 or confirm_reps <= 0 or self.llm is None:
+            return candidates
+        target_reps = int(self.config["generation"]["repetitions"]) + confirm_reps
+        target_pool = state["population"] if candidates is None else candidates
+        ranked = [c for c in self._rank(target_pool) if c.get("fitness") is not None][:in_run_k]
+        changed = False
+        for candidate in ranked:
+            before = candidate.get("fitness")
+            added = self._extend_evaluation_to_reps(candidate, target_reps)
+            if added > 0:
+                changed = True
+                self.store.append_event({
+                    "event": "in_run_elite_confirmed",
+                    "candidate_id": candidate["id"],
+                    "added_evaluations": added,
+                    "fitness_before": before,
+                    "fitness_after": candidate.get("fitness"),
+                    "eligible_rate": candidate.get("eligible_rate"),
+                    "eligible_style": candidate.get("eligible_style"),
+                })
+                self.store.save_state(state)
+        ranked_all = self._resolve_elite_ties(state, self._rank(target_pool))
+        if changed or ranked_all != target_pool:
+            if candidates is None:
+                state["population"] = ranked_all
+                self.store.save_state(state)
+            return ranked_all
+        return target_pool
+
+    def _load_seed_records(self) -> list[dict]:
+        seed_path_raw = self.config["population"].get("seed_prompts_path")
+        if not seed_path_raw:
+            return []
+        seed_path = Path(seed_path_raw)
+        if not seed_path.is_absolute():
+            cfg_base = Path(self.config.get("_config_path", ".")).resolve()
+            repo_root = cfg_base.parents[2] if len(cfg_base.parents) >= 3 else Path.cwd()
+            if (repo_root / seed_path).exists():
+                seed_path = repo_root / seed_path
+        payload = json.loads(seed_path.read_text(encoding="utf-8"))
+        raw_items = payload.get("candidates", []) if isinstance(payload, dict) else payload
+        rules = {
+            **self.config["prompt_rules"],
+            "min_prompt_chars": self.config["population"]["min_prompt_chars"],
+            "max_prompt_chars": self.config["population"]["max_prompt_chars"],
+        }
+        records, seen_prompts = [], set()
+        for idx, item in enumerate(raw_items):
+            prompt = (item.get("prompt") if isinstance(item, dict) else str(item)).strip()
+            if not prompt or prompt in seen_prompts:
+                continue
+            seen_prompts.add(prompt)
+            validation = validate_prompt(
+                prompt, rules=rules, references=self.selection["references"],
+                target_name=self.selection["target_name"],
+                target_aliases=self.selection.get("target_aliases"),
+                min_chars=self.config["population"]["min_prompt_chars"],
+                max_chars=self.config["population"]["max_prompt_chars"],
+            )
+            if not validation["ok"]:
+                continue
+            src_id = item.get("id", f"seed-{idx}") if isinstance(item, dict) else f"seed-{idx}"
+            records.append({
+                "origin": "seed",
+                "focus": f"seeded_from:{src_id}",
+                "source_index": len(records),
+                "prompt": prompt,
+                "design_notes": f"精英种子热启动（源自 {src_id}）",
+                "covered_dimensions": (item.get("covered_dimensions") if isinstance(item, dict) else None) or [],
+                "valid": True,
+                "validation": validation,
+                "attempts": [{"attempt": 1, "validation": validation, "meta": {"seed_source": src_id}}],
+                "model": getattr(self.llm, "model", None),
+                "mock": bool(getattr(self.llm, "mock", False)),
+            })
+            if len(records) >= self.size:
+                break
+        return records
+
     # -- initialization ----------------------------------------------
     def _ensure_initial_population(self, state):
         init = state.setdefault("initialization", {"expected": self.size, "candidates": []})
         candidates = init.setdefault("candidates", [])
         if not candidates:
-            generated = initialize_population(self.llm, self.config, self.selection)
-            for index, record in enumerate(generated):
-                candidate = self._new_candidate(record, generation=0, index=index, kind="i")
+            seeded = self._load_seed_records()
+            generated = list(seeded)
+            if len(generated) < self.size:
+                needed_cfg = {
+                    **self.config,
+                    "population": {**self.config["population"], "size": self.size - len(generated)},
+                }
+                generated.extend(initialize_population(self.llm, needed_cfg, self.selection))
+            for index, record in enumerate(generated[:self.size]):
+                kind = "s" if record.get("origin") == "seed" else "i"
+                candidate = self._new_candidate(record, generation=0, index=index, kind=kind)
                 candidates.append(candidate)
                 self.store.append_event({
                     "event": "initial_candidate_created", "candidate_id": candidate["id"],
@@ -124,12 +313,10 @@ class Optimizer:
         valid_evaluated = [c for c in candidates if c.get("evaluation") is not None]
         if not valid_evaluated:
             raise RuntimeError("初始种群没有产生任何可评估的候选 Prompt；请检查模型输出或提示词规则")
-        # Resume safety: only install the initial population on a fresh run.
-        # A mid-evolution resume must never overwrite the evolved population or
-        # reset the generation counter back to 0.
         if not state.get("population"):
             state["population"] = candidates
             state["generation"] = 0
+            self._confirm_leaders_in_run(state)
         self.store.write_json("initial_population.json", {
             "candidates": candidates,
             "valid_evaluated": len(valid_evaluated),
@@ -143,7 +330,7 @@ class Optimizer:
         fitness = candidate.get("fitness")
         return (
             1 if fitness is not None else 0,
-            1 if candidate.get("eligible") else 0,
+            *selection_objective(candidate),
             float(fitness) if fitness is not None else 0.0,
             float(candidate.get("literary_quality_score") or 0.0),
             -float(candidate.get("score_std") or 0.0),
@@ -154,24 +341,32 @@ class Optimizer:
         return sorted(candidates, key=self.rank_key, reverse=True)
 
     def _select_survivors(self, pool):
-        """Top-m selection with prompt-level deduplication.
-
-        The paper selects solely by score.  In a real LLM run, mutation can
-        return an unchanged prompt; keeping two identical prompts wastes the
-        fixed population budget.  We therefore prefer distinct prompt texts
-        first, then fill any remaining slots from the ranked pool.  This is a
-        diversity safeguard, not crossover.
-        """
+        """Top-m selection with exact deduplication and prompt-similarity niching."""
         ranked = self._rank(pool)
+        max_sim = float(self.config["population"].get("survivor_max_similarity", 0.88))
         survivors, seen = [], set()
+        # Pass 1: distinct, similarity-niched candidates so near-clones don't crowd out diversity.
         for candidate in ranked:
             key = candidate.get("prompt", "")
-            if key in seen:
+            if not key or key in seen:
+                continue
+            if survivors and any(prompt_similarity(key, s.get("prompt", "")) >= max_sim for s in survivors):
                 continue
             seen.add(key)
             survivors.append(candidate)
             if len(survivors) >= self.size:
                 break
+        # Pass 2: fill remaining slots with any non-identical prompt texts by rank.
+        if len(survivors) < self.size:
+            for candidate in ranked:
+                key = candidate.get("prompt", "")
+                if key in seen:
+                    continue
+                seen.add(key)
+                survivors.append(candidate)
+                if len(survivors) >= self.size:
+                    break
+        # Pass 3: fallback if pool has fewer distinct prompts than self.size.
         if len(survivors) < self.size:
             for candidate in ranked:
                 if candidate not in survivors:
@@ -183,6 +378,7 @@ class Optimizer:
     def _selection_summary(self, generation, pool, survivors):
         survivor_ids = {c["id"] for c in survivors}
         ranked = self._rank(pool)
+        max_sim = float(self.config["population"].get("survivor_max_similarity", 0.88))
         rows = []
         for rank, candidate in enumerate(ranked, 1):
             if candidate["id"] in survivor_ids:
@@ -191,6 +387,8 @@ class Optimizer:
                 reason = "not_evaluated_or_invalid_prompt"
             elif candidate.get("prompt") in {c.get("prompt") for c in survivors if c["id"] != candidate["id"]}:
                 reason = "duplicate_prompt_of_another_survivor"
+            elif any(prompt_similarity(candidate.get("prompt", ""), s.get("prompt", "")) >= max_sim for s in survivors):
+                reason = "near_duplicate_niched_out"
             elif not candidate.get("eligible"):
                 reason = "ineligible_constraints"
             else:
@@ -205,6 +403,9 @@ class Optimizer:
                 "style_score": candidate.get("style_score"),
                 "literary_quality_score": candidate.get("literary_quality_score"),
                 "score_std": candidate.get("score_std"),
+                "eligible_rate": candidate.get("eligible_rate"),
+                "eligible_style": candidate.get("eligible_style"),
+                "evaluation_count": candidate.get("evaluation_count"),
                 "selected": candidate["id"] in survivor_ids,
                 "reason": reason,
             })
@@ -225,6 +426,21 @@ class Optimizer:
             "created_at": utc_now(),
         }
 
+    def _crossover_pairs(self, parents, count: int):
+        ranked = [p for p in self._rank(parents) if p.get("valid") and p.get("fitness") is not None]
+        if len(ranked) < 2 or count <= 0:
+            return []
+        pairs = []
+        for i in range(len(ranked)):
+            for j in range(i + 1, len(ranked)):
+                if prompt_similarity(ranked[i].get("prompt", ""), ranked[j].get("prompt", "")) < 0.92:
+                    pairs.append((ranked[i], ranked[j]))
+                if len(pairs) >= count:
+                    return pairs
+        while len(pairs) < count and len(ranked) >= 2:
+            pairs.append((ranked[0], ranked[min(len(ranked) - 1, len(pairs) + 1)]))
+        return pairs[:count]
+
     # -- one generation ----------------------------------------------
     def _run_generation(self, state, generation):
         pending = state.get("pending_generation")
@@ -240,11 +456,16 @@ class Optimizer:
                 "children": children,
             }
             self.store.save_state(state)
-        done_parents = {child.get("parent_id") for child in children}
+
+        done_mutation_parents = {
+            child.get("parent_id") for child in children if child.get("origin") == "mutation"
+        }
         for index, parent in enumerate(parents):
-            if parent["id"] in done_parents:
+            if parent["id"] in done_mutation_parents:
                 continue
-            analysis = analyze_candidate(self.llm, self.config, parent, parent.get("evaluation") or {}, self.selection)
+            analysis = analyze_candidate(
+                self.llm, self.config, parent, parent.get("evaluation") or {}, self.selection,
+            )
             parent["analysis"] = analysis
             self.store.write_json(f"analyses/{parent['id']}.json", analysis)
             self.store.append_event({
@@ -253,7 +474,8 @@ class Optimizer:
             })
             try:
                 mutated = mutate_candidate(
-                    self.llm, self.config, parent, analysis, self.selection, round_id=f"g{generation:02d}",
+                    self.llm, self.config, parent, analysis, self.selection,
+                    round_id=f"g{generation:02d}", strategy_index=generation + index,
                 )
             except LLMOutputError as exc:
                 mutated = {
@@ -287,37 +509,66 @@ class Optimizer:
                     "errors": (child.get("validation") or {}).get("errors"),
                 })
             children.append(child)
-            state.setdefault("all_children", []).append({
-                "generation": generation,
-                "id": child["id"],
-                "parent_id": parent["id"],
-                "valid": child["valid"],
-                "fitness": child.get("fitness"),
-                "eligible": child.get("eligible"),
-                "changes": (child.get("mutation") or {}).get("changes", []),
-                "summary": (child.get("mutation") or {}).get("summary", ""),
-                "prompt": child["prompt"],
-            })
-            self.store.write_json(f"mutations/{child['id']}.json", {
-                "child_id": child["id"], "parent_id": parent["id"],
-                "prompt": child["prompt"], "valid": child["valid"],
-                "validation": child.get("validation"), "mutation": child.get("mutation"),
-            })
-            self.store.save_state(state)
-            self.store.append_event({
-                "event": "child_evaluated", "candidate_id": child["id"],
-                "parent_id": parent["id"], "valid": child["valid"],
-                "fitness": child.get("fitness"),
-            })
+            self._record_child_artifacts(state, generation, child)
+
+        # Semantic crossover between distinct elite parents
+        crossover_count = int(self.config["population"].get("crossover_count", 0))
+        pairs = self._crossover_pairs(parents, crossover_count)
+        done_crossovers = {
+            child.get("parent_id") for child in children if child.get("origin") == "crossover"
+        }
+        for pair_idx, (pa, pb) in enumerate(pairs):
+            pair_key = f"{pa['id']}+{pb['id']}"
+            if pair_key in done_crossovers:
+                continue
+            try:
+                crossed = crossover_candidates(
+                    self.llm, self.config, pa, pb, self.selection,
+                    round_id=f"g{generation:02d}", pair_index=pair_idx,
+                )
+            except LLMOutputError as exc:
+                crossed = {
+                    "prompt": "",
+                    "valid": False,
+                    "validation": {"ok": False, "errors": [str(exc)], "warnings": [], "metrics": {}},
+                    "changes": [], "preserved": [], "summary": "", "attempts": [],
+                    "model": getattr(self.llm, "model", None), "mock": bool(getattr(self.llm, "mock", False)),
+                }
+            except RuntimeError as exc:
+                if not is_output_truncation_error(exc):
+                    raise
+                crossed = {
+                    "prompt": "",
+                    "valid": False,
+                    "validation": {"ok": False, "errors": [f"重组输出被截断：{exc}"], "warnings": [], "metrics": {}},
+                    "changes": [], "preserved": [], "summary": "", "attempts": [],
+                    "model": getattr(self.llm, "model", None), "mock": bool(getattr(self.llm, "mock", False)),
+                }
+            child = self._new_candidate(
+                {**crossed, "origin": "crossover"}, generation=generation, index=pair_idx,
+                kind="x", extra_parents=[pa, pb],
+            )
+            if child["valid"]:
+                self._evaluate(child)
+            else:
+                self.store.append_event({
+                    "event": "crossover_invalid", "candidate_id": child["id"],
+                    "parent_id": child["parent_id"],
+                    "errors": (child.get("validation") or {}).get("errors"),
+                })
+            children.append(child)
+            self._record_child_artifacts(state, generation, child)
 
         pool = parents + children
         survivors = self._select_survivors(pool)
-        summary = self._selection_summary(generation, pool, survivors)
-        summary["parents"] = [p["id"] for p in parents]
-        summary["children"] = [c["id"] for c in children]
+        # Confirm top elites BEFORE committing generation state so resume is atomic
+        survivors = self._confirm_leaders_in_run(state, candidates=survivors)
         state["population"] = survivors
         state["generation"] = generation
         state["pending_generation"] = None
+        summary = self._selection_summary(generation, pool, survivors)
+        summary["parents"] = [p["id"] for p in parents]
+        summary["children"] = [c["id"] for c in children]
         state.setdefault("generations", []).append(summary)
         self.store.write_json(f"population/gen_{generation:03d}.json", {
             "generation": generation,
@@ -326,12 +577,40 @@ class Optimizer:
             "survivors": survivors,
             "summary": summary,
         })
+        return summary
+
+    def _record_child_artifacts(self, state, generation, child):
+        state.setdefault("all_children", []).append({
+            "generation": generation,
+            "id": child["id"],
+            "origin": child.get("origin"),
+            "parent_id": child.get("parent_id"),
+            "valid": child["valid"],
+            "fitness": child.get("fitness"),
+            "eligible": child.get("eligible"),
+            "eligible_rate": child.get("eligible_rate"),
+            "eligible_style": child.get("eligible_style"),
+            "changes": (child.get("mutation") or {}).get("changes", []),
+            "summary": (child.get("mutation") or {}).get("summary", ""),
+            "prompt": child["prompt"],
+        })
+        self.store.write_json(f"mutations/{child['id']}.json", {
+            "child_id": child["id"],
+            "origin": child.get("origin"),
+            "parent_id": child.get("parent_id"),
+            "prompt": child["prompt"],
+            "valid": child["valid"],
+            "validation": child.get("validation"),
+            "mutation": child.get("mutation"),
+        })
         self.store.save_state(state)
         self.store.append_event({
-            "event": "generation_complete", "generation": generation,
-            "best": summary["statistics"]["best"], "survivors": summary["survivor_ids"],
+            "event": "child_evaluated", "candidate_id": child["id"],
+            "origin": child.get("origin"), "parent_id": child.get("parent_id"),
+            "valid": child["valid"], "fitness": child.get("fitness"),
+            "eligible_rate": child.get("eligible_rate"),
+            "eligible_style": child.get("eligible_style"),
         })
-        return summary
 
     def _write_checkpoint(self, state, generation):
         interval = self.config["population"].get("checkpoint_every", 0)
@@ -344,6 +623,8 @@ class Optimizer:
             "created_at": utc_now(),
             "best_candidate_id": best["id"] if best else None,
             "best_fitness": best.get("fitness") if best else None,
+            "best_eligible_rate": best.get("eligible_rate") if best else None,
+            "best_eligible_style": best.get("eligible_style") if best else None,
             "population": ranked,
             "generation_summary": state.get("generations", [{}])[-1],
             "fitness_history": state.get("fitness_history", []),
@@ -352,9 +633,18 @@ class Optimizer:
         self.store.write_json(f"checkpoints/gen_{generation:03d}/snapshot.json", snapshot)
         if best:
             self.store.write_text(f"checkpoints/gen_{generation:03d}/best_prompt.txt", best.get("prompt", "") + "\n")
-            rows = ["# Generation %03d checkpoint" % generation, "", "| rank | candidate | fitness | eligible |", "|---|---|---:|---|"]
+            rows = [
+                f"# Generation {generation:03d} checkpoint",
+                "",
+                "| rank | candidate | eligible_rate | eligible_style | fitness | evals |",
+                "|---|---|---:|---:|---:|---:|",
+            ]
             for rank, candidate in enumerate(ranked, 1):
-                rows.append(f"| {rank} | {candidate['id']} | {candidate.get('fitness')} | {candidate.get('eligible')} |")
+                rows.append(
+                    f"| {rank} | {candidate['id']} | {candidate.get('eligible_rate')} | "
+                    f"{candidate.get('eligible_style')} | {candidate.get('fitness')} | "
+                    f"{candidate.get('evaluation_count')} |"
+                )
             rows.append("")
             self.store.write_text(f"checkpoints/gen_{generation:03d}/leaderboard.md", "\n".join(rows))
         self.store.append_event({"event": "checkpoint", "generation": generation, "best": best.get("fitness") if best else None})
@@ -366,54 +656,51 @@ class Optimizer:
         reps = ev.get("confirmation_repetitions", 0)
         if top_k <= 0 or reps <= 0:
             return None
-        ranked = self._rank(state["population"])[:top_k]
-        confirmations = []
-        for candidate in ranked:
-            if candidate.get("evaluation") is None:
+        target_reps = int(self.config["generation"]["repetitions"]) + int(reps)
+        confirmation = state.get("confirmation")
+        if not confirmation:
+            shortlist = [c["id"] for c in self._rank(state["population"]) if c.get("fitness") is not None][:top_k]
+            confirmation = {"completed": False, "top_k": top_k, "repetitions": reps,
+                            "target_repetitions": target_reps, "shortlist": shortlist, "rows": []}
+            state["confirmation"] = confirmation
+            self.store.save_state(state)
+        candidates = {c["id"]: c for c in state["population"]}
+        confirmations = confirmation["rows"]
+        done = {row["candidate_id"] for row in confirmations if row["completed"]}
+        for candidate_id in confirmation["shortlist"]:
+            if candidate_id in done:
                 continue
-            old_evaluations = candidate["evaluation"].get("evaluations", [])
-            max_rep = max((row.get("repetition", -1) for row in old_evaluations), default=-1)
+            candidate = candidates[candidate_id]
             fitness_before = candidate.get("fitness")
-            try:
-                extra = evaluate_candidate(
-                    self.llm, self.config, candidate, self.topics["optimization"], self.selection,
-                    judge_llm=self.judge_llm, repetitions=reps,
-                    repetition_offset=max_rep + 1, kind="references",
-                )
-            except BudgetExhausted as exc:
-                confirmations.append({"candidate_id": candidate["id"], "completed": False, "error": str(exc)})
-                state["confirmation"] = {
-                    "completed": False, "top_k": top_k, "repetitions": reps,
-                    "rows": confirmations, "note": "确认评估时预算耗尽；保留原适应度。",
-                }
-                self.store.save_state(state)
-                return state["confirmation"]
-            merged = old_evaluations + extra.get("evaluations", [])
-            evaluation = aggregate_evaluations(candidate, merged, self.config)
-            self._apply_evaluation(candidate, evaluation)
-            self.store.write_json(f"evaluations/{candidate['id']}.json", evaluation)
+            added = self._extend_evaluation_to_reps(candidate, target_reps)
             confirmations.append({
                 "candidate_id": candidate["id"], "completed": True,
-                "added_evaluations": len(extra.get("evaluations", [])),
+                "added_evaluations": added,
                 "fitness_before": fitness_before, "fitness_after": candidate.get("fitness"),
+                "eligible_rate": candidate.get("eligible_rate"),
+                "eligible_style": candidate.get("eligible_style"),
                 "evaluation_count": candidate.get("evaluation_count"),
             })
             self.store.append_event({
                 "event": "confirmation_evaluated", "candidate_id": candidate["id"],
-                "fitness": candidate.get("fitness"),
+                "added_evaluations": added, "fitness": candidate.get("fitness"),
+                "eligible_rate": candidate.get("eligible_rate"),
+                "eligible_style": candidate.get("eligible_style"),
             })
             self.store.save_state(state)
-        state["confirmation"] = {
-            "completed": True, "top_k": top_k, "repetitions": reps,
-            "rows": confirmations,
-            "note": "仅对最终种群的高分候选追加生成样本，以降低单次随机生成造成的误判。",
-        }
+        confirmation["completed"] = True
+        state["population"] = self._resolve_elite_ties(state, self._rank(state["population"]))
         self.store.save_state(state)
         return state["confirmation"]
 
     def _finalize(self, state):
         ranked = self._rank(state["population"])
         evaluated = [c for c in ranked if c.get("fitness") is not None]
+        confirmation = state.get("confirmation")
+        if confirmation and "shortlist" in confirmation:
+            if not confirmation["completed"]:
+                raise RuntimeError("候选确认重评尚未完成")
+            evaluated = [c for c in evaluated if c["id"] in confirmation["shortlist"]]
         if not evaluated:
             raise RuntimeError("最终种群没有可评估的候选")
         best = evaluated[0]
@@ -426,11 +713,19 @@ class Optimizer:
             "fitness": best["fitness"],
             "eligible": best.get("eligible"),
             "style_score": best.get("style_score"),
+            "deterministic_style_score": best.get("deterministic_style_score"),
+            "judge_style_score": best.get("judge_style_score"),
             "literary_quality_score": best.get("literary_quality_score"),
             "topic_adherence": best.get("topic_adherence"),
             "originality": best.get("originality"),
+            "eligible_rate": best.get("eligible_rate"),
+            "eligible_style": best.get("eligible_style"),
+            "pairwise_tiebreak_bonus": best.get("pairwise_tiebreak_bonus", 0.0),
+            "pairwise_summary": best.get("pairwise_summary"),
             "score_std": best.get("score_std"),
             "evaluation_count": best.get("evaluation_count"),
+            "prompt_length_chars": best.get("prompt_length_chars"),
+            "prompt_length_penalty": best.get("prompt_length_penalty"),
             "generation": best.get("generation"),
             "parent_id": best.get("parent_id"),
             "origin": best.get("origin"),
@@ -442,8 +737,8 @@ class Optimizer:
             "created_at": utc_now(),
             "limitations": [
                 "这是通过生成实验搜索到的风格控制 Prompt，不是诗人原始创作指令。",
-                "适应度包含 LLM 评审，存在主观性与同模型自评偏差。",
-                "小样本、单模型、有限轮次；不能据此声称普遍有效。",
+                "适应度包含 LLM 评审，即使切换同家族不同模型仍可能存在评测偏好。",
+                "有限语料与测试题目；审美结论仍需结合人工盲评抽查。",
             ] + (["MOCK 运行：Prompt 与分数均为模拟数据，不是研究结论。"] if state.get("is_mock") else []),
         }
         self.store.write_json("final_prompt.json", state["final_prompt"])
@@ -464,41 +759,47 @@ class Optimizer:
             min_improvement = self.config["population"].get("min_improvement", 0.0)
             history = state.get("fitness_history", [])
             last_history = history[-1] if history else None
-            best_so_far = (
-                last_history.get("best_so_far") if last_history else
-                max((c["fitness"] for c in state["population"] if c.get("fitness") is not None), default=None)
-            )
+            best_objective = (tuple(last_history["best_objective"]) if last_history else
+                              selection_objective(self._rank(state["population"])[0]))
             stale = int(last_history.get("stale_generations", 0)) if last_history else 0
-            while state["generation"] < max_generations:
+            while state["generation"] < max_generations and not state.get("early_stopped"):
                 generation = state["generation"] + 1
                 summary = self._run_generation(state, generation)
-                current = summary["statistics"]["best"]
-                if current is not None:
-                    if best_so_far is None or current > best_so_far + min_improvement:
-                        best_so_far = current
-                        stale = 0
-                    else:
-                        stale += 1
+                leader = self._rank(state["population"])[0]
+                current = selection_objective(leader)
+                if (current[0] > best_objective[0] or
+                        (current[0] == best_objective[0] and current[1] > best_objective[1] + min_improvement)):
+                    best_objective = current
+                    stale = 0
+                else:
+                    stale += 1
                 state.setdefault("fitness_history", []).append({
                     "generation": generation,
-                    "best": current,
+                    "best": leader.get("fitness"),
+                    "leader_id": leader["id"],
+                    "eligible_rate": current[0],
+                    "eligible_style": leader.get("eligible_style"),
                     "mean": summary["statistics"]["mean"],
                     "std": summary["statistics"]["std"],
-                    "best_so_far": best_so_far,
+                    "best_objective": list(best_objective),
                     "stale_generations": stale,
                 })
-                self._write_checkpoint(state, generation)
-                self.store.save_state(state)
                 if patience and stale >= patience:
                     state["early_stopped"] = {
                         "generation": generation, "patience": patience,
                         "min_improvement": min_improvement,
-                        "reason": "连续多代最优适应度没有超过阈值",
+                        "reason": "连续多代合格率和合格作品风格分均未改善至阈值",
                     }
                     self.store.append_event({"event": "early_stop", **state["early_stopped"]})
-                    break
+                self._write_checkpoint(state, generation)
+                self.store.save_state(state)
+                self.store.append_event({
+                    "event": "generation_complete", "generation": generation,
+                    "leader": leader["id"], "eligible_rate": current[0],
+                    "eligible_style": leader.get("eligible_style"), "survivors": summary["survivor_ids"],
+                })
             self._confirm_top(state)
-            best = self._finalize(state)
+            self._finalize(state)
             state["status"] = "optimization_completed"
             self.store.update_status(state, "optimization_completed")
             return state
@@ -507,5 +808,3 @@ class Optimizer:
             self.store.update_status(state, "budget_exhausted")
             self.store.append_event({"event": "budget_exhausted", "message": str(exc)})
             return state
-
-

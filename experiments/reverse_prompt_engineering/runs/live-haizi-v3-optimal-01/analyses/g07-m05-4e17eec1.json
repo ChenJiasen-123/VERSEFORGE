@@ -1,0 +1,163 @@
+{
+  "reproduced": [
+    {
+      "feature": "无标点呼吸分行",
+      "generated_evidence": "售货机 你是这层楼最后一张亮着的脸 / 光是冷的 属于值夜的人",
+      "reference_evidence": "亚洲铜，亚洲铜 / 祖父死在这里，父亲死在这里，我也将死在这里",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "呼告与复沓变奏",
+      "generated_evidence": "售货机 你把深夜分成格子 / 每一格都锁着一点甜",
+      "reference_evidence": "亚洲铜，亚洲铜 / 你是唯一的一块埋人的地方",
+      "claim_type": "observation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "具身动作与日常物件并置",
+      "generated_evidence": "我把那罐凉的 贴住额头",
+      "reference_evidence": "喂马，劈柴，周游世界 / 关心粮食和蔬菜",
+      "claim_type": "observation",
+      "confidence": "high"
+    }
+  ],
+  "missing": [
+    {
+      "feature": "原初元素/时间生命尺度与日常物件的碰撞",
+      "generated_evidence": "售货机 你把深夜分成格子 / 每一格都锁着一点甜",
+      "reference_evidence": "明月如镜高悬草原映照千年岁月 / 我的琴声呜咽 泪水全无",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "feature": "长短句张力（行长变异系数偏低）",
+      "generated_evidence": "opt-04 行长变异系数 0.12，opt-02 0.18，opt-03 0.16",
+      "reference_evidence": "参考行长变异系数中位数 0.338，p10 0.224",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "质朴而有重量的词域（具体字面词偏低）",
+      "generated_evidence": "opt-01 具体字面词/百字 4.05，opt-05 7.98",
+      "reference_evidence": "参考具体字面词/百字中位数 10.56，p10 8.19",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "赤诚呼告的灼烧感与变奏回返",
+      "generated_evidence": "opt-04 每节以“这是”开头，相邻行同头率 0.47",
+      "reference_evidence": "参考相邻行同头率中位数 0.08，p90 0.14",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "结尾落地留白（不总结升华）",
+      "generated_evidence": "opt-01 结尾“我把那罐凉的 贴住额头”仍带解释性动作；opt-04 结尾“弯腰 把绳结再紧一紧”偏格言化",
+      "reference_evidence": "参考结尾如“我把这远方的远归还草原 / 只身打马过草原”以动作收束，不解释",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    }
+  ],
+  "extraneous": [
+    {
+      "feature": "解释性明喻",
+      "generated_evidence": "投币口吞下最后一枚硬币 / 像吞下整夜的疲惫；取货口垂下 像一只疲软的手",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "工业零件清单式罗列",
+      "generated_evidence": "桥墩 铁链 江水 灯光 缆绳 桥影 跳板",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "固定呼告填空句式",
+      "generated_evidence": "opt-04 每节“这是……”；opt-02 每节“XX 你……”",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "解释性连词与过渡",
+      "generated_evidence": "还是我的骨头先认了输；却不愿照见船底的裂缝",
+      "claim_type": "observation",
+      "confidence": "medium"
+    }
+  ],
+  "prompt_issues": [
+    {
+      "quote": "呼告带灼烧感：短促肯定句直接命名眼前之物，说它是什么、属于谁，同时转向可被呼唤的人、地点或物",
+      "issue_type": "template_inducing",
+      "explanation": "“说它是什么、属于谁”直接诱导生成“XX 你属于谁”“这是……”等填空句式，导致每节首行呼告位置固定、同头率过高。",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "quote": "复沓须是语义变奏：允许同一呼告主语或短语跨节回返，但每次回返须改变它所承受的动作方向或所属关系",
+      "issue_type": "over_specific",
+      "explanation": "规定过死，生成时机械执行“每节首行呼告+变奏”，反而形成可预测的节间模板，削弱自然呼吸。",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "quote": "尺度压过物件：从现场器物或具身动作起步，让一个超出它自身的尺度（时间、生死、原初元素）真正压过它、改写它",
+      "issue_type": "vague",
+      "explanation": "“真正压过它、改写它”缺乏可操作标准，生成诗多停留在“深夜”“整座城”等泛化尺度，未出现原初元素与时间纵深。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "quote": "断行即呼吸，长短须有张力：行末几乎不落标点，靠换行与行内留白制造停顿；极短行与跨行长句交错并置，避免通篇行长大致均齐",
+      "issue_type": "ineffective",
+      "explanation": "虽已提出长短张力，但生成诗行长变异系数仍普遍低于参考p10，说明该条款未有效约束生成，需更具体的负面示例或删减其他干扰条款。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "quote": "词域取根本、句法压缩：多用身体、方位、天象、土地、亲缘、动作等基础实词，删去解释性连词，让短句与并列短语直接相撞",
+      "issue_type": "conflicting",
+      "explanation": "“抽象词可独立承担重量”与“不靠贴喻或说明句撑开”存在张力，生成诗仍出现“像吞下整夜的疲惫”等明喻，说明条款内部优先级不清。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    }
+  ],
+  "topic_overreliance": {
+    "assessment": "生成诗高度依赖题目给出的现场物件（售货机、铁锹、桥墩、秤、油枪），将诗写成物件清单与事务描写，未能从物件自然打开时间纵深或原初元素，导致 mythic_register 维度最低（2.2）。",
+    "evidence": "opt-03 罗列桥墩、铁链、江水、灯光、缆绳、桥影、跳板；opt-04 罗列指节、秤、白菜、土豆、筐、冰水、手、口子、疼。",
+    "claim_type": "observation",
+    "confidence": "high"
+  },
+  "summary": "当前生成诗已自然复现无标点分行、呼告复沓与具身动作并置等特征，但核心瓶颈在于：Prompt 中“说它是什么、属于谁”与“复沓须变奏”被机械执行为每节首行呼告填空，导致同头率过高、行长过平；同时“尺度压过物件”条款含糊，生成诗困于现场物件清单，未打开原初元素与时间生命尺度，词域偏轻、明喻与解释性连词残留，整体呈规则练习作而非赤诚呼告。",
+  "actionable_suggestions": [
+    "删去“说它是什么、属于谁”的填空式指令，改为“呼告对象可出现在行中任意位置，不必每节首行重复；复沓以语义推进为准，不规定回返频率”。",
+    "将“尺度压过物件”改为具体负面约束：“禁止将天象、时间词作为并列点缀；必须让一个原初元素（如土、水、火、夜、太阳）在诗中承担动作或判断，而非仅被命名”。",
+    "增加一条硬性禁令：“禁止使用‘像’‘如’‘似’引出的明喻，禁止‘还是……’‘却……’等解释性连词；抽象词须与具身动作直接相撞，不得单独成行作说明”。",
+    "精炼断行条款：“行长须有明显长短交错，至少出现一次三字以内短行与一次跨行连续长句；删去‘单节保持紧凑’等模糊配额，改为‘避免连续三行长度相近’”。",
+    "删去“结尾落地留白”中“或一声呼唤”的宽泛选项，改为“结尾只写一个具体动作或物象，不写格言、不写总结性判断，不出现‘把……’式解释性收束”。"
+  ],
+  "analysis_model": "deepseek-flash",
+  "analysis_meta": {
+    "usage": {
+      "prompt_tokens": 6716,
+      "completion_tokens": 2180,
+      "total_tokens": 8896,
+      "prompt_tokens_details": {
+        "cached_tokens": 3328
+      },
+      "prompt_cache_hit_tokens": 3328,
+      "prompt_cache_miss_tokens": 3388
+    },
+    "cache_hit": false,
+    "request_settings": {
+      "max_tokens": 4000,
+      "response_format": "json_object",
+      "thinking": "disabled",
+      "temperature": 0.2
+    },
+    "model": "deepseek-flash",
+    "attempt": 1
+  },
+  "fallback": false,
+  "mock": false
+}

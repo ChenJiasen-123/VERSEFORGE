@@ -1,0 +1,191 @@
+{
+  "reproduced": [
+    {
+      "feature": "无标点呼吸分行（行末几乎不落标点）",
+      "generated_evidence": "所有生成诗行末均无标点，如“走廊尽头 光还醒着”“机器低低地嗡”“我投一枚硬币”等，行末标点率为0。",
+      "reference_evidence": "参考诗行末标点率中位数为0，p90为0.077，绝大多数行末无标点。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "行内空格制造停顿与节奏",
+      "generated_evidence": "如“铁罐落下 一声闷响”“买一罐 指节碰出金属的凉”“水退到墙根 留下一圈泥线”等，行内空格频繁出现。",
+      "reference_evidence": "参考诗如“亚洲铜，亚洲铜”“我的琴声呜咽 泪水全无”“万人都要将火熄灭 我一人独将此火高高举起”等，行内空格常见。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "核心词根复现（黑夜、大地、粮食、村庄等）",
+      "generated_evidence": "“黑夜”在opt-04出现2次，“大地”在opt-01、opt-02、opt-04、opt-05出现，“粮食”在opt-04、opt-05出现，“村庄”在opt-04出现。",
+      "reference_evidence": "参考诗中“黑夜”“大地”“粮食”“村庄”等词根高频复现，如《黑夜的献诗》《麦地》等。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "呼告句式（“我愿”“你无力偿还”等）",
+      "generated_evidence": "opt-02“我愿把淤泥一车车推走”“孩子们 你们无力偿还这场水”；opt-04“我愿把手伸进这湿冷里”“我无力偿还那些赶路人的哈气”；opt-05“我愿这堆沙再高一点”“可你无力偿还”。",
+      "reference_evidence": "参考诗如“我愿将牢底坐穿”“你无力偿还/麦地和光芒的情义”“姐姐，今夜我在德令哈”等。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "结尾回到具体动作或短句",
+      "generated_evidence": "opt-01“走回病房 拖鞋蹭着地/一下 又一下”；opt-02“我拍拍手上的土 说 回来吧”；opt-03“到岸了/他把烟头弹进江心”；opt-05“风继续数着空油枪”。",
+      "reference_evidence": "参考诗如“我只愿面朝大海，春暖花开”“风后面是风/天空上面是天空/道路前面还是道路”“今夜我不关心人类，我只想你”等。",
+      "claim_type": "observation",
+      "confidence": "medium"
+    }
+  ],
+  "missing": [
+    {
+      "feature": "长短句张力（行长变异系数不足）",
+      "generated_evidence": "opt-02行长变异系数仅0.09，远低于参考p10的0.22；其他诗行长也偏均匀，如opt-01各行长度多在7-12字之间，缺少陡峭落差。",
+      "reference_evidence": "参考诗行长变异系数中位数0.338，p10为0.224，长短句交错明显，如《亚洲铜》中短行“亚洲铜，亚洲铜”与长行“祖父死在这里，父亲死在这里，我也将死在这里”并置。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "复沓的语义增重与变奏回环",
+      "generated_evidence": "opt-04“黑夜 黑夜”仅重复一次，后续未再回环；opt-05“我愿”与“你无力偿还”各出现一次，未形成变奏。整体重复率偏低（opt-04字重复率0.25，低于参考p10的0.28）。",
+      "reference_evidence": "参考诗如《亚洲铜》每节以“亚洲铜，亚洲铜”领起，语义逐节变化；《黑夜的献诗》中“黑夜一无所有/为何给我安慰”重复出现，语义加重。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "原初元素/时间生命尺度与日常物件的真实碰撞",
+      "generated_evidence": "opt-01“夜把大地翻了个面”后接“我听见自己的胃在叫”，但“大地”与“胃”的碰撞较突兀，且“骨灰盒”“井”的明喻偏装饰；opt-02“大地退后时踩出的印”后接操场事务，未自然打开时间纵深。",
+      "reference_evidence": "参考诗如《亚洲铜》将“祖父死在这里，父亲死在这里”与“青草”“野花的手掌”并置；《黑夜的献诗》将“丰收后荒凉的大地”与“阎王的眼睛”碰撞，尺度转换自然且有重量。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "质朴而有重量的词域（避免解释性连词与明喻）",
+      "generated_evidence": "opt-01“像有人把一整夜含在喉咙里”“像没人认领的骨灰盒”“叫得像一口井”“像神欠身”明喻密集（2.63/百字）；opt-02“像大地退后时踩出的印”“硬得像干透的田”“像锤”；opt-04“像一头尚未睁眼的兽”。",
+      "reference_evidence": "参考诗明喻率中位数为0，p90为0.198/百字，极少使用“像”字明喻，多靠并置与重复承担逻辑。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "赤诚呼告与自我贬抑的痛感深度",
+      "generated_evidence": "opt-02“你们无力偿还这场水”近参考句法但情感偏轻，痛感未深入；opt-04“我无力偿还那些赶路人的哈气”同样偏冷静清点。",
+      "reference_evidence": "参考诗如“你无力偿还/麦地和光芒的情义”“我年华虚度 空有一身疲倦”等，赤诚痛感与自我贬抑更强烈。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "神话/原初尺度的自然打开",
+      "generated_evidence": "opt-01“像神欠身”偏装饰；opt-02“大地退后”有原初感但整体困于操场事务；opt-05“守着大地漏下的粮食”稍显抽象。",
+      "reference_evidence": "参考诗如“目击众神死亡的草原上野花一片”“众神创造物中只有我最易朽”“太阳是我的名字/太阳是我的一生”等，神性尺度与日常物象自然融合。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    }
+  ],
+  "extraneous": [
+    {
+      "feature": "明喻滥用（“像”字句密集）",
+      "generated_evidence": "opt-01出现4处“像”字明喻；opt-02出现3处；opt-04出现1处。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "解释性连词与抽象判断",
+      "generated_evidence": "opt-01“像有人把一整夜含在喉咙里”引入解释；opt-02“像大地退后时踩出的印”解释水痕；opt-04“那重量里有一整座村庄的睡眠”抽象判断。",
+      "claim_type": "observation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "琐碎工业零件清点",
+      "generated_evidence": "opt-01“铁罐”“冷柜”“水瓶”“机器灯”；opt-03“铁链”“柴油”“冷馒头”“钢索”“桥墩”；opt-05“铁皮棚”“油价牌”“空油枪”。",
+      "claim_type": "observation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "节内行数过多（超出1-6行）",
+      "generated_evidence": "所有生成诗第2节行数均超过6行（opt-01第2节11行，opt-02第2节8行，opt-03第2节8行，opt-04第2节7行，opt-05第2节7行），导致形式违规。",
+      "claim_type": "observation",
+      "confidence": "high"
+    }
+  ],
+  "prompt_issues": [
+    {
+      "quote": "节内以短行领起、长行铺开、再收短行，节与节之间靠意象或呼告的回环推进",
+      "issue_type": "over_specific",
+      "explanation": "该条款规定过死，导致生成诗每节机械套用“短-长-短”结构，但实际行长变异系数仍偏低（opt-02仅0.09），且节内行数膨胀（第2节常超6行），反而破坏呼吸节奏。建议改为更灵活的长短句张力要求，不规定具体行数模式。",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "quote": "核心词根（粮食、黑夜、大地、火、远方、姐妹、村庄等）须反复出现，但每次改变句法位置或语义重量",
+      "issue_type": "template_inducing",
+      "explanation": "该条款诱导生成诗机械填充词根，如opt-04“黑夜 黑夜”仅重复一次未变奏，opt-05“我愿”“你无力偿还”各出现一次未回环。词根出现但未形成语义增重，反而像填空。建议强调复沓的变奏与语义推进，而非词根清单。",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "quote": "抒情姿态介于赤诚宣告与自我贬抑之间：用“我愿”“我不能”“你无力偿还”一类朴素直陈句",
+      "issue_type": "over_specific",
+      "explanation": "直接给出句式模板，导致生成诗每首必用“我愿”“你无力偿还”，如opt-02、opt-04、opt-05均出现，形成僵化套语。建议改为描述情感姿态，不提供具体句式。",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "quote": "意象尺度陡峭转换：从一只木桶、一束麦穗、一扇门等具体现场物件，直接跃向大地、天空、千年岁月、死亡与神性",
+      "issue_type": "vague",
+      "explanation": "该条款含糊，未说明如何自然碰撞，导致生成诗生硬拼接，如opt-01“夜把大地翻了个面”后接“胃在叫”，opt-02“大地退后”后接操场事务，尺度转换突兀。建议强调碰撞的有机性，而非简单并置。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "quote": "结尾不总结、不升华到空泛，而是回到一个具体动作或一句近乎童谣的短句",
+      "issue_type": "ineffective",
+      "explanation": "该条款部分有效，但生成诗结尾仍偏套路，如opt-01“一下 又一下”、opt-02“说 回来吧”、opt-05“风继续数着空油枪”，虽具体但缺乏余震。建议强调结尾的沉默与回响，而非仅动作。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "quote": "总纲：让声音比语义先到场——用几乎不落标点的断行制造呼吸，用朴素词根反复回响撑起精神尺度，让具体物件与大地、黑夜、死亡、时间正面相撞。",
+      "issue_type": "redundant",
+      "explanation": "总纲与后续条款重复，且“声音比语义先到场”含糊，未转化为可操作指令。建议精简总纲，聚焦核心矛盾。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    }
+  ],
+  "topic_overreliance": {
+    "assessment": "生成诗高度依赖题目给定的具体场景（医院走廊、操场、渡轮、批发市场、加油站），但未能从场景中自然生长出原初尺度，导致意象停留在琐碎物件清点，精神开阔度不足。",
+    "evidence": "opt-01围绕自动售货机写“铁罐”“冷柜”“水瓶”“机器灯”；opt-03围绕渡轮写“铁链”“柴油”“冷馒头”“钢索”“桥墩”；opt-05围绕加油站写“铁皮棚”“油价牌”“空油枪”。这些物件清单缺乏与大地、黑夜、死亡等尺度的真实碰撞。",
+    "claim_type": "interpretation",
+    "confidence": "high"
+  },
+  "summary": "当前生成诗在无标点分行、行内空格、核心词根复现和呼告句式上已自然复现参考风格，但核心瓶颈在于：长短句张力不足（行长变异系数偏低）、复沓缺乏语义增重与变奏回环、明喻滥用与解释性连词破坏质朴词域、原初尺度与日常物件的碰撞生硬且偏装饰。Prompt 的病因主要是过度规定具体句式（“我愿”“你无力偿还”）和结构模式（短-长-短），导致填空模板化；同时“意象尺度陡峭转换”等条款含糊，未能引导有机碰撞。形式违规（第2节行数超限）也暴露了结构条款的僵化。",
+  "actionable_suggestions": [
+    "删除“用‘我愿’‘我不能’‘你无力偿还’一类朴素直陈句”的具体句式规定，改为描述情感姿态（如“赤诚宣告与自我贬抑并置，不解释情感”），避免生成诗机械套用固定句式。",
+    "将“节内以短行领起、长行铺开、再收短行”改为更灵活的长短句张力要求（如“行与行之间须有陡峭的长度落差，避免句法均匀滑行”），不规定具体行数模式，以修复行长变异系数偏低和节内行数膨胀问题。",
+    "将“核心词根须反复出现”改为强调复沓的变奏与语义增重（如“同一词根每次出现须改变句法位置或语义重量，形成回响而非机械复沓”），并删除词根清单，避免填空式填充。",
+    "将“意象尺度陡峭转换”精炼为“具体物件须与大地、黑夜、死亡等尺度发生有机碰撞，避免生硬并置或装饰性明喻”，并明确限制明喻密度（如“少用‘像’字明喻，让并置与重复承担逻辑”）。",
+    "精简总纲，删除与后续条款重复的内容，聚焦“无标点呼吸分行、长短句张力、质朴词域、复沓变奏”四个核心，避免冗余膨胀。"
+  ],
+  "analysis_model": "deepseek-flash",
+  "analysis_meta": {
+    "usage": {
+      "prompt_tokens": 6895,
+      "completion_tokens": 3500,
+      "total_tokens": 10395,
+      "prompt_tokens_details": {
+        "cached_tokens": 3200
+      },
+      "prompt_cache_hit_tokens": 3200,
+      "prompt_cache_miss_tokens": 3695
+    },
+    "cache_hit": false,
+    "request_settings": {
+      "max_tokens": 4000,
+      "response_format": "json_object",
+      "thinking": "disabled",
+      "temperature": 0.2
+    },
+    "model": "deepseek-flash",
+    "attempt": 1
+  },
+  "fallback": false,
+  "mock": false
+}

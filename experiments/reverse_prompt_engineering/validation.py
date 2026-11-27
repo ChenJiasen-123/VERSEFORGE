@@ -1,8 +1,10 @@
 """Prompt-safety rules and JSON schema validators.
 
-The rules are intentionally deterministic and conservative.  They reject the
-most obvious forms of name-triggered imitation and verbatim corpus leakage;
-they do not claim to prove that a prompt is stylistically good.
+The rules are intentionally deterministic and conservative.  They reject:
+1. Name-triggered imitation and verbatim corpus leakage;
+2. Reference-dependent phrasing ("上述作品", "这些诗");
+3. Hardcoded poem-wide line/stanza quotas that conflict with unseen task limits;
+4. Post-hoc counting / self-check meta-checklists that induce robotic poetry.
 """
 from __future__ import annotations
 
@@ -23,6 +25,11 @@ def _instruction_units(prompt: str) -> list[str]:
             line_units.append(body)
     sentence_units = [part.strip() for part in re.split(r"[。；;]\s*", prompt) if len(part.strip()) >= 8]
     return line_units if len(line_units) >= len(sentence_units) else sentence_units
+
+
+_HARDCODED_POEM_QUOTA_RE = re.compile(
+    r"(?:全诗|整首诗?|总行数|总节数|全文)(?:控制在|限定在|保持在|共|分|约|为)?\s*\d+\s*(?:[—–―~～至到-]\s*\d+\s*)?[行节]"
+)
 
 
 def validate_prompt(prompt, *, rules, references, target_name, target_aliases=None,
@@ -49,15 +56,37 @@ def validate_prompt(prompt, *, rules, references, target_name, target_aliases=No
         if phrase in prompt:
             errors.append(f"Prompt 含有依赖参考材料的说法“{phrase}”，无法独立使用")
 
+    for phrase in rules.get("forbidden_meta_phrases") or []:
+        if phrase in prompt:
+            errors.append(f"Prompt 含有机械计数/写后自检元指令“{phrase}”，请直接写成自然的创作原则")
+
+    for prop in rules.get("forbidden_signature_props") or []:
+        if prop in prompt:
+            errors.append(f"Prompt 含有参考语料标志性题材名物或可被照搬的示范短语“{prop}”，会污染无关题目；请改写为抽象类别或关系描述")
+
+    if rules.get("forbid_hardcoded_poem_counts", False):
+        match = _HARDCODED_POEM_QUOTA_RE.search(prompt)
+        if match:
+            errors.append(
+                f"Prompt 硬编码了全诗总行数或总节数“{match.group(0)}”，会与不同题目的体裁篇幅要求冲突；篇幅应交由题目要求决定"
+            )
+
     found_vague = [phrase for phrase in rules.get("vague_phrases") or [] if phrase in prompt]
     if len(found_vague) > rules.get("max_vague_phrases", 2):
         errors.append("含糊套话过多：" + "、".join(found_vague))
     elif found_vague:
         warnings.append("含有含糊套话，建议替换为可执行指令：" + "、".join(found_vague))
 
+    numbered_lines = [
+        line for line in prompt.splitlines()
+        if re.match(r"^\s*(?:[-*•·]|\d+[.、)]|[一二三四五六七八九十]+[、.)]|【[^】]+】)", line)
+    ]
     units = _instruction_units(prompt)
     if len(units) < rules.get("min_instruction_units", 3):
         errors.append(f"可执行指令单元不足（{len(units)} < {rules.get('min_instruction_units', 3)}）")
+    max_units = rules.get("max_instruction_units")
+    if max_units and len(numbered_lines) > int(max_units):
+        errors.append(f"编号规则条目过多（{len(numbered_lines)} > {max_units}），容易导致机械清单化；请合并精简")
 
     normalized_prompt = _han_normalize(prompt)
     longest = 0
@@ -85,6 +114,7 @@ def validate_prompt(prompt, *, rules, references, target_name, target_aliases=No
         "metrics": {
             "char_count": char_count,
             "instruction_units": len(units),
+            "numbered_items": len(numbered_lines),
             "vague_phrases": found_vague,
             "longest_reference_common_substring": longest,
         },
@@ -147,6 +177,21 @@ def validate_mutation(data) -> list[str]:
     return issues
 
 
+def validate_crossover(data) -> list[str]:
+    issues = []
+    if not isinstance(data, dict):
+        return ["输出必须是 JSON 对象"]
+    if not isinstance(data.get("prompt"), str) or not data["prompt"].strip():
+        issues.append("prompt 须为非空字符串")
+    if not isinstance(data.get("from_parent_a"), list) or not data["from_parent_a"]:
+        issues.append("from_parent_a 须为非空数组")
+    if not isinstance(data.get("from_parent_b"), list) or not data["from_parent_b"]:
+        issues.append("from_parent_b 须为非空数组")
+    if not isinstance(data.get("summary"), str) or not data["summary"].strip():
+        issues.append("summary 须为非空字符串")
+    return issues
+
+
 ANALYSIS_LISTS = ("reproduced", "missing", "extraneous", "prompt_issues", "actionable_suggestions")
 
 
@@ -168,13 +213,15 @@ def validate_analysis(data) -> list[str]:
 
 
 JUDGE_DIMENSIONS = (
-    "lexical", "syntax", "lineation", "imagery", "emotion", "structure", "progression",
-    "concreteness", "repetition", "addressivity", "mythic_register", "closure",
+    "poetic_core", "lexical", "syntax", "lineation", "imagery", "emotion",
+    "structure", "progression", "concreteness", "repetition", "addressivity",
+    "mythic_register", "closure",
     "literary_quality", "topic_adherence", "originality",
 )
 STYLE_DIMENSIONS = (
-    "lexical", "syntax", "lineation", "imagery", "emotion", "structure", "progression",
-    "concreteness", "repetition", "addressivity", "mythic_register", "closure",
+    "poetic_core", "lexical", "syntax", "lineation", "imagery", "emotion",
+    "structure", "progression", "concreteness", "repetition", "addressivity",
+    "mythic_register", "closure",
 )
 
 
@@ -208,4 +255,20 @@ def validate_judge(data, require_evidence=True) -> list[str]:
             issues.append(f"未定义维度 {key} 缺少数值 score")
     if not isinstance(data.get("overall_notes"), str):
         issues.append("overall_notes 须为字符串")
+    return issues
+
+
+def validate_pairwise_judge(data) -> list[str]:
+    issues = []
+    if not isinstance(data, dict):
+        return ["输出必须是 JSON 对象"]
+    winner = str(data.get("winner", "")).strip().lower()
+    if winner not in ("1", "2", "tie"):
+        issues.append("winner 须为 '1'、'2' 或 'tie'")
+    rationale = data.get("rationale")
+    if not isinstance(rationale, str) or not rationale.strip():
+        issues.append("rationale 须为非空字符串")
+    conf = data.get("confidence")
+    if conf is not None and not isinstance(conf, str):
+        issues.append("confidence 须为字符串")
     return issues

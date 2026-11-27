@@ -1,0 +1,170 @@
+{
+  "reproduced": [
+    {
+      "feature": "无标点呼吸分行",
+      "generated_evidence": "所有生成诗行末均无标点，如“你亮着/像一枚不肯熄灭的旧硬币/深夜里/走廊把白墙推向我”",
+      "reference_evidence": "参考诗行末标点率中位数为0，如“亚洲铜，亚洲铜/祖父死在这里，父亲死在这里，我也将死在这里”",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "第二人称呼告",
+      "generated_evidence": "“你亮着”“你吞下多少人的凌晨”“你从铁皮舱里探出头”等，每首均出现“你”或“你们”",
+      "reference_evidence": "参考诗常用“你”“姐姐”“四姐妹”等呼告，如“姐姐，今夜我在德令哈”“你从远方来，我到远方去”",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "小物件—大尺度碰撞",
+      "generated_evidence": "“纸箱里沉睡的土豆/压着大地的心跳”“磅秤上站着一座村庄”“风把安全帽吹成/一只空碗”",
+      "reference_evidence": "参考诗如“麦地/别人看见你/觉得你温暖，美丽”“黑夜从大地上升起/遮住了光明的天空”",
+      "claim_type": "observation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "复沓与回环",
+      "generated_evidence": "“推向我/推向你”“卡在指腹/卡在喉咙”“水退下去了/大地没有退”",
+      "reference_evidence": "参考诗如“我的琴声呜咽 泪水全无”重复三次，“和所有以梦为马的诗人一样”多次回环",
+      "claim_type": "observation",
+      "confidence": "medium"
+    }
+  ],
+  "missing": [
+    {
+      "feature": "神话/元素尺度（mythic_register）",
+      "generated_evidence": "生成诗多困于具体事务，如“售货机”“铁锹”“缆绳”“油枪”，虽提及“大地”“黑夜”但未自然升入元素尺度，如“大地也在排队”生硬",
+      "reference_evidence": "参考诗直接召唤“众神”“太阳”“千年岁月”，如“目击众神死亡的草原上野花一片”“太阳是我的名字/太阳是我的一生”",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "feature": "赤诚呼告与变奏回返",
+      "generated_evidence": "呼告多停留在亲昵或质问，缺乏从亲昵到质问、祈愿到自省的语义重量变化，如“你亮着”“你醒着”重复但未加深",
+      "reference_evidence": "参考诗呼告随语境变重，如“亚洲铜”四次出现，每次语义指向不同（埋人地方、青草主人、白鸽子、月亮构成）",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "feature": "长短句张力（line_length_cv）",
+      "generated_evidence": "opt-04行长变异系数0.13，远低于参考p10 0.22；短行率偏高（opt-01 0.39，opt-03 0.42），但长句延伸不足，如“你数过——/三盏航标灯/两班倒/一个空水壶里晃荡的/十年”",
+      "reference_evidence": "参考诗行长变异系数中位数0.338，长短交替如“万人都要将火熄灭 我一人独将此火高高举起/此火为大 开花落英于神圣的祖国”",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "质朴而有重量的词域",
+      "generated_evidence": "具体字面词/百字偏低（opt-01 3.67 < 参考p10 8.19），且出现“硬币”“糖”“找零”等琐碎工业零件，缺乏“麦地”“粮仓”“石头”等朴素名物的重量",
+      "reference_evidence": "参考诗具体字面词/百字中位数10.56，如“麦地”“粮食”“石头”“村庄”反复出现",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "节间场景跳跃与上升/沉降弧线",
+      "generated_evidence": "生成诗节间推进多平铺，如opt-01从“你亮着”到“灯管嗡嗡”到“你把找零吐进我掌心”，缺乏由近及远、由具体到抽象的跳跃",
+      "reference_evidence": "参考诗如《四姐妹》从“荒凉的山冈”到“空气中的一棵麦子”到“蓝色远方的四姐妹”到“月亮形的山峰”，场景跳跃明显",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    }
+  ],
+  "extraneous": [
+    {
+      "feature": "明喻滥用",
+      "generated_evidence": "“像一枚不肯熄灭的旧硬币”“凉得像一枚小小的夜”“像一根晒蔫的旗杆”“像父辈/不肯松开的拳头”“仿佛这整条江/是一根不肯断的/脐带”",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "解释性连词",
+      "generated_evidence": "“而整条走廊睡成一口深井”“可大地并不因此温暖”“仿佛从黑夜手里接过一捧火”",
+      "claim_type": "observation",
+      "confidence": "medium"
+    },
+    {
+      "feature": "琐碎工业零件清点",
+      "generated_evidence": "“铁皮棚”“油枪”“鸟粪”“安全帽”“缆绳”“铁锹”“黑板擦”等，缺乏精神开阔度",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "feature": "行末句句加标点像散文",
+      "generated_evidence": "生成诗行末虽无标点，但部分行内使用逗号、句号，如“退下去吧 水”“退到渠底去”“让日头晒裂这层淤泥”，行内标点使节奏散文化",
+      "claim_type": "observation",
+      "confidence": "medium"
+    }
+  ],
+  "prompt_issues": [
+    {
+      "quote": "多用第二人称或群体性呼告，但每次呼告须改变句法位置或语义重量",
+      "issue_type": "over_specific",
+      "explanation": "该条款要求每次呼告都改变句法位置或语义重量，导致生成诗机械地变换呼告位置（如“你亮着”“你吞下”“你把找零”），但语义重量并未真正变化，形成填空式变奏。",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "quote": "从麦地、粮仓、石头、灯火、马、村庄等朴素名物出发，迅速推向黑夜、大地、众神、死亡、千年岁月",
+      "issue_type": "template_inducing",
+      "explanation": "该条款给出固定名物清单和推向目标，导致生成诗机械套用“小物件—大尺度”公式，如“纸箱里沉睡的土豆/压着大地的心跳”“磅秤上站着一座村庄”，缺乏自然变形。",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    },
+    {
+      "quote": "节间推进靠场景与视角的跳跃：由近及远、由具体到抽象、由个人到群体",
+      "issue_type": "vague",
+      "explanation": "该条款过于笼统，未说明如何实现跳跃，生成诗节间推进仍平铺直叙，如opt-01从“你亮着”到“灯管嗡嗡”到“你把找零吐进我掌心”，缺乏真正的视角跳跃。",
+      "claim_type": "interpretation",
+      "confidence": "medium"
+    },
+    {
+      "quote": "语言保持朴素、少连接词、少明喻，让名词与动词直接相撞",
+      "issue_type": "ineffective",
+      "explanation": "该条款要求少明喻，但生成诗仍大量使用明喻（如“像一枚不肯熄灭的旧硬币”“凉得像一枚小小的夜”），说明条款未有效约束生成。",
+      "claim_type": "observation",
+      "confidence": "high"
+    },
+    {
+      "quote": "情感姿态是骄傲与谦卑并置：叙述者既站在痛苦质问的中心，又承认两手空空",
+      "issue_type": "over_specific",
+      "explanation": "该条款规定具体情感姿态，导致生成诗机械插入“两手空空”等短语（如opt-04“我两手空空经过”、opt-05“而我两手空空”），形成套路化表达。",
+      "claim_type": "interpretation",
+      "confidence": "high"
+    }
+  ],
+  "topic_overreliance": {
+    "assessment": "生成诗高度依赖题目中的具体物件（售货机、铁锹、缆绳、油枪），未能从物件自然升入元素尺度，导致神话维度薄弱。",
+    "evidence": "opt-01围绕“售货机”写“硬币”“糖”“找零”，opt-03围绕“渡轮”写“安全帽”“缆绳”“航标灯”，均未有效推向“大地”“黑夜”“众神”等尺度。",
+    "claim_type": "interpretation",
+    "confidence": "high"
+  },
+  "summary": "当前生成诗在无标点分行、第二人称呼告等表面特征上已自然复现，但核心瓶颈在于神话/元素尺度缺失、呼告变奏机械、长短句张力不足，以及明喻和解释性连词滥用。Prompt 条款存在过度具体化（如固定名物清单、规定情感姿态）和无效约束（少明喻未生效），导致生成诗陷入“小物件—大尺度”填空模板和“两手空空”套路，缺乏参考诗中赤诚呼告与元素碰撞的精神重力。",
+  "actionable_suggestions": [
+    "删除“从麦地、粮仓、石头、灯火、马、村庄等朴素名物出发”中的固定名物清单，改为“从题目给定的具体物件出发，但避免琐碎清点，让物件在诗中自然变形为承载生命尺度的意象”。",
+    "将“情感姿态是骄傲与谦卑并置：叙述者既站在痛苦质问的中心，又承认两手空空”改为“情感姿态保持赤诚与克制，避免直接陈述‘两手空空’等套语，让谦卑与骄傲通过具体物象和动作暗示”。",
+    "将“多用第二人称或群体性呼告，但每次呼告须改变句法位置或语义重量”改为“呼告可重复出现，但每次出现应随语境自然变化语义指向，避免机械变换句法位置”。",
+    "删除“节间推进靠场景与视角的跳跃：由近及远、由具体到抽象、由个人到群体”中的具体方向规定，改为“节间推进依靠场景与视角的自然转换，形成整体上的上升或沉降弧线”。",
+    "强化“少明喻”条款，改为“禁止使用‘像’‘仿佛’等明喻词，让名词与动词直接相撞，通过并置和变形产生意象张力”。"
+  ],
+  "analysis_model": "deepseek-flash",
+  "analysis_meta": {
+    "usage": {
+      "prompt_tokens": 7233,
+      "completion_tokens": 2595,
+      "total_tokens": 9828,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 7233
+    },
+    "cache_hit": false,
+    "request_settings": {
+      "max_tokens": 4000,
+      "response_format": "json_object",
+      "thinking": "disabled",
+      "temperature": 0.2
+    },
+    "model": "deepseek-flash",
+    "attempt": 1
+  },
+  "fallback": false,
+  "mock": false
+}

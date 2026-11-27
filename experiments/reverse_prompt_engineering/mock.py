@@ -8,6 +8,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import re
 
 
 def _h(*parts) -> int:
@@ -20,42 +21,38 @@ def _pick(seq, seed, offset=0):
 
 
 PROMPT_ANGLES = [
-    "字词与语气：优先具体的名词和动词，少用抽象形容词。",
-    "句法与分行：让短句、跨行停顿和重复结构承担节奏。",
-    "意象与修辞：让日常物件与自然物并置，避免解释性比喻。",
-    "情感与抒情位置：先写动作和场景，再让情感从缝隙里出现。",
-    "篇章推进：用空间或时间移动组织全诗，结尾落在具体物象上。",
+    "优先使用质朴而有重量的具体名词与动词，让抽象感叹落在具体物象上。",
+    "少用行末标点，用断行、行内留白与长短句陡峭落差承担呼吸节奏。",
+    "让现场日常器物与黑夜、雨水、大地、身体等原初元素发生碰撞。",
+    "通过直接命名句与呼告建立说话姿态，核心词跨节回返时改变语境位置。",
+    "结尾自然承接前文建立的意象关系并保留余响，不用空洞格言收束。",
 ]
 
 POEM_LINES = [
     "夜里有人把灯留在走廊尽头",
-    "机器的低鸣像一场没有结束的雨",
-    "我数着硬币，也数着回家的路",
+    "机器的低鸣越过潮湿的地面",
+    "我握住硬币 也握住回家的路",
     "玻璃上映出两张疲倦的脸",
-    "风从门缝里带来铁锈的气味",
-    "有人把外套搭在椅背上",
-    "远处的水面慢慢合上",
-    "我听见楼上的脚步停了又响",
-    "灯管闪了一下，像在犹豫",
-    "一只空瓶滚到墙角",
-    "我们把沉默分着吃完",
-    "天亮以前，谁也没有离开",
+    "风从门缝吹来铁与泥土的气味",
+    "有人把外套搭在冰冷的椅背",
+    "远处的水面在黑暗中合拢",
+    "楼上的脚步停下又再次响起",
+    "灯管闪了一下",
+    "一只空瓶滚向墙角",
+    "我们把沉默分着咽下",
+    "黎明以前谁也没有离开",
     "窗外的树影比人更早醒来",
-    "一只鸟落在生锈的栏杆上",
-    "它看了我一眼，又飞走",
-    "桌上的水杯还留着温度",
-    "有人低声念出一个地名",
-    "那声音很快被机器吞掉",
-    "我把手插进口袋，摸到一枚扣子",
+    "水鸟落在生锈的栏杆",
+    "它望向河心又转身飞走",
+    "桌上的铁杯还留着掌心余温",
+    "有人低声叫出一个北方的地名",
+    "声音很快沉入夜色",
+    "我摸到口袋里一枚旧扣子",
     "雨水在台阶上写下又擦去",
-    "一辆车从桥下经过",
-    "灯光把我们的影子拉得很长",
-    "墙上的钟停在两点十七分",
-    "我忽然想起一件很小的事",
-    "后来我们都笑了",
-    "笑声落在地上，没有人捡",
-    "风把门吹开，又轻轻关上",
-    "天边露出一点灰白",
+    "夜班渡船从桥影下驶过",
+    "灯光把人的影子拉向江面",
+    "墙上的钟走过凌晨四点",
+    "风把铁皮门吹响",
 ]
 
 
@@ -79,9 +76,7 @@ class MockRPELLM:
         self.requests.append({"kind": payload.get("kind"), "system": system, "user": user, "payload": payload})
         kind = payload.get("kind")
         seed = _h(self.seed, kind, user)
-        if kind == "rpe_initialize":
-            data = self._prompt_payload(payload, seed)
-        elif kind == "rpe_reverse_once":
+        if kind in ("rpe_initialize", "rpe_reverse_once"):
             data = self._prompt_payload(payload, seed)
         elif kind == "rpe_generate_poem":
             data = self._poem_payload(payload, seed)
@@ -91,6 +86,92 @@ class MockRPELLM:
             data = self._analysis_payload(payload, seed)
         elif kind == "rpe_mutate_prompt":
             data = self._mutation_payload(payload, seed)
+        elif kind == "rpe_crossover_prompt":
+            data = self._crossover_payload(payload, seed)
+        elif kind == "rpe_pairwise_poem":
+            p1 = (payload.get("poem_1") or {}).get("text", "")
+            p2 = (payload.get("poem_2") or {}).get("text", "")
+            h1, h2 = _h("pw", p1), _h("pw", p2)
+            winner = "tie" if h1 == h2 else ("1" if h1 > h2 else "2")
+            data = {
+                "winner": winner,
+                "confidence": "medium",
+                "evidence_1": p1.splitlines()[0] if p1.splitlines() else "",
+                "evidence_2": p2.splitlines()[0] if p2.splitlines() else "",
+                "rationale": "Mock 双盲成对比较：基于文本稳定哈希裁定，保证交换顺序完全对称。",
+                "mock": True,
+            }
+        elif kind == "rpe_scene_grounding":
+            topic = str(payload.get("user_input") or "无题")
+            data = {
+                "starting_element": f"{topic[:6]}前的冷木门与掌心盐粒",
+                "primal_tension": "将眼前微小触感直接推入黑夜与大地的沉重尺度",
+                "speaker_stance": "第一人称直呼黑夜与自己，赤诚克制",
+                "progression_seed": "由静默守候转向直面远方与黎明",
+                "avoid_traps": "不写日常琐事流水账与廉价明喻",
+            }
+        elif kind in ("rpe_mutate_scene_grounding", "rpe_crossover_scene_grounding"):
+            base = str(payload.get("parent_prompt") or (payload.get("parent_a") or {}).get("prompt") or "").strip()
+            suffix = f"\n5. 强化时间纵深与身体承重，变体{seed % 11 + 1}，绝不编造日常琐碎因果链。"
+            prompt = (base[:360] + suffix) if base else (
+                "你是前置诗学立意器：\n1. 只取一件素朴实物与身体触感起跳。\n"
+                "2. 直接接入黑夜、大地与时间纵深。\n3. 设定第一人称赤诚呼告位置。\n"
+                f"4. 拒绝琐碎生活故事脚本，保留纵深推进空间（变体{seed % 11 + 1}）。"
+            )
+            data = {"prompt": prompt, "changes": [{"op": "adjust", "target": "尺度", "reason": "Mock"}], "summary": "Mock Step-2 变异"}
+        elif kind in ("rpe_init_expansion", "rpe_reverse_expansion_once"):
+            idx = int(payload.get("candidate_index") or 0)
+            prompt = (
+                "现代诗前置构思扩写原则（只管选物、尺度与关系，不涉语言排版）：\n"
+                f"1. 从题目核心经验里提取一件最质朴的基础实物或身体触感作为起跳切口（视角{idx + 1}）。\n"
+                "2. 立即建立该具身切口与黑夜、大地、水火、季节或生命时间纵深的悬殊对峙关系。\n"
+                "3. 确立第一人称赤诚直接的发话位置与可呼唤的他者或自然对象。\n"
+                "4. 给出中后段关系加深或视角沉降的方向势能，绝不编排买卖通勤等日常琐事因果流水账。\n"
+            )
+            data = {
+                "prompt": prompt,
+                "design_notes": "Mock 从参考诗世界建构归纳的扩写原则。",
+                "covered_dimensions": ["imagery", "mythic_register", "progression", "addressivity"],
+                "mock": True,
+            }
+        elif kind == "rpe_expand_topic":
+            topic = str(payload.get("topic") or "无题")
+            data = {
+                "entry_anchor": f"{topic[:6]}时刻掌心微凉的木门与灰",
+                "world_scale": "门内微弱呼吸与门外整片黑夜及大地纵深正面对峙",
+                "stance_and_relation": "第一人称在暗处直呼远方与未抵达的明天",
+                "arc_turn": "从独自静守转向推门承受时间与风的重量",
+                "avoid": "避开日常职场家务流水账与空泛哲理口号",
+            }
+        elif kind == "rpe_analyze_expansion":
+            data = self._analysis_payload(payload, seed)
+        elif kind == "rpe_mutate_expansion":
+            parent = str(payload.get("parent_prompt") or "").strip()
+            line4 = f"4. 强化时间折叠与身体承重，留出中后段尺度陡转余地（变体{seed % 9 + 1}），拒绝世俗故事链。"
+            prompt = re.sub(r"^4\..*$", line4, parent, count=1, flags=re.MULTILINE) if "4." in parent else (parent + "\n" + line4)
+            if prompt == parent:
+                prompt = parent + "\n5. 保持起跳切口素朴克制，避免堆砌杂乱场景。"
+            data = {
+                "prompt": prompt,
+                "changes": [{"op": "replace", "target": "第4条推进与留白", "reason": "Mock 扩写变异"}],
+                "preserved": ["素朴切口与原初尺度对峙"],
+                "summary": "Mock 扩写变异改进推进势能。",
+            }
+        elif kind == "rpe_crossover_expansion":
+            prompt = (
+                "现代诗前置构思融合原则：\n"
+                "1. 锁定单一素朴实物或身体触感起跳，剥离世俗生活琐事流水账。\n"
+                "2. 让微小切口直接对撞黑夜、大地、水火或一生的时间跨度。\n"
+                "3. 明确第一人称切近呼告的关系位置，使抽象情绪获得物理重量。\n"
+                f"4. 设定中后段视角陡转或安静回落的关系势能（融合变体{seed % 7 + 1}），不规定逐句剧情。\n"
+            )
+            data = {
+                "prompt": prompt,
+                "from_parent_a": ["素朴切口与尺度对峙"],
+                "from_parent_b": ["发话关系与转折势能"],
+                "resolved_conflicts": ["合并重复的反琐事条款"],
+                "summary": "Mock 扩写语义重组。",
+            }
         else:
             data = {"error": f"mock 未支持 kind={kind}"}
         content = json.dumps(data, ensure_ascii=False)
@@ -112,25 +193,23 @@ class MockRPELLM:
 
     def _prompt_payload(self, payload, seed):
         angle = payload.get("focus") or _pick(PROMPT_ANGLES, seed)
-        index = payload.get("candidate_index", 0)
+        index = int(payload.get("candidate_index") or 0)
         variants = [
-            "让每一节有一个可看见的中心物象，但不要解释它的象征意义。",
-            "把长句拆成两到三个短句，允许一行只有一个动作。",
-            "在第三节改变人称或视角，让前两节积累的情绪被重新照亮。",
-            "重复一个短句或短语两次，第二次改变它的语气。",
-            "结尾不要总结，留下一个仍在运动中的物件。",
+            "每一节围绕一个核心物象展开动作与尺度变化，不做象征说教。",
+            "长句与三五字短行交替出现，多数行尾不加标点，用断行形成呼吸。",
+            "中段切换一次观看距离，把眼前器物推向黑夜、江水或土地的纵深。",
+            "让一个关键词在不同节回返并改变句法位置，避免原样照抄整行。",
+            "收尾停在具体动作或带有余温的物象上，不追加格言总结。",
         ]
-        chosen = variants[(seed + int(index or 0)) % len(variants)]
+        chosen = variants[(seed + index) % len(variants)]
         prompt = (
-            "写现代汉语自由诗。遵守以下可迁移的写作指令：\n"
+            "现代自由诗风格指令（篇幅与分节服从具体题目要求）：\n"
             f"1. {angle}\n"
-            "2. 每节控制在2—5行，行尾优先落在具体名词、动作或短句上；不要连续三行使用相同长度的句子。\n"
-            "3. 全诗至少出现一次重复呼告或重复短语，但同一意象不要反复超过三次。\n"
-            "4. 先写动作、空间和声音，再让情感从场景的缝隙里出现；每节最多一次直接抒情。\n"
-            "5. 句法允许短句、破折号和跨行停顿，不使用成语堆叠，不把抽象名词当作行尾支点。\n"
-            f"6. {chosen}\n"
-            "7. 不要复述任何既有作品的场景、人物、地名或成句；只迁移语言组织、节奏、意象关系和篇章推进方式。\n"
-            "8. 题目可以完全不同；不要要求新诗继续写旧题材，也不要在诗中解释这些指令。\n"
+            "2. 行尾少用标点，多在名词或动词处自然断行，让长句铺展与短行停顿形成明显张力。\n"
+            "3. 具体日常物象须与大地、夜色、水、风或身体感知发生关系，不堆砌琐碎零件清单。\n"
+            "4. 情感融入直接命名、呼告与具体动作之中，少用因为、所以、然而等解释性连词。\n"
+            f"5. {chosen}\n"
+            "6. 不复述既有作品的人物、地名或成句，只迁移语言呼吸与意象组织方式。\n"
         )
         return {
             "prompt": prompt,
@@ -141,50 +220,47 @@ class MockRPELLM:
 
     def _poem_payload(self, payload, seed):
         topic = str(payload.get("topic") or "无题")
-        max_lines = int(payload.get("max_lines") or 14)
-        line_count = min(max_lines, 12 + seed % 5)
+        max_lines = int(payload.get("max_lines") or 16)
+        line_count = min(max_lines, 12 + seed % 4)
         chosen = []
         for i in range(line_count):
             if i == 0:
-                chosen.append(f"{topic}，灯还亮着")
+                chosen.append(f"{topic}的灯还亮着")
             else:
-                line = _pick(POEM_LINES, seed, i * 7)
+                line = _pick(POEM_LINES, seed, i * 5)
                 if line in chosen:
-                    line = _pick(POEM_LINES, seed, i * 7 + 3)
+                    line = _pick(POEM_LINES, seed, i * 5 + 2)
                 chosen.append(line)
-        # 3—4 stanzas with 3—5 lines each
-        stanzas = []
-        cursor = 0
-        widths = [4, 4, 4, max(0, line_count - 12)]
-        for width in widths:
-            if cursor >= line_count:
-                break
-            width = max(1, min(width, line_count - cursor))
-            stanzas.append(chosen[cursor:cursor + width])
-            cursor += width
-        if cursor < line_count:
-            stanzas[-1].extend(chosen[cursor:])
+        # Split into 3 stanzas of 4-6 lines separated by "" so requirement_issues passes
+        s1 = 4
+        s2 = 4
+        stanzas = [chosen[:s1], chosen[s1:s1 + s2], chosen[s1 + s2:]]
         lines = []
-        for stanza in stanzas:
+        for idx, stanza in enumerate(stanzas):
+            if not stanza:
+                continue
+            if idx > 0:
+                lines.append("")
             lines.extend(stanza)
         title = f"{topic}（模拟稿）"
         return {"title": title, "lines": lines, "mock": True}
 
     def _judge_payload(self, payload, seed):
         poem = payload.get("generated_poem") or {}
-        lines = poem.get("lines") or []
-        text = "\n".join(lines)
-        evidence = [line for line in lines[:2] if line] or ["（无正文）"]
+        lines = [line for line in (poem.get("lines") or []) if line.strip()]
+        evidence = lines[:2] or ["（无正文）"]
         dims = {}
         names = [
-            "lexical", "syntax", "lineation", "imagery", "emotion", "structure", "progression",
-            "concreteness", "repetition", "addressivity", "mythic_register", "closure",
+            "poetic_core", "lexical", "syntax", "lineation", "imagery", "emotion",
+            "structure", "progression", "concreteness", "repetition", "addressivity",
+            "mythic_register", "closure",
             "literary_quality", "topic_adherence", "originality",
         ]
-        base = 2.6 + (seed % 18) / 10.0
+        base = 3.2 + (seed % 12) / 10.0
         for i, name in enumerate(names):
-            offset = ((seed >> (i * 3)) % 9) / 10.0 - 0.4
-            score = max(0.0, min(5.0, round(base + offset, 1)))
+            offset = ((seed >> (i * 3)) % 7) / 10.0 - 0.3
+            score = max(3.0 if name in ("topic_adherence", "originality", "literary_quality") else 1.5,
+                        min(5.0, round(base + offset, 1)))
             dims[name] = {
                 "score": score,
                 "evidence": evidence[:1] + ([_pick(lines, seed, i + 3)] if lines else []),
@@ -203,36 +279,34 @@ class MockRPELLM:
         generated = payload.get("generated_poems") or []
         gen_line = ""
         if generated:
-            lines = generated[0].get("lines") or generated[0].get("text", "").splitlines()
+            lines = [x for x in (generated[0].get("lines") or generated[0].get("text", "").splitlines()) if x.strip()]
             gen_line = lines[0] if lines else ""
-        ref_line = ""
-        if refs:
-            ref_line = (refs[0].get("text") or "").splitlines()[0]
+        ref_line = (refs[0].get("text") or "").splitlines()[0] if refs else ""
         return {
             "reproduced": [{
-                "feature": "短行与具体动作并置",
+                "feature": "无标点断行与具体物象并置",
                 "generated_evidence": gen_line,
                 "reference_evidence": ref_line,
                 "claim_type": "observation",
                 "confidence": "medium",
             }],
             "missing": [{
-                "feature": "重复呼告的强度可能不足",
+                "feature": "原初元素尺度与变奏回返仍可加强",
                 "generated_evidence": gen_line,
                 "reference_evidence": ref_line,
                 "claim_type": "interpretation",
                 "confidence": "low",
             }],
             "extraneous": [{
-                "feature": "解释性句子偏多",
+                "feature": "局部叙述略平",
                 "generated_evidence": gen_line,
                 "claim_type": "observation",
                 "confidence": "medium",
             }],
             "prompt_issues": [{
-                "quote": "每节最多一次直接抒情",
+                "quote": "情感融入直接命名",
                 "issue_type": "vague",
-                "explanation": "Mock 分析：该条可执行性尚可，但需要说明抒情如何落地。",
+                "explanation": "Mock 分析：可进一步说明呼告与回返如何改变位置。",
                 "claim_type": "interpretation",
             }],
             "topic_overreliance": {
@@ -242,32 +316,54 @@ class MockRPELLM:
             },
             "summary": "Mock 差异分析：仅验证字段与流程，不是对真实诗歌的判断。",
             "actionable_suggestions": [
-                "把抽象评价改成可观察的句法或分行规则。",
-                "保留已经有效的短行和动作先行写法。",
-                "增加一条限制重复意象使用次数的指令。",
+                "将模糊表述替换为可观察的长短行落差与变奏回返指引。",
+                "保留无标点自然断行与物象碰撞原则。",
             ],
             "mock": True,
         }
 
     def _mutation_payload(self, payload, seed):
         parent = str(payload.get("parent_prompt") or "").strip()
-        additions = [
-            "让每一节的最后一个词落在可看见的物件或正在发生的动作上，避免用抽象判断收束。",
-            "在第二或第三节加入一次短促的呼告，呼告对象只能是物、地点或时间，不得是人名。",
-            "把连续两个解释性句子删掉，改成一个动作加一个声音。",
-            "全诗至少有一次跨行停顿，让一句话在两行之间断开。",
+        replacements = [
+            "5. 让核心词在后节回返时改变句法位置或尺度，收尾停在仍带余温的动作或物象上。",
+            "5. 在中段引入一次由近景器物向夜色、江水或大地尺度的推远，结尾不做格言总结。",
+            "5. 允许一处对具体物或地点的短促呼告，呼告后紧接无标点短行形成呼吸顿挫。",
+            "5. 明喻保持克制，优先用直接命名句连接具体身体感知与自然元素。",
         ]
-        chosen = additions[seed % len(additions)]
-        prompt = parent + ("\n" if parent else "") + f"9. {chosen}"
+        chosen = replacements[seed % len(replacements)]
+        if re.search(r"^5\..*$", parent, flags=re.MULTILINE):
+            prompt = re.sub(r"^5\..*$", chosen, parent, count=1, flags=re.MULTILINE)
+            if prompt == parent:
+                prompt = parent + "\n7. 保持每节内部呼吸紧凑，避免散文化解释句。"
+        else:
+            prompt = parent + "\n" + chosen
         return {
             "prompt": prompt,
             "changes": [{
-                "op": "add",
-                "target": "新增一条可执行的分行或意象指令",
-                "reason": "Mock 变异依据差异分析中的可执行性建议；真实运行时会由模型给出理由。",
+                "op": "replace",
+                "target": "第5条结构与回返原则",
+                "reason": "Mock 变异依据差异分析优化变奏与收束规则。",
             }],
-            "preserved": ["保留父代中已有的短行与具体动作要求"],
-            "summary": "Mock 变异：追加一条指令，用于流程测试。",
+            "preserved": ["保留无标点断行与原初元素碰撞要求"],
+            "summary": "Mock 变异：替换第5条规则以验证演化流程。",
+            "mock": True,
+        }
+
+    def _crossover_payload(self, payload, seed):
+        prompt = (
+            "现代自由诗融合风格指令（篇幅与分节服从题目要求）：\n"
+            "1. 词域取质朴而有重量的基础名词与单双音节动词，少用解释性连词。\n"
+            "2. 行末少用标点，依靠自然断行、行内空格停顿以及长句与三五字短行的陡峭对比建立节奏。\n"
+            "3. 把题目现场的具体器物与黑夜、大地、水火、身体等深层生命尺度并置碰撞。\n"
+            "4. 允许直接命名与克制呼告，核心意象跨节回返时须改变语境或句法位置。\n"
+            f"5. 结尾承接前文物象关系并停在余响处（变体 {seed % 7 + 1}），不写总结格言。\n"
+        )
+        return {
+            "prompt": prompt,
+            "from_parent_a": ["质朴词域与元素尺度并置"],
+            "from_parent_b": ["无标点断行与长短句呼吸对比"],
+            "resolved_conflicts": ["合并了重复的收尾要求"],
+            "summary": "Mock 重组：融合双亲词域与分行优势。",
             "mock": True,
         }
 

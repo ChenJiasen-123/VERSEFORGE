@@ -6,6 +6,7 @@ candidate id, generation number, or evaluation feedback.
 from __future__ import annotations
 
 import json
+import re
 
 from poetry_agent.core import Poem, Task, check
 from .llm import BudgetExhausted, LLMOutputError, is_output_truncation_error
@@ -17,10 +18,61 @@ GENERATOR_SYSTEM = """你是中文诗歌写作者。你会收到一份风格指�
 
 要求：
 1. 严格按风格指令写作，但不要解释或引用风格指令。
-2. 题目是新的；不要复述任何既有作品的成句、人物或情节。
-3. 只输出 JSON，不要 markdown。
+2. 题目、体裁、行数、分节和题目中的明确要求优先于风格指令；如果风格指令与题目要求冲突，以题目要求为准，并在不违反题目的前提下尽量执行风格指令。
+3. 题目是新的；不要复述任何既有作品的成句、人物或情节。
+4. 只输出 JSON，不要 markdown。
 JSON 结构：{"title": "标题", "lines": ["第一行", "第二行", ...]}
 每一行必须是一个独立的字符串元素，不要在一行里放多个换行。分节可以用空字符串 "" 表示；不要用含空格的行代替空行。"""
+
+
+_RANGE = r"(\d+)\s*[—–―~～-]\s*(\d+)"
+
+
+def stanza_shape(raw_lines: list[str]) -> list[int]:
+    """每节的非空行数；空字符串表示分节。"""
+    blocks: list[int] = []
+    current = 0
+    for line in raw_lines:
+        if line.strip():
+            current += 1
+        elif current:
+            blocks.append(current)
+            current = 0
+    if current:
+        blocks.append(current)
+    return blocks
+
+
+def requirement_issues(raw_lines: list[str], topic: dict) -> list[str]:
+    """检查题目写明的总行数下限、分节数和每节行数。
+
+    ``poetry_agent.core.check`` 只检查总行数上限；分节与下限此前无人执行，
+    导致违反“分2—4节/每节1—6行/至少12行”的诗也能算格式通过。
+    """
+    issues: list[str] = []
+    requirements = topic.get("requirements") or ""
+    total = sum(1 for line in raw_lines if line.strip())
+    blocks = stanza_shape(raw_lines)
+
+    match = re.search(r"(?<!每节)" + _RANGE + r"\s*行", requirements)
+    if match:
+        low = int(match.group(1))
+        if total < low:
+            issues.append(f"正文{total}行，少于{low}行")
+
+    match = re.search(r"分\s*" + _RANGE + r"\s*节", requirements)
+    if match:
+        low, high = int(match.group(1)), int(match.group(2))
+        if not low <= len(blocks) <= high:
+            issues.append(f"正文{len(blocks)}节，题目要求{low}—{high}节")
+
+    match = re.search(r"每节\s*" + _RANGE + r"\s*行", requirements)
+    if match:
+        low, high = int(match.group(1)), int(match.group(2))
+        bad = [index for index, size in enumerate(blocks, 1) if not low <= size <= high]
+        if bad:
+            issues.append(f"第{'、'.join(map(str, bad))}节行数不在{low}—{high}行内")
+    return issues
 
 
 def task_from_topic(topic: dict, config: dict) -> Task:
@@ -57,38 +109,58 @@ def generation_payload(style_prompt: str, topic: dict, config: dict) -> dict:
 
 
 def generate_poem(llm, config, style_prompt: str, topic: dict, *, cache_variant: str) -> dict:
+    task = task_from_topic(topic, config)
     payload = generation_payload(style_prompt, topic, config)
+    repair_attempts = int(config["generation"].get("max_form_repair_attempts", 0))
+    last_result = None
     try:
-        data, meta = llm.call_json(
-            purpose="rpe_generate_poem",
-            system=GENERATOR_SYSTEM,
-            user=json.dumps(payload, ensure_ascii=False),
-            max_tokens=config["generation"]["max_tokens"],
-            temperature=config["generation"]["temperature"],
-            thinking=config["generation"]["thinking"],
-            validator=validate_generation,
-            cache_variant=cache_variant,
-        )
-        raw_lines = [line.strip() for line in data["lines"]]
-        body_lines = [line for line in raw_lines if line]
-        if not body_lines:
-            raise ValueError("lines 没有非空正文")
-        poem = Poem(str(data["title"]).strip(), body_lines)
-        task = task_from_topic(topic, config)
-        form_issues = check(poem, task)
-        text = "\n".join(raw_lines).strip("\n")
-        return {
-            "ok": True,
-            "topic_id": topic["id"],
-            "title": poem.title,
-            "lines": poem.lines,
-            "raw_lines": raw_lines,
-            "text": text,
-            "form_ok": not form_issues,
-            "form_issues": form_issues,
-            "meta": meta,
-            "mock": bool(getattr(llm, "mock", False)),
-        }
+        for attempt in range(repair_attempts + 1):
+            current_payload = dict(payload)
+            if attempt:
+                current_payload["_previous_draft"] = last_result["raw_lines"]
+                current_payload["_form_feedback"] = (
+                    "上一稿（见 _previous_draft）未通过题目格式检查：" + "；".join(last_result["form_issues"]) +
+                    "。请完整保留原诗的声口、意象与诗意，仅针对违规处调整分节空行或合并/微调超限行，确保总行数、总节数和每节行数全部严格符合 requirements；分节用空字符串 \"\" 表示。"
+                )
+            try:
+                data, meta = llm.call_json(
+                    purpose="rpe_generate_poem",
+                    system=GENERATOR_SYSTEM,
+                    user=json.dumps(current_payload, ensure_ascii=False),
+                    max_tokens=config["generation"]["max_tokens"],
+                    temperature=config["generation"]["temperature"],
+                    thinking=config["generation"]["thinking"],
+                    validator=validate_generation,
+                    cache_variant=(cache_variant if attempt == 0 else f"{cache_variant}:formrepair{attempt}"),
+                )
+            except LLMOutputError:
+                if last_result is not None:
+                    return last_result
+                raise
+            raw_lines = [line.strip() for line in data["lines"]]
+            body_lines = [line for line in raw_lines if line]
+            if not body_lines:
+                raise ValueError("lines 没有非空正文")
+            poem = Poem(str(data["title"]).strip(), body_lines)
+            form_issues = check(poem, task) + requirement_issues(raw_lines, topic)
+            text = "\n".join(raw_lines).strip("\n")
+            result = {
+                "ok": True,
+                "topic_id": topic["id"],
+                "title": poem.title,
+                "lines": poem.lines,
+                "raw_lines": raw_lines,
+                "text": text,
+                "form_ok": not form_issues,
+                "form_issues": form_issues,
+                "form_repair_attempts": attempt,
+                "meta": meta,
+                "mock": bool(getattr(llm, "mock", False)),
+            }
+            if not form_issues or attempt >= repair_attempts:
+                return result
+            last_result = result
+        return last_result
     except BudgetExhausted:
         raise
     except LLMOutputError as exc:  # unusable JSON is an evaluation failure

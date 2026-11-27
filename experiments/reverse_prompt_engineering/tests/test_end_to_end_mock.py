@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[3]
 CONFIG = Path(__file__).resolve().parents[1] / "config.yaml"
 
 
-def small_config(tmp, *, max_calls=300, max_tokens=800000):
+def small_config(tmp, *, max_calls=400, max_tokens=1500000):
     cfg = load_config(CONFIG)
     cfg["experiment"]["output_root"] = str(Path(tmp) / "runs")
     cfg["population"]["size"] = 2
@@ -41,6 +41,10 @@ class EndToEndMockTests(unittest.TestCase):
             best = state["final_prompt"]
             self.assertIn(best["candidate_id"], {c["id"] for c in state["population"]})
             self.assertTrue(best["is_mock"])
+            confirmation = state["confirmation"]
+            self.assertTrue(confirmation["completed"])
+            self.assertEqual(confirmation["shortlist"], [best["candidate_id"]])
+            self.assertEqual(best["evaluation_count"], 2 * len(cfg["topics"]["optimization"]))
             run_dir = Path(cfg["experiment"]["output_root"]) / "e2e"
             for name in (
                 "state.json", "run.json", "report.md", "initial_population.json",
@@ -69,7 +73,7 @@ class EndToEndMockTests(unittest.TestCase):
                 payload = json.loads(row["user"])
                 self.assertNotIn("reference_poems", payload)
                 self.assertNotIn("reference_poems", row["user"])
-                allowed = {"kind", "style_prompt", "topic", "genre", "max_lines", "requirements", "output_schema", "_retry_feedback"}
+                allowed = {"kind", "style_prompt", "topic", "genre", "max_lines", "requirements", "output_schema", "_retry_feedback", "_form_feedback", "_previous_draft"}
                 self.assertTrue(set(payload) <= allowed, set(payload) - allowed)
                 # Baseline A intentionally uses the poet name; all optimized/baseline-B
                 # prompts must not contain the name.
@@ -99,7 +103,7 @@ class EndToEndMockTests(unittest.TestCase):
             run_dir = Path(cfg["experiment"]["output_root"]) / "resume"
             self.assertTrue((run_dir / "state.json").exists())
 
-            cfg2 = small_config(tmp, max_calls=300, max_tokens=800000)
+            cfg2 = small_config(tmp, max_calls=400, max_tokens=1500000)
             second = run_experiment(cfg2, "mock", project_root=ROOT, run_id="resume", resume=True, authorized=False)
             self.assertEqual(second["status"], "completed")
             self.assertIsNotNone(second.get("final_prompt"))

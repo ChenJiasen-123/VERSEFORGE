@@ -1,29 +1,24 @@
-# RPE-GA 中文诗歌逆向提示词实验配置
-# 仅此文件中的参数会进入实验；CLI 可覆盖预算等少量参数。
+# RPE-GA 中文诗歌逆向提示词实验配置（v6：锻造唯一“诗核”主轴与中后段破壁力 + 严禁散珠贴喻/散文逗号/虚假呼告/轻放退场）
 experiment:
   name: haizi-rpe-ga
-  seed: 20251125
+  seed: 20261129
   output_root: experiments/reverse_prompt_engineering/runs
   language: zh
-  notes: "扩展原型：15首参考诗、13首留出诗、5个优化题目、10个测试题目、种群5、4代；新增5个评审维度与3个确定性结构指标。"
+  notes: "v6：升级rpe-poetry-style-v6（新增主核意象跨节贯通率core_motif_span、核心实字凝聚度core_lexical_focus、贴喻节率simile_stanza_rate、行内逗号防散文化comma_per_line与套路轻放收尾惩罚tame_putdown_closure，下调反转噪声mid_stanza_novelty至0.01）+ rpe-poetry-zh-v5（新增首位核心维度poetic_core权重0.18，下调addressivity至0.02遏制虚假呼告）。"
 
 corpus:
-  # 该语料来自项目已有的海子诗歌归档；原文件在 var/ 下且不随 git 分发。
   path: var/haizi/corpus.jsonl
   id_prefix: haizi-
   reference_split: train
   reference_count: 15
-  # 留空时按 metadata.core_rank 排序自动选取；也可显式列出 poem_id。
   reference_poem_ids: []
   reference_order: core_rank
   held_out_split: held_out
   held_out_count: 13
   held_out_poem_ids: []
   exclude_flags: [is_fragment, is_duplicate, misattributed, is_translation]
-  # target_name 只用于基线A和提示词禁用名检查；不会发送给初始化、分析或变异调用。
   target_name: 海子
   target_aliases: []
-  # 自动选诗时排除正文直接出现诗人姓名的作品，避免姓名触发或身份泄露。
   exclude_target_name_in_auto_selection: true
   max_reference_chars: 1200
   max_held_out_chars: 1200
@@ -34,7 +29,7 @@ topics:
       topic: 深夜医院走廊尽头的自动售货机
       genre: modern
       max_lines: 20
-      requirements: "12—20行，分2—4节；每节1—6行；写深夜、机器与人的疲惫；不得出现任何诗人姓名。"
+      requirements: "12—20行，分2—4节；每节1—6行；写深夜陪护人、机器与漫长守候；不得出现任何诗人姓名。"
     - id: opt-02
       topic: 洪水退去后的乡村小学操场
       genre: modern
@@ -46,15 +41,30 @@ topics:
       max_lines: 20
       requirements: "12—20行，分2—4节；每节1—6行；写夜班工人、江水与城市灯光；不得出现任何诗人姓名。"
     - id: opt-04
-      topic: 凌晨四点的农产品批发市场
+      topic: 拆迁街区最后一家亮灯的理发店
       genre: modern
       max_lines: 20
-      requirements: "12—20行，分2—4节；每节1—6行；写夜班搬运、湿冷地面与城市将醒；不得出现任何诗人姓名。"
+      requirements: "12—20行，分2—4节；每节1—6行；写旧镜子、热水与夜晚来客；不得出现任何诗人姓名。"
     - id: opt-05
-      topic: 沙漠公路旁的废弃加油站
+      topic: 冬夜给远方亲人写一封不会寄出的信
       genre: modern
       max_lines: 20
-      requirements: "12—20行，分2—4节；每节1—6行；写风沙、铁皮棚与过路人的短暂停留；不得出现任何诗人姓名。"
+      requirements: "12—20行，分2—4节；每节1—6行；写出切肤思念与克制或炽热的呼唤；不得出现任何诗人姓名。"
+    - id: opt-06
+      topic: 深夜醒来突然意识到父母与自己都已不再年轻
+      genre: modern
+      max_lines: 20
+      requirements: "12—20行，分2—4节；每节1—6行；写时间重量、亲缘痛感与生命直视；不得出现任何诗人姓名。"
+    - id: opt-07
+      topic: 列车驶过故乡小站却没有下车的夜晚
+      genre: modern
+      max_lines: 20
+      requirements: "12—20行，分2—4节；每节1—6行；写窗外灯火、擦肩而过的土地与无法回头的怅痛；不得出现任何诗人姓名。"
+    - id: opt-08
+      topic: 大风天在路口与深爱的人道别，把祝福咽回心里
+      genre: modern
+      max_lines: 20
+      requirements: "12—20行，分2—4节；每节1—6行；写风中的告别、未说出口的话与滚烫心声；不得出现任何诗人姓名。"
   test:
     - id: test-01
       topic: 搬家日留下的空房间
@@ -67,42 +77,42 @@ topics:
       max_lines: 20
       requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
     - id: test-03
-      topic: 旧火车站行李寄存处的雨伞
-      genre: modern
-      max_lines: 20
-      requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
-    - id: test-04
-      topic: 城市天台上的小型菜园
-      genre: modern
-      max_lines: 20
-      requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
-    - id: test-05
-      topic: 河滩上被风吹走的帐篷
-      genre: modern
-      max_lines: 20
-      requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
-    - id: test-06
       topic: 海边灯塔的最后一位守塔人
       genre: modern
       max_lines: 20
       requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
-    - id: test-07
-      topic: 老式电影院散场后的放映室
-      genre: modern
-      max_lines: 20
-      requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
-    - id: test-08
+    - id: test-04
       topic: 雪后山村的有线广播站
       genre: modern
       max_lines: 20
       requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+    - id: test-05
+      topic: 水库泄洪前夜的观测站
+      genre: modern
+      max_lines: 20
+      requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+    - id: test-06
+      topic: 除夕夜独自守着一桌热饭等待迟迟未归的人
+      genre: modern
+      max_lines: 20
+      requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+    - id: test-07
+      topic: 整理逝去长辈留下的旧工具箱，在铁锈里认出他的一生
+      genre: modern
+      max_lines: 20
+      requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
+    - id: test-08
+      topic: 写给多年未见、如今各自沉默在人海里的旧友
+      genre: modern
+      max_lines: 20
+      requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
     - id: test-09
-      topic: 城市地下通道里的修鞋摊
+      topic: 重病初愈后第一次走出病房晒到春天的太阳
       genre: modern
       max_lines: 20
       requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
     - id: test-10
-      topic: 水库泄洪前夜的观测站
+      topic: 失败后独自在夜路行走，对黑夜说出活下去的愿望
       genre: modern
       max_lines: 20
       requirements: "12—20行，分2—4节；每节1—6行；不得出现任何诗人姓名。"
@@ -112,55 +122,62 @@ generation:
   temperature: 1.0
   max_tokens: 1200
   thinking: disabled
+  max_form_repair_attempts: 1
   default_genre: modern
   default_max_lines: 20
   default_requirements: "12—20行，分2—4节；每节1—6行；使用现代汉语；不得出现任何诗人姓名。"
 
 population:
-  size: 5
-  generations: 30
+  size: 6
+  generations: 8
+  crossover_count: 2
+  survivor_max_similarity: 0.88
+  in_run_confirm_top_k: 2
   initialization_mode: independent
-  init_temperature: 1.0
+  init_temperature: 0.95
   init_max_tokens: 1400
   mutation_temperature: 0.8
-  mutation_max_tokens: 2000
+  mutation_max_tokens: 1800
   analysis_temperature: 0.2
   analysis_max_tokens: 4000
-  # 初始化/分析/变异统一关闭思考模式，避免 reasoning token 挤占输出预算。
   thinking: disabled
   min_prompt_chars: 120
-  max_prompt_chars: 1400
-  max_prompt_repair_attempts: 1
-  patience: 5
-  min_improvement: 0.25
-  # 每 5 代写一次 checkpoints/gen_XXX/ 快照；0 表示关闭。
-  checkpoint_every: 5
+  max_prompt_chars: 600
+  max_prompt_repair_attempts: 2
+  patience: 3
+  min_improvement: 0.20
+  checkpoint_every: 2
 
 evaluation:
-  # null 表示与生成使用同一模型；也可设 DEEPSEEK_JUDGE_MODEL 环境变量。
-  # 现有客户端只能调用 DeepSeek；切换模型名仍是同家族，需在报告中记录自评偏差。
-  judge_model: null
+  # 使用不同于生成模型(deepseek-flash)的 deepseek-chat 担任匿名评审，减轻同模型打分饱和与自评偏好。
+  judge_model: deepseek-chat
   judge_temperature: 0.0
   judge_max_tokens: 3800
   judge_thinking: disabled
-  rubric_version: rpe-poetry-zh-v1
-  deterministic_style_weight: 0.35
-  judge_style_weight: 0.65
+  rubric_version: rpe-poetry-zh-v5
+  deterministic_style_weight: 0.42
+  judge_style_weight: 0.58
   quality_weight: 0.15
-  # Judge 风格维度加权。progression（推进感）单独拉高，其余维度相应下调。
+  prompt_length_free: 520
+  prompt_length_penalty_per_100_chars: 3.0
+  prompt_length_penalty_max: 8.0
   style_dimension_weights:
-    progression: 0.24
-    structure: 0.10
-    imagery: 0.09
-    emotion: 0.08
-    lexical: 0.07
-    syntax: 0.07
-    lineation: 0.07
-    concreteness: 0.06
-    repetition: 0.06
-    closure: 0.06
-    addressivity: 0.05
-    mythic_register: 0.05
+    poetic_core: 0.18
+    imagery: 0.12
+    emotion: 0.11
+    lineation: 0.11
+    syntax: 0.09
+    progression: 0.09
+    lexical: 0.08
+    mythic_register: 0.07
+    structure: 0.05
+    closure: 0.04
+    repetition: 0.03
+    addressivity: 0.02
+    concreteness: 0.01
+  pairwise_tiebreak_margin: 2.5
+  pairwise_max_pairs: 7
+  pairwise_bonus_cap: 1.2
   topic_threshold: 3.0
   originality_threshold: 3.0
   quality_floor: 2.0
@@ -172,7 +189,7 @@ evaluation:
   copy_lcs_chars: 12
   copy_line_chars: 8
   copy_rouge1_cap: 0.80
-  confirmation_top_k: 3
+  confirmation_top_k: 6
   confirmation_repetitions: 1
   judge_evidence_required: true
 
@@ -181,6 +198,28 @@ prompt_rules:
   warn_reference_ngram: 8
   max_vague_phrases: 2
   min_instruction_units: 3
+  max_instruction_units: 8
+  forbid_hardcoded_poem_counts: true
+  forbidden_meta_phrases:
+    - 完成后自检
+    - 定稿前自检
+    - 成稿后逐条自查
+    - 数出明喻
+    - 任一项不满足则重写
+    - 逐项统计
+    - 自查清单
+  forbidden_signature_props:
+    - 麦地
+    - 麦穗
+    - 麦子
+    - 粮仓
+    - 草原
+    - 德令哈
+    - 青海湖
+    - 敦煌
+    - 亚洲铜
+    - 以梦为马
+    - 面朝大海
   forbidden_dependency_phrases:
     - 参考上面
     - 参考上述
@@ -194,7 +233,6 @@ prompt_rules:
     - 参考作品
     - 参考诗
     - 上述
-    - 上面
     - 这些作品
     - 原作
     - 旧作
@@ -215,18 +253,17 @@ prompt_rules:
     - 跃然纸上
 
 budget:
-  max_api_calls: 2500
-  max_total_tokens: 12000000
+  max_api_calls: 100000
+  max_total_tokens: 1000000000
   request_timeout: 90
   max_parse_retries: 2
-  # 供应商价格随时变化；留空时只统计 token，不推算费用。
   price_per_million_input: null
   price_per_million_output: null
   require_authorization: true
 
 benchmark:
   enabled: true
-  repetitions: 1
+  repetitions: 2
   temperature: 1.0
   max_tokens: 1200
   baseline_a_prompt: "请模仿诗人{target_name}的风格，围绕题目“{topic}”创作一首现代诗。要求：{requirements}"

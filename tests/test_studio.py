@@ -68,6 +68,7 @@ class StudioTests(unittest.TestCase):
         self.assertEqual(len(client.requests), 5)
         self.assertTrue(result['checks']['revision_semantics_rechecked'])
         self.assertTrue(result['checks']['requirements_confirmed'])
+        self.assertEqual(result['status'], 'completed')
         self.assertEqual(client.requests[-1][1]['poem']['lines'], ['寄出之后，树又长高了一寸'])
 
     def test_failed_requirement_check_retains_the_generated_poem(self):
@@ -81,6 +82,7 @@ class StudioTests(unittest.TestCase):
         result = run_studio('写一首诗，不超过30行。', client=client)
         self.assertEqual(result['poem']['lines'], ['水位线'])
         self.assertFalse(result['checks']['requirements_check_completed'])
+        self.assertEqual(result['status'], 'needs_review')
 
 
     def test_rpe_v4_style_mode_loads_optimal_prompt_and_preserves_stanza_breaks(self):
@@ -224,6 +226,18 @@ class StudioTests(unittest.TestCase):
 
 
 
+
+class StudioCompletionStatusTests(unittest.TestCase):
+    def test_known_hard_error_cannot_be_reported_as_completed(self):
+        from unittest.mock import patch
+        poem = {'title': '河床', 'lines': ['水位线']}
+        client = Client([brief(), checked(), poem, checked()])
+        with patch('poetry_agent.candidates.compose_candidates', return_value={'poem':poem,'issues':['hard error']}), \
+             patch('poetry_agent.studio.check', return_value=['hard error']):
+            result = run_studio('不超过30行', client=client)
+        self.assertEqual(result['status'], 'needs_review')
+        self.assertEqual(result['checks']['final_hard_issues'], ['hard error'])
+
 
 class ExpressionPlanningTests(unittest.TestCase):
     def test_missing_plan_stops_before_generation(self):

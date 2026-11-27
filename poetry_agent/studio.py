@@ -448,6 +448,8 @@ def run_studio(prompt, hint='auto', preference='', previous=None, progress=lambd
                 'parallelism_status': 'unknown' if task.genre in ('wulv', 'qilv') else 'not_required_by_this_workflow',
                 'requirements_check_completed': final_report['complete'], 'requirements_confirmed': final_report['confirmed'],
                 'literary_quality_verified': False, 'revision_semantics_rechecked': final_report['complete']}}
+    if out['checks']['final_hard_issues'] or not out['checks']['requirements_confirmed']:
+        out['status'] = 'needs_review'
     selected_cand_num = run.get('selected_candidate', 1)
     if expansion_mode != 'none' and brief.get('directions'):
         adopted_dir_idx = (brief.get('selected_direction', 0) + selected_cand_num - 1) % len(brief['directions'])

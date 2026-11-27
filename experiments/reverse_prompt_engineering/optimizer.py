@@ -12,6 +12,7 @@ import statistics
 from datetime import datetime, timezone
 from pathlib import Path
 
+from experiments.evolution.selection import select_survivors, crossover_pairs
 from .analyzer import analyze_candidate
 from .evaluator import (
     aggregate_evaluations, evaluate_candidate, pairwise_compare_candidates, selection_objective,
@@ -341,39 +342,9 @@ class Optimizer:
         return sorted(candidates, key=self.rank_key, reverse=True)
 
     def _select_survivors(self, pool):
-        """Top-m selection with exact deduplication and prompt-similarity niching."""
-        ranked = self._rank(pool)
-        max_sim = float(self.config["population"].get("survivor_max_similarity", 0.88))
-        survivors, seen = [], set()
-        # Pass 1: distinct, similarity-niched candidates so near-clones don't crowd out diversity.
-        for candidate in ranked:
-            key = candidate.get("prompt", "")
-            if not key or key in seen:
-                continue
-            if survivors and any(prompt_similarity(key, s.get("prompt", "")) >= max_sim for s in survivors):
-                continue
-            seen.add(key)
-            survivors.append(candidate)
-            if len(survivors) >= self.size:
-                break
-        # Pass 2: fill remaining slots with any non-identical prompt texts by rank.
-        if len(survivors) < self.size:
-            for candidate in ranked:
-                key = candidate.get("prompt", "")
-                if key in seen:
-                    continue
-                seen.add(key)
-                survivors.append(candidate)
-                if len(survivors) >= self.size:
-                    break
-        # Pass 3: fallback if pool has fewer distinct prompts than self.size.
-        if len(survivors) < self.size:
-            for candidate in ranked:
-                if candidate not in survivors:
-                    survivors.append(candidate)
-                if len(survivors) >= self.size:
-                    break
-        return survivors
+        return select_survivors(pool, size=self.size, rank_key=self.rank_key,
+            genome=lambda c: c.get("prompt", ""), similarity=prompt_similarity,
+            max_similarity=float(self.config["population"].get("survivor_max_similarity", .88)))
 
     def _selection_summary(self, generation, pool, survivors):
         survivor_ids = {c["id"] for c in survivors}
@@ -427,19 +398,9 @@ class Optimizer:
         }
 
     def _crossover_pairs(self, parents, count: int):
-        ranked = [p for p in self._rank(parents) if p.get("valid") and p.get("fitness") is not None]
-        if len(ranked) < 2 or count <= 0:
-            return []
-        pairs = []
-        for i in range(len(ranked)):
-            for j in range(i + 1, len(ranked)):
-                if prompt_similarity(ranked[i].get("prompt", ""), ranked[j].get("prompt", "")) < 0.92:
-                    pairs.append((ranked[i], ranked[j]))
-                if len(pairs) >= count:
-                    return pairs
-        while len(pairs) < count and len(ranked) >= 2:
-            pairs.append((ranked[0], ranked[min(len(ranked) - 1, len(pairs) + 1)]))
-        return pairs[:count]
+        return crossover_pairs(parents, count=count, rank_key=self.rank_key,
+            genome=lambda c: c.get("prompt", ""), similarity=prompt_similarity,
+            eligible=lambda p: p.get("valid") and p.get("fitness") is not None)
 
     # -- one generation ----------------------------------------------
     def _run_generation(self, state, generation):

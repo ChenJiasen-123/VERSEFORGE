@@ -1,0 +1,48 @@
+{
+  "scope": "首轮验证五言律绝和七言律绝；入口复用已有其他谱体检查，但本轮不据此宣称律诗与词稳定",
+  "pilot_ids": [
+    "pilot-01",
+    "pilot-02",
+    "pilot-03",
+    "pilot-04"
+  ],
+  "held_out_ids": [
+    "held-01",
+    "held-02",
+    "held-03",
+    "held-04",
+    "held-05",
+    "held-06",
+    "held-07",
+    "held-08",
+    "held-09",
+    "held-10",
+    "held-11",
+    "held-12"
+  ],
+  "repetitions": 2,
+  "arms": [
+    "baseline_studio",
+    "classical_evolution"
+  ],
+  "population": 3,
+  "generations": 2,
+  "max_calls": 45,
+  "seconds": 900,
+  "acceptance_targets": {
+    "known_hard_clear": 22,
+    "full_formal_pass_separate_from_unknown": true,
+    "literary_worth_keeping": 18,
+    "required_allusions": "每首专项单独核查",
+    "false_completion_with_known_failure": 0
+  },
+  "sample_size_warning": "24次结果不证明所有题型稳定；双臂调用量不同，报告资源差异；模型盲评不是用户偏好验证",
+  "freeze_rule": "四题试验后冻结代码、配置、题集、典源和基线版本，再运行24次与基线的对照；未达标如实报告，不改题重算",
+  "generation_tokens": 16384,
+  "readability_floor": "模型expression、progression、diction均至少2/4；只是代理门槛，不是文学认证",
+  "pilot_revision_notes": [
+    "保留pilot-01原始结果：对称模型盲评新旧各胜一题，两题平；已知token用量375064对130322，不能声称新流程整体胜出。",
+    "复跑前压缩重复格律上下文，增加生成输出额度并给两臂相同额度上限，补充失败分类与薄弱项驱动变异。",
+    "所有试验性修订在十二题测试之前完成；旧试验失败不回写覆盖。"
+  ]
+}

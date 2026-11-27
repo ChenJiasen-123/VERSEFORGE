@@ -56,7 +56,7 @@ class V3MetricsAndPromptRuleTests(unittest.TestCase):
         s_slop = style_similarity(punct_prose, self.ref_texts)
         self.assertGreater(s_clean["score"], s_slop["score"] + 8.0)
         self.assertGreater(s_slop["anti_slop_penalty"], 0.0)
-        self.assertEqual(s_clean["feature_schema"], "rpe-poetry-style-v3")
+        self.assertEqual(s_clean["feature_schema"], "rpe-poetry-style-v6")
 
     def test_corpus_stylometry_summary_and_diagnosis_are_anonymous(self):
         summary = corpus_stylometry_summary(self.ref_texts)

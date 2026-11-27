@@ -27,7 +27,7 @@ def group(rows):
 
 
 class SelectionMetricsTests(unittest.TestCase):
-    def test_progression_is_reported_but_does_not_change_author_score(self):
+    def test_progression_proxy_stays_diagnostic_while_judge_progression_has_weight(self):
         original = metrics.profile("我的灯亮着\n我出门了")
         altered = dict(original, progression_proxy=1 - original["progression_proxy"])
         self.assertEqual(metrics.compare_profiles(original, original)["score"],
@@ -37,7 +37,7 @@ class SelectionMetricsTests(unittest.TestCase):
             return evaluator._per_poem_fitness(DEFAULTS, {"score": 50}, judge, True, {"copy_flag": False})
         before = score()
         judge["dimensions"]["progression"]["score"] = 5
-        self.assertEqual(before["style_score"], score()["style_score"])
+        self.assertGreater(score()["style_score"], before["style_score"])
 
     def test_missing_and_ineligible_poems_lower_pass_rate(self):
         mixed = group([row("a", 0, 40, True), row("b", 0, 90, False), {"ok": False}])["aggregate"]

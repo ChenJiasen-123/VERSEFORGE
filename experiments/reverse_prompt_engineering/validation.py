@@ -213,13 +213,15 @@ def validate_analysis(data) -> list[str]:
 
 
 JUDGE_DIMENSIONS = (
-    "lexical", "syntax", "lineation", "imagery", "emotion", "structure", "progression",
-    "concreteness", "repetition", "addressivity", "mythic_register", "closure",
+    "poetic_core", "lexical", "syntax", "lineation", "imagery", "emotion",
+    "structure", "progression", "concreteness", "repetition", "addressivity",
+    "mythic_register", "closure",
     "literary_quality", "topic_adherence", "originality",
 )
 STYLE_DIMENSIONS = (
-    "lexical", "syntax", "lineation", "imagery", "emotion", "structure", "progression",
-    "concreteness", "repetition", "addressivity", "mythic_register", "closure",
+    "poetic_core", "lexical", "syntax", "lineation", "imagery", "emotion",
+    "structure", "progression", "concreteness", "repetition", "addressivity",
+    "mythic_register", "closure",
 )
 
 
@@ -253,4 +255,20 @@ def validate_judge(data, require_evidence=True) -> list[str]:
             issues.append(f"未定义维度 {key} 缺少数值 score")
     if not isinstance(data.get("overall_notes"), str):
         issues.append("overall_notes 须为字符串")
+    return issues
+
+
+def validate_pairwise_judge(data) -> list[str]:
+    issues = []
+    if not isinstance(data, dict):
+        return ["输出必须是 JSON 对象"]
+    winner = str(data.get("winner", "")).strip().lower()
+    if winner not in ("1", "2", "tie"):
+        issues.append("winner 须为 '1'、'2' 或 'tie'")
+    rationale = data.get("rationale")
+    if not isinstance(rationale, str) or not rationale.strip():
+        issues.append("rationale 须为非空字符串")
+    conf = data.get("confidence")
+    if conf is not None and not isinstance(conf, str):
+        issues.append("confidence 须为字符串")
     return issues

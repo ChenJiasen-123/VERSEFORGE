@@ -6,7 +6,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from poetry_agent.client import DeepSeekClient, MockClient, load_env
-from poetry_agent.core import Task
+from poetry_agent.core import Task, load_optimal_style_prompt
 from poetry_agent.candidates import compose_candidates
 from poetry_agent.robot import speak_mock, speech_text
 
@@ -34,6 +34,8 @@ def main():
     parser.add_argument("--aesthetic", action="store_true", help="按体裁启用审读、修订及候选比较；尚未证明质量提升")
     parser.add_argument('--aesthetic-examples', action='store_true', help='现代诗可选实验：读取用户正面点评片段，须同时启用--aesthetic')
     parser.add_argument('--generation-thinking', choices=['enabled', 'disabled'], help='可选生成思考模式；不指定时沿用服务默认，审读与比较仍独立设置')
+    parser.add_argument('--style-mode', choices=['standard', 'rpe_v6', 'rpe_v4'], default='standard',
+                        help='现代诗可选启用RPE-GA v6诗核风格引擎（默认自动搭配thinking=enabled与8192输出上限）')
     parser.add_argument("--speak", action="store_true", help="打印模拟朗诵文本，不播放声音")
     parser.add_argument("--max-revisions", type=int, choices=range(3), default=2)
     parser.add_argument('--candidates', type=int, choices=range(1, 4), default=1, help='独立生成候选数量，共享总时间预算')
@@ -51,8 +53,12 @@ def main():
         load_env(ROOT / ".env")
         client = MockClient() if args.mock else DeepSeekClient()
         print(f"模式：{'离线模拟' if args.mock else '真实API（可能产生费用）'}；模型：{client.model}")
+        use_rpe = args.style_mode in ('rpe_v6', 'rpe_v4') and task.genre == 'modern'
+        active_style = load_optimal_style_prompt() if use_rpe else None
+        effective_thinking = args.generation_thinking or ('enabled' if use_rpe else None)
         result = compose_candidates(task, client, args.candidates, args.max_revisions, args.budget, aesthetic=args.aesthetic,
-                         revision_scope=args.revision_scope, use_examples=args.aesthetic_examples, generation_thinking=args.generation_thinking)
+                         revision_scope=args.revision_scope, use_examples=args.aesthetic_examples,
+                         generation_thinking=effective_thinking, style_prompt=active_style)
         result["run_id"] = uuid4().hex
         result["created_at"] = datetime.now(timezone.utc).isoformat()
         result["speech_text"] = speech_text(result["poem"]) if result["poem"] else None

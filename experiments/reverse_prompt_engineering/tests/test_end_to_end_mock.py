@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[3]
 CONFIG = Path(__file__).resolve().parents[1] / "config.yaml"
 
 
-def small_config(tmp, *, max_calls=300, max_tokens=800000):
+def small_config(tmp, *, max_calls=400, max_tokens=1500000):
     cfg = load_config(CONFIG)
     cfg["experiment"]["output_root"] = str(Path(tmp) / "runs")
     cfg["population"]["size"] = 2
@@ -103,7 +103,7 @@ class EndToEndMockTests(unittest.TestCase):
             run_dir = Path(cfg["experiment"]["output_root"]) / "resume"
             self.assertTrue((run_dir / "state.json").exists())
 
-            cfg2 = small_config(tmp, max_calls=300, max_tokens=800000)
+            cfg2 = small_config(tmp, max_calls=400, max_tokens=1500000)
             second = run_experiment(cfg2, "mock", project_root=ROOT, run_id="resume", resume=True, authorized=False)
             self.assertEqual(second["status"], "completed")
             self.assertIsNotNone(second.get("final_prompt"))

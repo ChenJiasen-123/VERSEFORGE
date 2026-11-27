@@ -75,8 +75,39 @@ class WebTests(unittest.TestCase):
 
     def test_bad_input_is_rejected_before_worker_submission(self):
         self.session()
-        for data in ({'prompt': ''}, {'prompt': '诗', 'genre': 'invalid'}, {'prompt': ['not text']}):
+        for data in (
+            {'prompt': ''}, {'prompt': '诗', 'genre': 'invalid'},
+            {'prompt': '夜雨', 'style_mode': 'invalid'},
+            {'prompt': '夜雨', 'expansion_mode': 'invalid'},
+            {'prompt': '夜雨', 'expansion_model': 'gpt-4'},
+            {'prompt': '夜雨', 'auto_polish': 'invalid'},
+            {'prompt': ['not text']},
+        ):
             self.assertEqual(self.request('POST', '/api/jobs', data)[0], 400)
+
+    def test_auto_polish_toggle_controls_independent_editor_option(self):
+        from poetry_agent.studio import run_studio
+        captured = []
+        def fake_studio(prompt, genre, preference, previous, progress, **kwargs):
+            captured.append(kwargs)
+            return {'status': 'completed', 'poem': {'title': '测试诗', 'lines': ['一行']}}
+        import web_server
+        orig_ref = web_server.run_studio
+        web_server.run_studio = fake_studio
+        self.server.studio.runner = fake_studio
+        try:
+            self.session()
+            id_off = json.loads(self.request('POST', '/api/jobs', {'prompt': '一场雨之后', 'auto_polish': 'off'})[1])['id']
+            id_on = json.loads(self.request('POST', '/api/jobs', {'prompt': '一场雨之后', 'auto_polish': 'on'})[1])['id']
+            for jid in (id_off, id_on):
+                for _ in range(30):
+                    job = json.loads(self.request('GET', '/api/jobs/' + jid)[1])
+                    if job['status'] == 'completed':
+                        break
+                    time.sleep(.02)
+            self.assertEqual([c['independent_editor'] for c in captured], [False, True])
+        finally:
+            web_server.run_studio = orig_ref
 
     def test_worker_failure_is_bounded_and_keeps_phase_without_raw_exception(self):
         def failing(*args, progress, **kwargs):

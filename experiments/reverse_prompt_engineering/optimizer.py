@@ -7,15 +7,20 @@ editing generated poems.
 from __future__ import annotations
 
 import hashlib
+import json
 import statistics
 from datetime import datetime, timezone
+from pathlib import Path
 
 from .analyzer import analyze_candidate
-from .evaluator import aggregate_evaluations, evaluate_candidate, selection_objective
+from .evaluator import (
+    aggregate_evaluations, evaluate_candidate, pairwise_compare_candidates, selection_objective,
+)
 from .initializer import initialize_population
 from .llm import BudgetExhausted, LLMOutputError, is_output_truncation_error
 from .metrics import prompt_similarity
 from .mutator import crossover_candidates, mutate_candidate
+from .validation import validate_prompt
 
 
 def utc_now():
@@ -131,6 +136,63 @@ class Optimizer:
         self.store.write_json(f"evaluations/{candidate['id']}.json", evaluation)
         return len(extra.get("evaluations", []))
 
+    def _resolve_elite_ties(self, state, candidates):
+        """Run symmetric AB+BA pairwise comparison when top-2 confirmed elites are within noise margin."""
+        margin = float(self.config["evaluation"].get("pairwise_tiebreak_margin", 0.0))
+        if margin <= 0 or self.judge_llm is None or not hasattr(self.judge_llm, "call_json"):
+            return candidates
+        for c in candidates:
+            c["pairwise_tiebreak_bonus"] = 0.0
+        ranked = [c for c in self._rank(candidates) if c.get("fitness") is not None and (c.get("eligible_rate") or 0) > 0]
+        if len(ranked) < 2:
+            return candidates
+        c1, c2 = ranked[0], ranked[1]
+        if c1.get("eligible_rate") != c2.get("eligible_rate"):
+            return candidates
+        s1, s2 = c1.get("eligible_style"), c2.get("eligible_style")
+        if s1 is None or s2 is None or abs(float(s1) - float(s2)) > margin:
+            return candidates
+        result = pairwise_compare_candidates(
+            self.judge_llm, self.config, c1, c2, self.selection, kind="references",
+        )
+        c1["pairwise_tiebreak_bonus"] = result["bonus_a"]
+        c2["pairwise_tiebreak_bonus"] = round(-result["bonus_a"], 4)
+        c1["pairwise_summary"] = {
+            "opponent": c2["id"],
+            "consistent_wins": result["consistent_wins_a"],
+            "consistent_losses": result["consistent_wins_b"],
+            "ties_or_flips": result["ties_or_order_flips"],
+            "order_flips": result["order_flips"],
+            "bonus": result["bonus_a"],
+        }
+        c2["pairwise_summary"] = {
+            "opponent": c1["id"],
+            "consistent_wins": result["consistent_wins_b"],
+            "consistent_losses": result["consistent_wins_a"],
+            "ties_or_flips": result["ties_or_order_flips"],
+            "order_flips": result["order_flips"],
+            "bonus": round(-result["bonus_a"], 4),
+        }
+        state.setdefault("pairwise_tiebreaks", []).append({
+            "generation": state.get("generation", 0),
+            "created_at": utc_now(),
+            **{k: v for k, v in result.items() if k != "details"},
+        })
+        if self.store:
+            self.store.write_json(
+                f"evaluations/pairwise_{c1['id']}_vs_{c2['id']}.json", result,
+            )
+            self.store.append_event({
+                "event": "pairwise_tiebreak",
+                "candidate_a": c1["id"],
+                "candidate_b": c2["id"],
+                "consistent_wins_a": result["consistent_wins_a"],
+                "consistent_wins_b": result["consistent_wins_b"],
+                "order_flips": result["order_flips"],
+                "bonus_a": result["bonus_a"],
+            })
+        return self._rank(candidates)
+
     def _confirm_leaders_in_run(self, state, candidates=None):
         """Confirm top-k elites during evolution so 1-sample flukes cannot freeze progress."""
         in_run_k = min(int(self.config["population"].get("in_run_confirm_top_k", 0)), self.size)
@@ -156,22 +218,80 @@ class Optimizer:
                     "eligible_style": candidate.get("eligible_style"),
                 })
                 self.store.save_state(state)
-        if changed:
-            ranked_all = self._rank(target_pool)
+        ranked_all = self._resolve_elite_ties(state, self._rank(target_pool))
+        if changed or ranked_all != target_pool:
             if candidates is None:
                 state["population"] = ranked_all
                 self.store.save_state(state)
             return ranked_all
         return target_pool
 
+    def _load_seed_records(self) -> list[dict]:
+        seed_path_raw = self.config["population"].get("seed_prompts_path")
+        if not seed_path_raw:
+            return []
+        seed_path = Path(seed_path_raw)
+        if not seed_path.is_absolute():
+            cfg_base = Path(self.config.get("_config_path", ".")).resolve()
+            repo_root = cfg_base.parents[2] if len(cfg_base.parents) >= 3 else Path.cwd()
+            if (repo_root / seed_path).exists():
+                seed_path = repo_root / seed_path
+        payload = json.loads(seed_path.read_text(encoding="utf-8"))
+        raw_items = payload.get("candidates", []) if isinstance(payload, dict) else payload
+        rules = {
+            **self.config["prompt_rules"],
+            "min_prompt_chars": self.config["population"]["min_prompt_chars"],
+            "max_prompt_chars": self.config["population"]["max_prompt_chars"],
+        }
+        records, seen_prompts = [], set()
+        for idx, item in enumerate(raw_items):
+            prompt = (item.get("prompt") if isinstance(item, dict) else str(item)).strip()
+            if not prompt or prompt in seen_prompts:
+                continue
+            seen_prompts.add(prompt)
+            validation = validate_prompt(
+                prompt, rules=rules, references=self.selection["references"],
+                target_name=self.selection["target_name"],
+                target_aliases=self.selection.get("target_aliases"),
+                min_chars=self.config["population"]["min_prompt_chars"],
+                max_chars=self.config["population"]["max_prompt_chars"],
+            )
+            if not validation["ok"]:
+                continue
+            src_id = item.get("id", f"seed-{idx}") if isinstance(item, dict) else f"seed-{idx}"
+            records.append({
+                "origin": "seed",
+                "focus": f"seeded_from:{src_id}",
+                "source_index": len(records),
+                "prompt": prompt,
+                "design_notes": f"精英种子热启动（源自 {src_id}）",
+                "covered_dimensions": (item.get("covered_dimensions") if isinstance(item, dict) else None) or [],
+                "valid": True,
+                "validation": validation,
+                "attempts": [{"attempt": 1, "validation": validation, "meta": {"seed_source": src_id}}],
+                "model": getattr(self.llm, "model", None),
+                "mock": bool(getattr(self.llm, "mock", False)),
+            })
+            if len(records) >= self.size:
+                break
+        return records
+
     # -- initialization ----------------------------------------------
     def _ensure_initial_population(self, state):
         init = state.setdefault("initialization", {"expected": self.size, "candidates": []})
         candidates = init.setdefault("candidates", [])
         if not candidates:
-            generated = initialize_population(self.llm, self.config, self.selection)
-            for index, record in enumerate(generated):
-                candidate = self._new_candidate(record, generation=0, index=index, kind="i")
+            seeded = self._load_seed_records()
+            generated = list(seeded)
+            if len(generated) < self.size:
+                needed_cfg = {
+                    **self.config,
+                    "population": {**self.config["population"], "size": self.size - len(generated)},
+                }
+                generated.extend(initialize_population(self.llm, needed_cfg, self.selection))
+            for index, record in enumerate(generated[:self.size]):
+                kind = "s" if record.get("origin") == "seed" else "i"
+                candidate = self._new_candidate(record, generation=0, index=index, kind=kind)
                 candidates.append(candidate)
                 self.store.append_event({
                     "event": "initial_candidate_created", "candidate_id": candidate["id"],
@@ -569,7 +689,7 @@ class Optimizer:
             })
             self.store.save_state(state)
         confirmation["completed"] = True
-        state["population"] = self._rank(state["population"])
+        state["population"] = self._resolve_elite_ties(state, self._rank(state["population"]))
         self.store.save_state(state)
         return state["confirmation"]
 
@@ -600,6 +720,8 @@ class Optimizer:
             "originality": best.get("originality"),
             "eligible_rate": best.get("eligible_rate"),
             "eligible_style": best.get("eligible_style"),
+            "pairwise_tiebreak_bonus": best.get("pairwise_tiebreak_bonus", 0.0),
+            "pairwise_summary": best.get("pairwise_summary"),
             "score_std": best.get("score_std"),
             "evaluation_count": best.get("evaluation_count"),
             "prompt_length_chars": best.get("prompt_length_chars"),

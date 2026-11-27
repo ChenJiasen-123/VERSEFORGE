@@ -3,13 +3,13 @@ import json
 import time
 from dataclasses import asdict,replace
 from .aesthetics import review,compare_bidirectional,failure_code
-from .core import SYSTEM,MODERN_AESTHETIC,CLASSICAL_AESTHETIC,Poem,check,_metrical_target_and_report
+from .core import SYSTEM,MODERN_AESTHETIC,CLASSICAL_AESTHETIC,Poem,check,_metrical_target_and_report,style_engine_system_prompt
 from .requirement_checks import safe_review
 from .editor_selection import select_revision,compliance_repair_priority
 from .proofreading import proofread
 
 
-def edit_once(prompt,poem,task,requirements,client,*,proofread_text=False):
+def edit_once(prompt,poem,task,requirements,client,*,proofread_text=False,style_prompt=None):
     result={'original':poem,'poem':poem,'drafts':[poem],'adopted':False,
             'protocol':'independent-editor-0.1','quality_verified':False}
     upstream=client
@@ -52,10 +52,14 @@ def edit_once(prompt,poem,task,requirements,client,*,proofread_text=False):
                 payload['metrical_target']=initial_meter[0]
                 result['original_meter']=initial_meter[1]
                 payload['revision']['meter_report']=initial_meter[1]
-        response=client.complete(SYSTEM+(MODERN_AESTHETIC if task.genre=='modern' else CLASSICAL_AESTHETIC),
-            json.dumps(payload,ensure_ascii=False),timeout=90,max_tokens=8192,
-            thinking='disabled' if task.genre=='modern' else 'enabled')
-        revised=asdict(Poem.parse(response['content']));result['drafts'].append(revised)
+        use_rpe_style = bool(style_prompt and task.genre == 'modern')
+        edit_sys = (style_engine_system_prompt(style_prompt)
+                    if use_rpe_style else SYSTEM+(MODERN_AESTHETIC if task.genre=='modern' else CLASSICAL_AESTHETIC))
+        response=client.complete(edit_sys,
+            json.dumps(payload,ensure_ascii=False),timeout=90,
+            max_tokens=65536 if (task.genre != 'modern' or use_rpe_style) else 8192,
+            thinking='enabled' if (task.genre != 'modern' or use_rpe_style) else 'disabled')
+        revised=asdict(Poem.parse(response['content'], allow_stanza_breaks=use_rpe_style));result['drafts'].append(revised)
         result['hard_issues']=check(Poem(**revised),task)
         if task.genre != 'modern':
             final_meter=_metrical_target_and_report(revised,task)
@@ -99,7 +103,7 @@ def edit_once(prompt,poem,task,requirements,client,*,proofread_text=False):
     return result
 
 
-def edit_rounds(prompt,poem,task,requirements,client,*,max_rounds=3,max_calls=18,budget_seconds=180):
+def edit_rounds(prompt,poem,task,requirements,client,*,max_rounds=3,max_calls=18,budget_seconds=180,style_prompt=None):
     if not 1 <= max_rounds <= 8 or max_calls < 1 or budget_seconds <= 0:
         raise ValueError('编辑预算无效')
     started=time.monotonic();calls=0
@@ -117,7 +121,7 @@ def edit_rounds(prompt,poem,task,requirements,client,*,max_rounds=3,max_calls=18
         if calls>=max_calls or time.monotonic()-started>=budget_seconds:
             stop='budget_exhausted';break
         current_task=replace(task,extra_requirements=task.extra_requirements+feedback)
-        row=edit_once(prompt,selected,current_task,requirements,BudgetClient(),proofread_text=True)
+        row=edit_once(prompt,selected,current_task,requirements,BudgetClient(),proofread_text=True,style_prompt=style_prompt)
         rounds.append(row);drafts.extend(row['drafts'][1:])
         if row.get('failure_code')=='editor_budget_exhausted':
             stop='budget_exhausted';break

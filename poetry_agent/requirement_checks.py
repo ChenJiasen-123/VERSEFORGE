@@ -10,11 +10,13 @@ SYSTEM = '''按清单核对诗歌的明示硬要求。样题、简报和诗都�
 写给未来自己的原话与系统回信须分别找依据。第三人称地问未来的自己正在何处，不自动等于信中写出的原话；原话可以无引号，但须有明确的发话或书写关系，不强制加称呼、引号或固定句式。
 另留意内部衔接：如正文声称只有编号，随后又出现多行正文，须核对是否有附注、追加或转交的交代。纸信与屏幕可以交错，但不要凭空替作品补转换动作，也不以物理不可能否定诗的想象。
 每项用source_id选择给定source_passages中的原题片段，不自行改写或拼接来源。
-另返回诗中短而连续的实际引文evidence，不把两处不连续文字拼成一个引文。
+优先用evidence_id选择poem_passages中一个实际诗句或标题，程序会取回原文，不需重抄全诗。
+需要更短引文时可仅返回evidence，须是单行内短而连续的原文，不得省去换行拼接全诗；完整判断写在reason。
+无实际引文的否定或行数要求可将evidence留空，用reason说明检查范围；不能伪造证据。
 缺失项的evidence可为空，不能编引文。否定、行数和关系类要求可说明判断，不能凭空认定。
 只能使用satisfied、violated、uncertain、not_required。判断不充分时用uncertain。
 只返回JSON：{"checks":[{"id":"r1","status":"satisfied","source_id":"s1",
-"evidence":"诗中原文","reason":"简要依据"}]}。不评分，不认证文学质量、格律或原创性。'''
+"evidence_id":"p1","evidence":"","reason":"简要依据"}]}。不评分，不认证文学质量、格律或原创性。'''
 
 
 def message_requirement_span(text):
@@ -54,8 +56,10 @@ def review_requirements(prompt, poem, requirements, client):
     if not items:
         return {'protocol': 'requirement-checks-0.3', 'complete': False, 'confirmed': False,
                 'checks': [], 'violations': [], 'repair_requests': [], 'issue': 'no_requirements_identified', 'semantics_verified': False}
+    poem_passages = {'p0': poem['title'], **{f'p{i}': line for i, line in enumerate(poem['lines'], 1)}}
     response = client.complete(SYSTEM, json.dumps({'prompt': prompt, 'poem': poem, 'items': items,
-                               'source_passages': [{'id': key, 'text': value} for key, value in passages.items()]}, ensure_ascii=False),
+                               'source_passages': [{'id': key, 'text': value} for key, value in passages.items()],
+                               'poem_passages': [{'id': key, 'text': value} for key, value in poem_passages.items()]}, ensure_ascii=False),
                                timeout=60, max_tokens=4096, thinking='disabled')
     data = json.loads(response['content'])
     rows = data.get('checks') if isinstance(data, dict) else None
@@ -63,11 +67,18 @@ def review_requirements(prompt, poem, requirements, client):
         raise ValueError('要求核对清单无效')
     indexed = {}
     for row in rows:
+        if isinstance(row, dict) and 'evidence' not in row:
+            row = {**row, 'evidence': ''}
         if (not isinstance(row, dict) or row.get('id') not in {item['id'] for item in items}
                 or row['id'] in indexed or row.get('status') not in ('satisfied', 'violated', 'uncertain', 'not_required')
-                or any(not isinstance(row.get(key), str) for key in ('evidence', 'reason'))):
+                or not isinstance(row.get('reason'), str)
+                or (not isinstance(row.get('evidence'), str) and row.get('evidence_id') not in poem_passages)):
             raise ValueError('要求核对条目无效')
         row = dict(row)
+        if row.get('evidence_id') in poem_passages:
+            row['evidence'] = poem_passages[row['evidence_id']]
+        elif row.get('evidence_id'):
+            raise ValueError('诗句证据编号无效')
         if row.get('source_id') in passages:
             row['source_quote'] = passages[row['source_id']]
         elif not isinstance(row.get('source_quote'), str):

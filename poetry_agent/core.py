@@ -13,6 +13,7 @@ from .aesthetic_examples import load_examples
 from .revision_scope import limits as local_limits, inspect_revision
 from .meter_changes import compare_meter
 from .lushi import specification as lushi_specification, evidence as lushi_evidence
+from .allusion_policy import WRITER as ALLUSION_COMPRESSION
 
 
 @dataclass
@@ -177,6 +178,7 @@ CLASSICAL_AESTHETIC = '''
 审美判断不代替所选基本谱和韵书检查，不能自行认证合律。
 只按既定JSON输出标题与正文。
 '''
+CLASSICAL_AESTHETIC += ALLUSION_COMPRESSION
 
 
 def _metrical_target_and_report(poem, task):

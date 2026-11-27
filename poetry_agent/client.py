@@ -1,4 +1,6 @@
 import json
+import hashlib
+from datetime import datetime, timezone
 import os
 import urllib.error
 import urllib.request
@@ -48,6 +50,7 @@ class DeepSeekClient:
         request = urllib.request.Request(self.base + "/chat/completions",
             data=json.dumps(payload).encode("utf-8"), headers={
                 "Content-Type": "application/json", "Authorization": "Bearer " + self.key})
+        started_utc = datetime.now(timezone.utc).isoformat()
         try:
             opener = urllib.request.build_opener(NoRedirect())
             with opener.open(request, timeout=min(timeout, 90)) as response:
@@ -61,6 +64,9 @@ class DeepSeekClient:
             if not isinstance(content, str) or not content.strip():
                 raise RuntimeError("模型返回空正文")
             return {"content": content, "usage": data.get("usage", {}),
+                    "response_metadata": {"id": data.get("id"), "model": data.get("model"),
+                        "created": data.get("created"), "started_utc": started_utc,
+                        "base_url": self.base, "key_fingerprint_sha256": hashlib.sha256(self.key.encode()).hexdigest()[:16]},
                     'request_settings': {'max_tokens': max_tokens, 'response_format': 'json_object',
                                          'thinking': thinking or 'service_default'}}
         except urllib.error.HTTPError as exc:

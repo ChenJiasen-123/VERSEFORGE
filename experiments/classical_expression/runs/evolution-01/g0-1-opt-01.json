@@ -1,0 +1,3535 @@
+{
+  "workflow": {
+    "poem": {
+      "title": "题旧饭盒",
+      "lines": [
+        "空盘扣案月微明",
+        "旧印承唇记勺声",
+        "数载钢匙沿口过",
+        "留痕不拭任窗清"
+      ]
+    },
+    "checks": {
+      "hard": [],
+      "meter": [
+        {
+          "id": "ping_rhyme",
+          "tones": [
+            "PPZZZPP",
+            "ZZPPZZP",
+            "ZZPPPZZ",
+            "PPZZZPP"
+          ],
+          "rhyme_lines_1based": [
+            1,
+            2,
+            4
+          ],
+          "source": "https://www.gongfa.com/wanglishilv.htm",
+          "scope": "exact_basic_target",
+          "limitations": [
+            "只要求本次生成遵循基本谱，不代表其他合法变格均出律",
+            "首句同韵；不在此目标内开放邻韵或拗救",
+            "P为平、Z为仄，须按所选旧韵辨音"
+          ]
+        },
+        {
+          "status": "unknown",
+          "rule_source": "https://www.gongfa.com/wanglishilv.htm",
+          "findings": [
+            {
+              "line": 1,
+              "character": 1,
+              "text": "空",
+              "expected_tone": "P",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "status": "unknown",
+              "kind": "ambiguous_reading"
+            },
+            {
+              "line": 1,
+              "character": 2,
+              "text": "盘",
+              "expected_tone": "P",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table_with_glyph_candidates",
+              "glyph_evidence": {
+                "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                "candidates": [
+                  "盤"
+                ],
+                "missing_candidates": [],
+                "candidate_memberships": [
+                  {
+                    "character": "盤",
+                    "memberships": [
+                      {
+                        "tone": "P",
+                        "rhyme": "上平聲十四寒",
+                        "source": "https://zh.wikisource.org/wiki/平水韻"
+                      }
+                    ]
+                  }
+                ],
+                "sense_selected": false
+              },
+              "actual_tone": "P",
+              "rhyme_candidates": [
+                "上平聲十四寒"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 1,
+              "character": 3,
+              "text": "扣",
+              "expected_tone": "Z",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table_with_glyph_candidates",
+              "glyph_evidence": {
+                "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                "candidates": [
+                  "扣",
+                  "釦"
+                ],
+                "missing_candidates": [],
+                "candidate_memberships": [
+                  {
+                    "character": "扣",
+                    "memberships": [
+                      {
+                        "tone": "Z",
+                        "rhyme": "上聲二十五有",
+                        "source": "https://zh.wikisource.org/wiki/平水韻"
+                      },
+                      {
+                        "tone": "Z",
+                        "rhyme": "去聲二十六宥",
+                        "source": "https://zh.wikisource.org/wiki/平水韻"
+                      }
+                    ]
+                  },
+                  {
+                    "character": "釦",
+                    "memberships": [
+                      {
+                        "tone": "Z",
+                        "rhyme": "上聲二十五有",
+                        "source": "https://zh.wikisource.org/wiki/平水韻"
+                      }
+                    ]
+                  }
+                ],
+                "sense_selected": false
+              },
+              "actual_tone": "Z",
+              "rhyme_candidates": [
+                "上聲二十五有",
+                "去聲二十六宥"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 1,
+              "character": 4,
+              "text": "案",
+              "expected_tone": "Z",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "actual_tone": "Z",
+              "rhyme_candidates": [
+                "去聲十五翰"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 1,
+              "character": 5,
+              "text": "月",
+              "expected_tone": "Z",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "actual_tone": "Z",
+              "rhyme_candidates": [
+                "入聲六月"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 1,
+              "character": 6,
+              "text": "微",
+              "expected_tone": "P",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "actual_tone": "P",
+              "rhyme_candidates": [
+                "上平聲五微"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 1,
+              "character": 7,
+              "text": "明",
+              "expected_tone": "P",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "actual_tone": "P",
+              "rhyme_candidates": [
+                "下平聲八庚"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 2,
+              "character": 1,
+              "text": "旧",
+              "expected_tone": "Z",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table_with_glyph_candidates",
+              "glyph_evidence": {
+                "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                "candidates": [
+                  "舊"
+                ],
+                "missing_candidates": [],
+                "candidate_memberships": [
+                  {
+                    "character": "舊",
+                    "memberships": [
+                      {
+                        "tone": "Z",
+                        "rhyme": "去聲二十六宥",
+                        "source": "https://zh.wikisource.org/wiki/平水韻"
+                      }
+                    ]
+                  }
+                ],
+                "sense_selected": false
+              },
+              "actual_tone": "Z",
+              "rhyme_candidates": [
+                "去聲二十六宥"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 2,
+              "character": 2,
+              "text": "印",
+              "expected_tone": "Z",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "actual_tone": "Z",
+              "rhyme_candidates": [
+                "去聲十二震"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 2,
+              "character": 3,
+              "text": "承",
+              "expected_tone": "P",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "actual_tone": "P",
+              "rhyme_candidates": [
+                "下平聲十蒸"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 2,
+              "character": 4,
+              "text": "唇",
+              "expected_tone": "P",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table_with_glyph_candidates",
+              "glyph_evidence": {
+                "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                "candidates": [
+                  "脣",
+                  "唇"
+                ],
+                "missing_candidates": [
+                  "唇"
+                ],
+                "candidate_memberships": [
+                  {
+                    "character": "脣",
+                    "memberships": [
+                      {
+                        "tone": "P",
+                        "rhyme": "上平聲十一真",
+                        "source": "https://zh.wikisource.org/wiki/平水韻"
+                      }
+                    ]
+                  },
+                  {
+                    "character": "唇",
+                    "memberships": []
+                  }
+                ],
+                "sense_selected": false
+              },
+              "status": "unknown",
+              "kind": "incomplete_glyph_candidates"
+            },
+            {
+              "line": 2,
+              "character": 5,
+              "text": "记",
+              "expected_tone": "Z",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table_with_glyph_candidates",
+              "glyph_evidence": {
+                "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                "candidates": [
+                  "記"
+                ],
+                "missing_candidates": [],
+                "candidate_memberships": [
+                  {
+                    "character": "記",
+                    "memberships": [
+                      {
+                        "tone": "Z",
+                        "rhyme": "去聲四寘",
+                        "source": "https://zh.wikisource.org/wiki/平水韻"
+                      }
+                    ]
+                  }
+                ],
+                "sense_selected": false
+              },
+              "actual_tone": "Z",
+              "rhyme_candidates": [
+                "去聲四寘"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 2,
+              "character": 6,
+              "text": "勺",
+              "expected_tone": "Z",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "actual_tone": "Z",
+              "rhyme_candidates": [
+                "入聲十藥"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 2,
+              "character": 7,
+              "text": "声",
+              "expected_tone": "P",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table_with_glyph_candidates",
+              "glyph_evidence": {
+                "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                "candidates": [
+                  "聲"
+                ],
+                "missing_candidates": [],
+                "candidate_memberships": [
+                  {
+                    "character": "聲",
+                    "memberships": [
+                      {
+                        "tone": "P",
+                        "rhyme": "下平聲八庚",
+                        "source": "https://zh.wikisource.org/wiki/平水韻"
+                      }
+                    ]
+                  }
+                ],
+                "sense_selected": false
+              },
+              "actual_tone": "P",
+              "rhyme_candidates": [
+                "下平聲八庚"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 3,
+              "character": 1,
+              "text": "数",
+              "expected_tone": "Z",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table_with_glyph_candidates",
+              "glyph_evidence": {
+                "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                "candidates": [
+                  "數"
+                ],
+                "missing_candidates": [],
+                "candidate_memberships": [
+                  {
+                    "character": "數",
+                    "memberships": [
+                      {
+                        "tone": "Z",
+                        "rhyme": "上聲七麌",
+                        "source": "https://zh.wikisource.org/wiki/平水韻"
+                      },
+                      {
+                        "tone": "Z",
+                        "rhyme": "入聲三覺",
+                        "source": "https://zh.wikisource.org/wiki/平水韻"
+                      },
+                      {
+                        "tone": "Z",
+                        "rhyme": "去聲七遇",
+                        "source": "https://zh.wikisource.org/wiki/平水韻"
+                      }
+                    ]
+                  }
+                ],
+                "sense_selected": false
+              },
+              "actual_tone": "Z",
+              "rhyme_candidates": [
+                "上聲七麌",
+                "入聲三覺",
+                "去聲七遇"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 3,
+              "character": 2,
+              "text": "载",
+              "expected_tone": "Z",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table_with_glyph_candidates",
+              "glyph_evidence": {
+                "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                "candidates": [
+                  "載"
+                ],
+                "missing_candidates": [],
+                "candidate_memberships": [
+                  {
+                    "character": "載",
+                    "memberships": [
+                      {
+                        "tone": "Z",
+                        "rhyme": "上聲十賄",
+                        "source": "https://zh.wikisource.org/wiki/平水韻"
+                      },
+                      {
+                        "tone": "Z",
+                        "rhyme": "去聲十一隊",
+                        "source": "https://zh.wikisource.org/wiki/平水韻"
+                      }
+                    ]
+                  }
+                ],
+                "sense_selected": false
+              },
+              "actual_tone": "Z",
+              "rhyme_candidates": [
+                "上聲十賄",
+                "去聲十一隊"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 3,
+              "character": 3,
+              "text": "钢",
+              "expected_tone": "P",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table_with_glyph_candidates",
+              "glyph_evidence": {
+                "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                "candidates": [
+                  "鋼"
+                ],
+                "missing_candidates": [],
+                "candidate_memberships": [
+                  {
+                    "character": "鋼",
+                    "memberships": [
+                      {
+                        "tone": "P",
+                        "rhyme": "下平聲七陽",
+                        "source": "https://zh.wikisource.org/wiki/平水韻"
+                      }
+                    ]
+                  }
+                ],
+                "sense_selected": false
+              },
+              "actual_tone": "P",
+              "rhyme_candidates": [
+                "下平聲七陽"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 3,
+              "character": 4,
+              "text": "匙",
+              "expected_tone": "P",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "actual_tone": "P",
+              "rhyme_candidates": [
+                "上平聲四支"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 3,
+              "character": 5,
+              "text": "沿",
+              "expected_tone": "P",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "actual_tone": "P",
+              "rhyme_candidates": [
+                "下平聲一先"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 3,
+              "character": 6,
+              "text": "口",
+              "expected_tone": "Z",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "actual_tone": "Z",
+              "rhyme_candidates": [
+                "上聲二十五有"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 3,
+              "character": 7,
+              "text": "过",
+              "expected_tone": "Z",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table_with_glyph_candidates",
+              "glyph_evidence": {
+                "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                "candidates": [
+                  "過"
+                ],
+                "missing_candidates": [],
+                "candidate_memberships": [
+                  {
+                    "character": "過",
+                    "memberships": [
+                      {
+                        "tone": "P",
+                        "rhyme": "下平聲五歌",
+                        "source": "https://zh.wikisource.org/wiki/平水韻"
+                      },
+                      {
+                        "tone": "Z",
+                        "rhyme": "去聲二十一箇",
+                        "source": "https://zh.wikisource.org/wiki/平水韻"
+                      }
+                    ]
+                  }
+                ],
+                "sense_selected": false
+              },
+              "status": "unknown",
+              "kind": "ambiguous_reading"
+            },
+            {
+              "line": 4,
+              "character": 1,
+              "text": "留",
+              "expected_tone": "P",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "status": "unknown",
+              "kind": "ambiguous_reading"
+            },
+            {
+              "line": 4,
+              "character": 2,
+              "text": "痕",
+              "expected_tone": "P",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "actual_tone": "P",
+              "rhyme_candidates": [
+                "上平聲十三元"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 4,
+              "character": 3,
+              "text": "不",
+              "expected_tone": "Z",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "status": "unknown",
+              "kind": "ambiguous_reading"
+            },
+            {
+              "line": 4,
+              "character": 4,
+              "text": "拭",
+              "expected_tone": "Z",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "actual_tone": "Z",
+              "rhyme_candidates": [
+                "入聲十三職"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 4,
+              "character": 5,
+              "text": "任",
+              "expected_tone": "Z",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "status": "unknown",
+              "kind": "ambiguous_reading"
+            },
+            {
+              "line": 4,
+              "character": 6,
+              "text": "窗",
+              "expected_tone": "P",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "actual_tone": "P",
+              "rhyme_candidates": [
+                "上平聲三江"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "line": 4,
+              "character": 7,
+              "text": "清",
+              "expected_tone": "P",
+              "sources": [
+                "https://zh.wikisource.org/wiki/平水韻"
+              ],
+              "reading_basis": "web_table",
+              "actual_tone": "P",
+              "rhyme_candidates": [
+                "下平聲八庚"
+              ],
+              "kind": "tone",
+              "status": "pass"
+            },
+            {
+              "kind": "rhyme",
+              "status": "pass",
+              "groups": [
+                "下平聲八庚",
+                "下平聲八庚",
+                "下平聲八庚"
+              ],
+              "positions": [
+                {
+                  "line": 1,
+                  "character": 7,
+                  "text": "明",
+                  "resolved_group": "下平聲八庚"
+                },
+                {
+                  "line": 2,
+                  "character": 7,
+                  "text": "声",
+                  "resolved_group": "下平聲八庚"
+                },
+                {
+                  "line": 4,
+                  "character": 7,
+                  "text": "清",
+                  "resolved_group": "下平聲八庚"
+                }
+              ]
+            }
+          ],
+          "scope": "selected_basic_target_against_web_main_table"
+        }
+      ],
+      "requirements": {
+        "protocol": "requirement-checks-0.3",
+        "complete": true,
+        "confirmed": true,
+        "checks": [
+          {
+            "id": "r1",
+            "status": "satisfied",
+            "source_id": "s0",
+            "evidence": "空盘扣案月微明",
+            "reason": "标题《题旧饭盒》标注器物；正文四句均未出现“饭”“盒”二字，并写形（空盘、旧印、沿口）、声（勺声）、用痕（承唇、沿口过、留痕）；为七言绝句四句，押平声韵（明、声、清）。",
+            "source_quote": "为旧饭盒题诗；题目标注器物，正文不得出现饭、盒二字，只写形声用痕。\n体裁：七言绝句，四句；指定基本谱：ping_rhyme。",
+            "requirement": "为旧饭盒题诗；题目标注器物，正文不得出现饭、盒二字，只写形声用痕。\n体裁：七言绝句，四句；指定基本谱：ping_rhyme。"
+          }
+        ],
+        "violations": [],
+        "semantics_verified": false,
+        "repair_requests": [],
+        "usage": {
+          "prompt_tokens": 722,
+          "completion_tokens": 109,
+          "total_tokens": 831,
+          "prompt_tokens_details": {
+            "cached_tokens": 256
+          },
+          "prompt_cache_hit_tokens": 256,
+          "prompt_cache_miss_tokens": 466
+        }
+      }
+    }
+  },
+  "blind": {
+    "data": {
+      "reading": "读到的是一具被静置在月下的旧餐器：它空着扣在桌上，唇印与勺声还留在表面，钢匙多年沿口刮过，主人却不擦去这些痕迹，任由窗色清亮。全诗从物之静到声之忆，再到留痕不拭的从容，情绪偏清冷而自持，末句有一种不刻意清理的安定。",
+      "evidence": [
+        {
+          "quote": "空盘扣案月微明",
+          "role": "以“空”“扣”点出器物被闲置的状态，月光微明定下静而略凉的基调，并借“盘”避开题面禁字。"
+        },
+        {
+          "quote": "旧印承唇记勺声",
+          "role": "把触觉的唇印与听觉的勺声并置，让旧物从静物转为有使用记忆的载体。"
+        },
+        {
+          "quote": "数载钢匙沿口过",
+          "role": "“数载”拉开时间，“沿口过”写摩擦的路径，承接上句的声音记忆，使磨损具体可感。"
+        },
+        {
+          "quote": "留痕不拭任窗清",
+          "role": "从“沿口过”的痕转到“不拭”的选择，以“任窗清”收束，把留痕与窗光并置，形成不清理的从容。"
+        }
+      ],
+      "movement": "首句写物之静与光，次句由印到声，第三句拉长时间写摩擦，末句由痕转为不拭的态度；四句由外到内、由静到声再到取舍，推进平缓。",
+      "gap": "",
+      "device_risks": [
+        "“旧印承唇”若按字面理解为唇印，尚可；但“印”也可能被读作印章，存在轻微歧义，不过尚不妨碍表达成立。",
+        "“任窗清”的“清”略偏抽象，与前文具体的痕、声相比稍虚，但不致断裂。"
+      ],
+      "decision": "keep"
+    },
+    "meta": {
+      "usage": {
+        "prompt_tokens": 380,
+        "completion_tokens": 411,
+        "total_tokens": 791,
+        "prompt_tokens_details": {
+          "cached_tokens": 128
+        },
+        "prompt_cache_hit_tokens": 128,
+        "prompt_cache_miss_tokens": 252
+      },
+      "cache_hit": false,
+      "request_settings": {
+        "max_tokens": 2200,
+        "response_format": "json_object",
+        "thinking": "disabled"
+      },
+      "model": "deepseek-flash",
+      "attempt": 1
+    },
+    "quality_verified": false
+  },
+  "planning": {
+    "data": {
+      "options": [
+        {
+          "experience": "清点时从旧饭盒里取出一张卷边价签，背面有孩子以前写的铅笔字，辨认笔迹时想起当时谁天天用它带饭。",
+          "movement": "第一句写盒沿的凹痕和盒底积着水痕，第二句听见扣环松动时发出短促的响声；第三句从盒中取出这张纸片，第四句发现铅笔字迹被压得模糊，只认出一个偏旁。",
+          "perspective": "一个整理旧物的人，第一人称隐在动作里。",
+          "device": "白描，以取出纸片和辨认字迹的先后推进",
+          "risk": "容易只剩寻物清单；须让第三句到第四句的认出与否改变人与旧物的关系。"
+        },
+        {
+          "experience": "借旧饭盒给邻家孩子带一顿饭，送还时发现盒盖被擦得发白，连原来的刻痕也被磨平了，心里既高兴又有点认不出它。",
+          "movement": "先写盒盖外侧原先划着的记号，第二句写现在那道记号被擦浅；第三句从孩子母亲口里知道她洗了很久，第四句写我接过时指腹沿磨白处摸过去，仍能摸到凹下去的旧痕。",
+          "perspective": "出借者，从对方归还的处境中反看自己的不舍。",
+          "device": "对面落笔，借邻家母亲擦洗、归还的行动显出此方对旧物的牵挂",
+          "risk": "若只写擦洗动作而不写我方摸痕时的发现，对面落笔就落空，成邻人行事报告。"
+        },
+        {
+          "experience": "傍晚把空盒扣在窗台上晾着，月光顺着盒沿内侧的旧划痕走，忽然想到这痕迹原是多年来添饭时钢勺刮出来的，于是不再急着把它擦掉。",
+          "movement": "第一句写盒扣在窗台，第二句写月光沿盒沿内侧的一道浅划痕走；第三句见划痕连续不断，第四句想起这是钢勺日积月累刮出的，手停在抹布上没有落下。",
+          "perspective": "独自在窗边劳作后歇下的人。",
+          "device": "移情，月光照出划痕意义的变化，使旧痕从碍眼变成需保留的关系印记",
+          "risk": "易被误写成单纯月光景物描写；须让第四句的停手动作把意义变化落实。"
+        }
+      ],
+      "selected": 2
+    },
+    "meta": {
+      "usage": {
+        "prompt_tokens": 638,
+        "completion_tokens": 508,
+        "total_tokens": 1146,
+        "prompt_tokens_details": {
+          "cached_tokens": 256
+        },
+        "prompt_cache_hit_tokens": 256,
+        "prompt_cache_miss_tokens": 382
+      },
+      "cache_hit": false,
+      "request_settings": {
+        "max_tokens": 2200,
+        "response_format": "json_object",
+        "thinking": "disabled"
+      },
+      "model": "deepseek-flash",
+      "attempt": 1
+    }
+  },
+  "initial": {
+    "title": "题旧饭盒",
+    "lines": [
+      "空盘扣案月斜明",
+      "旧划沿唇记勺声",
+      "数载钢匙沿口过",
+      "留痕不擦任窗清"
+    ]
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "candidate": {
+        "workflow": {
+          "poem": {
+            "title": "题旧饭盒",
+            "lines": [
+              "空盘扣案月微明",
+              "旧印承唇记勺声",
+              "数载钢匙沿口过",
+              "留痕不拭任窗清"
+            ]
+          },
+          "checks": {
+            "hard": [],
+            "meter": [
+              {
+                "id": "ping_rhyme",
+                "tones": [
+                  "PPZZZPP",
+                  "ZZPPZZP",
+                  "ZZPPPZZ",
+                  "PPZZZPP"
+                ],
+                "rhyme_lines_1based": [
+                  1,
+                  2,
+                  4
+                ],
+                "source": "https://www.gongfa.com/wanglishilv.htm",
+                "scope": "exact_basic_target",
+                "limitations": [
+                  "只要求本次生成遵循基本谱，不代表其他合法变格均出律",
+                  "首句同韵；不在此目标内开放邻韵或拗救",
+                  "P为平、Z为仄，须按所选旧韵辨音"
+                ]
+              },
+              {
+                "status": "unknown",
+                "rule_source": "https://www.gongfa.com/wanglishilv.htm",
+                "findings": [
+                  {
+                    "line": 1,
+                    "character": 1,
+                    "text": "空",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "status": "unknown",
+                    "kind": "ambiguous_reading"
+                  },
+                  {
+                    "line": 1,
+                    "character": 2,
+                    "text": "盘",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "盤"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "盤",
+                          "memberships": [
+                            {
+                              "tone": "P",
+                              "rhyme": "上平聲十四寒",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "上平聲十四寒"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 1,
+                    "character": 3,
+                    "text": "扣",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "扣",
+                        "釦"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "扣",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "上聲二十五有",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            },
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲二十六宥",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        },
+                        {
+                          "character": "釦",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "上聲二十五有",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "上聲二十五有",
+                      "去聲二十六宥"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 1,
+                    "character": 4,
+                    "text": "案",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "去聲十五翰"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 1,
+                    "character": 5,
+                    "text": "月",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "入聲六月"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 1,
+                    "character": 6,
+                    "text": "微",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "上平聲五微"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 1,
+                    "character": 7,
+                    "text": "明",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "下平聲八庚"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 2,
+                    "character": 1,
+                    "text": "旧",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "舊"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "舊",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲二十六宥",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "去聲二十六宥"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 2,
+                    "character": 2,
+                    "text": "印",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "去聲十二震"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 2,
+                    "character": 3,
+                    "text": "承",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "下平聲十蒸"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 2,
+                    "character": 4,
+                    "text": "唇",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "脣",
+                        "唇"
+                      ],
+                      "missing_candidates": [
+                        "唇"
+                      ],
+                      "candidate_memberships": [
+                        {
+                          "character": "脣",
+                          "memberships": [
+                            {
+                              "tone": "P",
+                              "rhyme": "上平聲十一真",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        },
+                        {
+                          "character": "唇",
+                          "memberships": []
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "status": "unknown",
+                    "kind": "incomplete_glyph_candidates"
+                  },
+                  {
+                    "line": 2,
+                    "character": 5,
+                    "text": "记",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "記"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "記",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲四寘",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "去聲四寘"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 2,
+                    "character": 6,
+                    "text": "勺",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "入聲十藥"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 2,
+                    "character": 7,
+                    "text": "声",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "聲"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "聲",
+                          "memberships": [
+                            {
+                              "tone": "P",
+                              "rhyme": "下平聲八庚",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "下平聲八庚"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 1,
+                    "text": "数",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "數"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "數",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "上聲七麌",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            },
+                            {
+                              "tone": "Z",
+                              "rhyme": "入聲三覺",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            },
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲七遇",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "上聲七麌",
+                      "入聲三覺",
+                      "去聲七遇"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 2,
+                    "text": "载",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "載"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "載",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "上聲十賄",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            },
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲十一隊",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "上聲十賄",
+                      "去聲十一隊"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 3,
+                    "text": "钢",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "鋼"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "鋼",
+                          "memberships": [
+                            {
+                              "tone": "P",
+                              "rhyme": "下平聲七陽",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "下平聲七陽"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 4,
+                    "text": "匙",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "上平聲四支"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 5,
+                    "text": "沿",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "下平聲一先"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 6,
+                    "text": "口",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "上聲二十五有"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 7,
+                    "text": "过",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "過"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "過",
+                          "memberships": [
+                            {
+                              "tone": "P",
+                              "rhyme": "下平聲五歌",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            },
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲二十一箇",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "status": "unknown",
+                    "kind": "ambiguous_reading"
+                  },
+                  {
+                    "line": 4,
+                    "character": 1,
+                    "text": "留",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "status": "unknown",
+                    "kind": "ambiguous_reading"
+                  },
+                  {
+                    "line": 4,
+                    "character": 2,
+                    "text": "痕",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "上平聲十三元"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 4,
+                    "character": 3,
+                    "text": "不",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "status": "unknown",
+                    "kind": "ambiguous_reading"
+                  },
+                  {
+                    "line": 4,
+                    "character": 4,
+                    "text": "拭",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "入聲十三職"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 4,
+                    "character": 5,
+                    "text": "任",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "status": "unknown",
+                    "kind": "ambiguous_reading"
+                  },
+                  {
+                    "line": 4,
+                    "character": 6,
+                    "text": "窗",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "上平聲三江"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 4,
+                    "character": 7,
+                    "text": "清",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "下平聲八庚"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "kind": "rhyme",
+                    "status": "pass",
+                    "groups": [
+                      "下平聲八庚",
+                      "下平聲八庚",
+                      "下平聲八庚"
+                    ],
+                    "positions": [
+                      {
+                        "line": 1,
+                        "character": 7,
+                        "text": "明",
+                        "resolved_group": "下平聲八庚"
+                      },
+                      {
+                        "line": 2,
+                        "character": 7,
+                        "text": "声",
+                        "resolved_group": "下平聲八庚"
+                      },
+                      {
+                        "line": 4,
+                        "character": 7,
+                        "text": "清",
+                        "resolved_group": "下平聲八庚"
+                      }
+                    ]
+                  }
+                ],
+                "scope": "selected_basic_target_against_web_main_table"
+              }
+            ],
+            "requirements": {
+              "protocol": "requirement-checks-0.3",
+              "complete": true,
+              "confirmed": true,
+              "checks": [
+                {
+                  "id": "r1",
+                  "status": "satisfied",
+                  "source_id": "s0",
+                  "evidence": "空盘扣案月微明",
+                  "reason": "标题《题旧饭盒》标注器物；正文四句均未出现“饭”“盒”二字，并写形（空盘、旧印、沿口）、声（勺声）、用痕（承唇、沿口过、留痕）；为七言绝句四句，押平声韵（明、声、清）。",
+                  "source_quote": "为旧饭盒题诗；题目标注器物，正文不得出现饭、盒二字，只写形声用痕。\n体裁：七言绝句，四句；指定基本谱：ping_rhyme。",
+                  "requirement": "为旧饭盒题诗；题目标注器物，正文不得出现饭、盒二字，只写形声用痕。\n体裁：七言绝句，四句；指定基本谱：ping_rhyme。"
+                }
+              ],
+              "violations": [],
+              "semantics_verified": false,
+              "repair_requests": [],
+              "usage": {
+                "prompt_tokens": 722,
+                "completion_tokens": 109,
+                "total_tokens": 831,
+                "prompt_tokens_details": {
+                  "cached_tokens": 256
+                },
+                "prompt_cache_hit_tokens": 256,
+                "prompt_cache_miss_tokens": 466
+              }
+            }
+          }
+        },
+        "blind": {
+          "data": {
+            "reading": "读到的是一具被静置在月下的旧餐器：它空着扣在桌上，唇印与勺声还留在表面，钢匙多年沿口刮过，主人却不擦去这些痕迹，任由窗色清亮。全诗从物之静到声之忆，再到留痕不拭的从容，情绪偏清冷而自持，末句有一种不刻意清理的安定。",
+            "evidence": [
+              {
+                "quote": "空盘扣案月微明",
+                "role": "以“空”“扣”点出器物被闲置的状态，月光微明定下静而略凉的基调，并借“盘”避开题面禁字。"
+              },
+              {
+                "quote": "旧印承唇记勺声",
+                "role": "把触觉的唇印与听觉的勺声并置，让旧物从静物转为有使用记忆的载体。"
+              },
+              {
+                "quote": "数载钢匙沿口过",
+                "role": "“数载”拉开时间，“沿口过”写摩擦的路径，承接上句的声音记忆，使磨损具体可感。"
+              },
+              {
+                "quote": "留痕不拭任窗清",
+                "role": "从“沿口过”的痕转到“不拭”的选择，以“任窗清”收束，把留痕与窗光并置，形成不清理的从容。"
+              }
+            ],
+            "movement": "首句写物之静与光，次句由印到声，第三句拉长时间写摩擦，末句由痕转为不拭的态度；四句由外到内、由静到声再到取舍，推进平缓。",
+            "gap": "",
+            "device_risks": [
+              "“旧印承唇”若按字面理解为唇印，尚可；但“印”也可能被读作印章，存在轻微歧义，不过尚不妨碍表达成立。",
+              "“任窗清”的“清”略偏抽象，与前文具体的痕、声相比稍虚，但不致断裂。"
+            ],
+            "decision": "keep"
+          },
+          "meta": {
+            "usage": {
+              "prompt_tokens": 380,
+              "completion_tokens": 411,
+              "total_tokens": 791,
+              "prompt_tokens_details": {
+                "cached_tokens": 128
+              },
+              "prompt_cache_hit_tokens": 128,
+              "prompt_cache_miss_tokens": 252
+            },
+            "cache_hit": false,
+            "request_settings": {
+              "max_tokens": 2200,
+              "response_format": "json_object",
+              "thinking": "disabled"
+            },
+            "model": "deepseek-flash",
+            "attempt": 1
+          },
+          "quality_verified": false
+        }
+      },
+      "adopted": true,
+      "selection_basis": "ordinal_formal_then_expression_proxy_not_literary_certification"
+    },
+    {
+      "round": 2,
+      "candidate": {
+        "workflow": {
+          "poem": {
+            "title": "题旧饭盒",
+            "lines": [
+              "空盘扣案月微明",
+              "旧渍沾唇记勺声",
+              "数载钢匙沿口刮",
+              "留痕不拭任窗清"
+            ]
+          },
+          "checks": {
+            "hard": [],
+            "meter": [
+              {
+                "id": "ping_rhyme",
+                "tones": [
+                  "PPZZZPP",
+                  "ZZPPZZP",
+                  "ZZPPPZZ",
+                  "PPZZZPP"
+                ],
+                "rhyme_lines_1based": [
+                  1,
+                  2,
+                  4
+                ],
+                "source": "https://www.gongfa.com/wanglishilv.htm",
+                "scope": "exact_basic_target",
+                "limitations": [
+                  "只要求本次生成遵循基本谱，不代表其他合法变格均出律",
+                  "首句同韵；不在此目标内开放邻韵或拗救",
+                  "P为平、Z为仄，须按所选旧韵辨音"
+                ]
+              },
+              {
+                "status": "unknown",
+                "rule_source": "https://www.gongfa.com/wanglishilv.htm",
+                "findings": [
+                  {
+                    "line": 1,
+                    "character": 1,
+                    "text": "空",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "status": "unknown",
+                    "kind": "ambiguous_reading"
+                  },
+                  {
+                    "line": 1,
+                    "character": 2,
+                    "text": "盘",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "盤"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "盤",
+                          "memberships": [
+                            {
+                              "tone": "P",
+                              "rhyme": "上平聲十四寒",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "上平聲十四寒"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 1,
+                    "character": 3,
+                    "text": "扣",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "扣",
+                        "釦"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "扣",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "上聲二十五有",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            },
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲二十六宥",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        },
+                        {
+                          "character": "釦",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "上聲二十五有",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "上聲二十五有",
+                      "去聲二十六宥"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 1,
+                    "character": 4,
+                    "text": "案",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "去聲十五翰"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 1,
+                    "character": 5,
+                    "text": "月",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "入聲六月"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 1,
+                    "character": 6,
+                    "text": "微",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "上平聲五微"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 1,
+                    "character": 7,
+                    "text": "明",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "下平聲八庚"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 2,
+                    "character": 1,
+                    "text": "旧",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "舊"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "舊",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲二十六宥",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "去聲二十六宥"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 2,
+                    "character": 2,
+                    "text": "渍",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "漬"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "漬",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲四寘",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "去聲四寘"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 2,
+                    "character": 3,
+                    "text": "沾",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "沾",
+                        "霑"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "沾",
+                          "memberships": [
+                            {
+                              "tone": "P",
+                              "rhyme": "下平聲十四鹽",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            },
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲二十九豔",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        },
+                        {
+                          "character": "霑",
+                          "memberships": [
+                            {
+                              "tone": "P",
+                              "rhyme": "下平聲十四鹽",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "status": "unknown",
+                    "kind": "ambiguous_reading"
+                  },
+                  {
+                    "line": 2,
+                    "character": 4,
+                    "text": "唇",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "脣",
+                        "唇"
+                      ],
+                      "missing_candidates": [
+                        "唇"
+                      ],
+                      "candidate_memberships": [
+                        {
+                          "character": "脣",
+                          "memberships": [
+                            {
+                              "tone": "P",
+                              "rhyme": "上平聲十一真",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        },
+                        {
+                          "character": "唇",
+                          "memberships": []
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "status": "unknown",
+                    "kind": "incomplete_glyph_candidates"
+                  },
+                  {
+                    "line": 2,
+                    "character": 5,
+                    "text": "记",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "記"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "記",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲四寘",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "去聲四寘"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 2,
+                    "character": 6,
+                    "text": "勺",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "入聲十藥"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 2,
+                    "character": 7,
+                    "text": "声",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "聲"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "聲",
+                          "memberships": [
+                            {
+                              "tone": "P",
+                              "rhyme": "下平聲八庚",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "下平聲八庚"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 1,
+                    "text": "数",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "數"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "數",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "上聲七麌",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            },
+                            {
+                              "tone": "Z",
+                              "rhyme": "入聲三覺",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            },
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲七遇",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "上聲七麌",
+                      "入聲三覺",
+                      "去聲七遇"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 2,
+                    "text": "载",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "載"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "載",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "上聲十賄",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            },
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲十一隊",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "上聲十賄",
+                      "去聲十一隊"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 3,
+                    "text": "钢",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "鋼"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "鋼",
+                          "memberships": [
+                            {
+                              "tone": "P",
+                              "rhyme": "下平聲七陽",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "下平聲七陽"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 4,
+                    "text": "匙",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "上平聲四支"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 5,
+                    "text": "沿",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "下平聲一先"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 6,
+                    "text": "口",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "上聲二十五有"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 7,
+                    "text": "刮",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "刮",
+                        "颳"
+                      ],
+                      "missing_candidates": [
+                        "颳"
+                      ],
+                      "candidate_memberships": [
+                        {
+                          "character": "刮",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "入聲八黠",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        },
+                        {
+                          "character": "颳",
+                          "memberships": []
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "status": "unknown",
+                    "kind": "incomplete_glyph_candidates"
+                  },
+                  {
+                    "line": 4,
+                    "character": 1,
+                    "text": "留",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "status": "unknown",
+                    "kind": "ambiguous_reading"
+                  },
+                  {
+                    "line": 4,
+                    "character": 2,
+                    "text": "痕",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "上平聲十三元"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 4,
+                    "character": 3,
+                    "text": "不",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "status": "unknown",
+                    "kind": "ambiguous_reading"
+                  },
+                  {
+                    "line": 4,
+                    "character": 4,
+                    "text": "拭",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "入聲十三職"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 4,
+                    "character": 5,
+                    "text": "任",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "status": "unknown",
+                    "kind": "ambiguous_reading"
+                  },
+                  {
+                    "line": 4,
+                    "character": 6,
+                    "text": "窗",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "上平聲三江"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 4,
+                    "character": 7,
+                    "text": "清",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "下平聲八庚"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "kind": "rhyme",
+                    "status": "pass",
+                    "groups": [
+                      "下平聲八庚",
+                      "下平聲八庚",
+                      "下平聲八庚"
+                    ],
+                    "positions": [
+                      {
+                        "line": 1,
+                        "character": 7,
+                        "text": "明",
+                        "resolved_group": "下平聲八庚"
+                      },
+                      {
+                        "line": 2,
+                        "character": 7,
+                        "text": "声",
+                        "resolved_group": "下平聲八庚"
+                      },
+                      {
+                        "line": 4,
+                        "character": 7,
+                        "text": "清",
+                        "resolved_group": "下平聲八庚"
+                      }
+                    ]
+                  }
+                ],
+                "scope": "selected_basic_target_against_web_main_table"
+              }
+            ],
+            "requirements": {
+              "protocol": "requirement-checks-0.3",
+              "complete": true,
+              "confirmed": true,
+              "checks": [
+                {
+                  "id": "r1",
+                  "status": "satisfied",
+                  "source_id": "s0",
+                  "evidence": "空盘扣案月微明",
+                  "reason": "标题为《题旧饭盒》标注器物；正文四句均无“饭”“盒”二字，并写盘、渍、勺声、钢匙、留痕等形声用痕；为七言四句，押“明、声、清”平声韵，符合基本平韵要求。",
+                  "source_quote": "为旧饭盒题诗；题目标注器物，正文不得出现饭、盒二字，只写形声用痕。\n体裁：七言绝句，四句；指定基本谱：ping_rhyme。",
+                  "requirement": "为旧饭盒题诗；题目标注器物，正文不得出现饭、盒二字，只写形声用痕。\n体裁：七言绝句，四句；指定基本谱：ping_rhyme。"
+                }
+              ],
+              "violations": [],
+              "semantics_verified": false,
+              "repair_requests": [],
+              "usage": {
+                "prompt_tokens": 722,
+                "completion_tokens": 102,
+                "total_tokens": 824,
+                "prompt_tokens_details": {
+                  "cached_tokens": 256
+                },
+                "prompt_cache_hit_tokens": 256,
+                "prompt_cache_miss_tokens": 466
+              }
+            }
+          }
+        },
+        "blind": {
+          "data": {
+            "reading": "读到一件被长久使用、如今静置的旧器物：空盘扣在案上，月光微明，旧渍尚在，勺声似可追忆，钢匙刮过沿口留下痕迹，主人不擦去这些痕，任窗光透进来。整体是克制的怀旧，带一点日常的温感，不悲不烈。",
+            "evidence": [
+              {
+                "quote": "空盘扣案月微明",
+                "role": "以物之形（盘扣）与夜光定下静置的现场，器物不再使用而仍有存在感。"
+              },
+              {
+                "quote": "旧渍沾唇记勺声",
+                "role": "从视觉痕迹转到触觉/听觉记忆，渍与唇、勺声把使用史带入，而不直说器物名。"
+              },
+              {
+                "quote": "数载钢匙沿口刮",
+                "role": "具体到长时间反复摩擦的用法痕，形与用同时推进，时间被刮进器物。"
+              },
+              {
+                "quote": "留痕不拭任窗清",
+                "role": "收束在“不拭”的选择上，痕被保留，窗清与器物之痕形成对照，克制地给出态度。"
+              }
+            ],
+            "movement": "由静物夜景起，经旧渍与勺声引入使用记忆，再落到多年刮擦的具体痕迹，最后以不拭痕、任窗清收住，从形到声到用再到态度，推进平稳。",
+            "gap": "“沾唇”的主语略含混：是旧渍沾唇（人唇触渍），还是渍本身在器物口沿如唇？此处虽可读出触感，但歧义稍碍“记勺声”的因果衔接。",
+            "device_risks": [
+              "“月微明”与“窗清”都借光来点静，光意象略可替换，但不妨碍整体成立。",
+              "“钢匙”偏具体现代材质，与古典七言语境略有摩擦，但作为器物用痕的实指尚可。"
+            ],
+            "decision": "keep"
+          },
+          "meta": {
+            "usage": {
+              "prompt_tokens": 380,
+              "completion_tokens": 414,
+              "total_tokens": 794,
+              "prompt_tokens_details": {
+                "cached_tokens": 128
+              },
+              "prompt_cache_hit_tokens": 128,
+              "prompt_cache_miss_tokens": 252
+            },
+            "cache_hit": false,
+            "request_settings": {
+              "max_tokens": 2200,
+              "response_format": "json_object",
+              "thinking": "disabled"
+            },
+            "model": "deepseek-flash",
+            "attempt": 1
+          },
+          "quality_verified": false
+        }
+      },
+      "adopted": false,
+      "selection_basis": "ordinal_formal_then_expression_proxy_not_literary_certification"
+    },
+    {
+      "round": 3,
+      "candidate": {
+        "workflow": {
+          "poem": {
+            "title": "题旧饭盒",
+            "lines": [
+              "空腔倒扣作清鸣",
+              "旧渍沾唇记勺声",
+              "数载钢匙沿口刮",
+              "留痕不拭自分明"
+            ]
+          },
+          "checks": {
+            "hard": [],
+            "meter": [
+              {
+                "id": "ping_rhyme",
+                "tones": [
+                  "PPZZZPP",
+                  "ZZPPZZP",
+                  "ZZPPPZZ",
+                  "PPZZZPP"
+                ],
+                "rhyme_lines_1based": [
+                  1,
+                  2,
+                  4
+                ],
+                "source": "https://www.gongfa.com/wanglishilv.htm",
+                "scope": "exact_basic_target",
+                "limitations": [
+                  "只要求本次生成遵循基本谱，不代表其他合法变格均出律",
+                  "首句同韵；不在此目标内开放邻韵或拗救",
+                  "P为平、Z为仄，须按所选旧韵辨音"
+                ]
+              },
+              {
+                "status": "unknown",
+                "rule_source": "https://www.gongfa.com/wanglishilv.htm",
+                "findings": [
+                  {
+                    "line": 1,
+                    "character": 1,
+                    "text": "空",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "status": "unknown",
+                    "kind": "ambiguous_reading"
+                  },
+                  {
+                    "line": 1,
+                    "character": 2,
+                    "text": "腔",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "上平聲三江"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 1,
+                    "character": 3,
+                    "text": "倒",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "上聲十九皓",
+                      "去聲二十號"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 1,
+                    "character": 4,
+                    "text": "扣",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "扣",
+                        "釦"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "扣",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "上聲二十五有",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            },
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲二十六宥",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        },
+                        {
+                          "character": "釦",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "上聲二十五有",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "上聲二十五有",
+                      "去聲二十六宥"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 1,
+                    "character": 5,
+                    "text": "作",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "入聲十藥",
+                      "去聲七遇",
+                      "去聲二十一箇"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 1,
+                    "character": 6,
+                    "text": "清",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "下平聲八庚"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 1,
+                    "character": 7,
+                    "text": "鸣",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "鳴"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "鳴",
+                          "memberships": [
+                            {
+                              "tone": "P",
+                              "rhyme": "下平聲八庚",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "下平聲八庚"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 2,
+                    "character": 1,
+                    "text": "旧",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "舊"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "舊",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲二十六宥",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "去聲二十六宥"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 2,
+                    "character": 2,
+                    "text": "渍",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "漬"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "漬",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲四寘",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "去聲四寘"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 2,
+                    "character": 3,
+                    "text": "沾",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "沾",
+                        "霑"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "沾",
+                          "memberships": [
+                            {
+                              "tone": "P",
+                              "rhyme": "下平聲十四鹽",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            },
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲二十九豔",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        },
+                        {
+                          "character": "霑",
+                          "memberships": [
+                            {
+                              "tone": "P",
+                              "rhyme": "下平聲十四鹽",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "status": "unknown",
+                    "kind": "ambiguous_reading"
+                  },
+                  {
+                    "line": 2,
+                    "character": 4,
+                    "text": "唇",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "脣",
+                        "唇"
+                      ],
+                      "missing_candidates": [
+                        "唇"
+                      ],
+                      "candidate_memberships": [
+                        {
+                          "character": "脣",
+                          "memberships": [
+                            {
+                              "tone": "P",
+                              "rhyme": "上平聲十一真",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        },
+                        {
+                          "character": "唇",
+                          "memberships": []
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "status": "unknown",
+                    "kind": "incomplete_glyph_candidates"
+                  },
+                  {
+                    "line": 2,
+                    "character": 5,
+                    "text": "记",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "記"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "記",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲四寘",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "去聲四寘"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 2,
+                    "character": 6,
+                    "text": "勺",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "入聲十藥"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 2,
+                    "character": 7,
+                    "text": "声",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "聲"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "聲",
+                          "memberships": [
+                            {
+                              "tone": "P",
+                              "rhyme": "下平聲八庚",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "下平聲八庚"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 1,
+                    "text": "数",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "數"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "數",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "上聲七麌",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            },
+                            {
+                              "tone": "Z",
+                              "rhyme": "入聲三覺",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            },
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲七遇",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "上聲七麌",
+                      "入聲三覺",
+                      "去聲七遇"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 2,
+                    "text": "载",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "載"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "載",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "上聲十賄",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            },
+                            {
+                              "tone": "Z",
+                              "rhyme": "去聲十一隊",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "上聲十賄",
+                      "去聲十一隊"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 3,
+                    "text": "钢",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "鋼"
+                      ],
+                      "missing_candidates": [],
+                      "candidate_memberships": [
+                        {
+                          "character": "鋼",
+                          "memberships": [
+                            {
+                              "tone": "P",
+                              "rhyme": "下平聲七陽",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "下平聲七陽"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 4,
+                    "text": "匙",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "上平聲四支"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 5,
+                    "text": "沿",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "下平聲一先"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 6,
+                    "text": "口",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "上聲二十五有"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 3,
+                    "character": 7,
+                    "text": "刮",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table_with_glyph_candidates",
+                    "glyph_evidence": {
+                      "source": "https://raw.githubusercontent.com/BYVoid/OpenCC/178f05dbc5dbcedd09d4ab39d501094f4d9d8820/data/dictionary/STCharacters.txt",
+                      "sha256": "a0ca1601c70648cf48b33c3c6210ccbecc5c7eead4b4c3daf76587ba2c03582b",
+                      "candidates": [
+                        "刮",
+                        "颳"
+                      ],
+                      "missing_candidates": [
+                        "颳"
+                      ],
+                      "candidate_memberships": [
+                        {
+                          "character": "刮",
+                          "memberships": [
+                            {
+                              "tone": "Z",
+                              "rhyme": "入聲八黠",
+                              "source": "https://zh.wikisource.org/wiki/平水韻"
+                            }
+                          ]
+                        },
+                        {
+                          "character": "颳",
+                          "memberships": []
+                        }
+                      ],
+                      "sense_selected": false
+                    },
+                    "status": "unknown",
+                    "kind": "incomplete_glyph_candidates"
+                  },
+                  {
+                    "line": 4,
+                    "character": 1,
+                    "text": "留",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "status": "unknown",
+                    "kind": "ambiguous_reading"
+                  },
+                  {
+                    "line": 4,
+                    "character": 2,
+                    "text": "痕",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "上平聲十三元"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 4,
+                    "character": 3,
+                    "text": "不",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "status": "unknown",
+                    "kind": "ambiguous_reading"
+                  },
+                  {
+                    "line": 4,
+                    "character": 4,
+                    "text": "拭",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "入聲十三職"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 4,
+                    "character": 5,
+                    "text": "自",
+                    "expected_tone": "Z",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "Z",
+                    "rhyme_candidates": [
+                      "去聲四寘"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "line": 4,
+                    "character": 6,
+                    "text": "分",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "status": "unknown",
+                    "kind": "ambiguous_reading"
+                  },
+                  {
+                    "line": 4,
+                    "character": 7,
+                    "text": "明",
+                    "expected_tone": "P",
+                    "sources": [
+                      "https://zh.wikisource.org/wiki/平水韻"
+                    ],
+                    "reading_basis": "web_table",
+                    "actual_tone": "P",
+                    "rhyme_candidates": [
+                      "下平聲八庚"
+                    ],
+                    "kind": "tone",
+                    "status": "pass"
+                  },
+                  {
+                    "kind": "rhyme",
+                    "status": "pass",
+                    "groups": [
+                      "下平聲八庚",
+                      "下平聲八庚",
+                      "下平聲八庚"
+                    ],
+                    "positions": [
+                      {
+                        "line": 1,
+                        "character": 7,
+                        "text": "鸣",
+                        "resolved_group": "下平聲八庚"
+                      },
+                      {
+                        "line": 2,
+                        "character": 7,
+                        "text": "声",
+                        "resolved_group": "下平聲八庚"
+                      },
+                      {
+                        "line": 4,
+                        "character": 7,
+                        "text": "明",
+                        "resolved_group": "下平聲八庚"
+                      }
+                    ]
+                  }
+                ],
+                "scope": "selected_basic_target_against_web_main_table"
+              }
+            ],
+            "requirements": {
+              "protocol": "requirement-checks-0.3",
+              "complete": true,
+              "confirmed": true,
+              "checks": [
+                {
+                  "id": "r1",
+                  "status": "satisfied",
+                  "source_id": "s0",
+                  "evidence": "空腔倒扣作清鸣",
+                  "reason": "题目《题旧饭盒》标注器物；正文四句无“饭”“盒”二字，以“清鸣”“勺声”“钢匙沿口刮”“留痕”写形声用痕；为七言四句，韵脚“鸣、声、明”合平声韵。",
+                  "source_quote": "为旧饭盒题诗；题目标注器物，正文不得出现饭、盒二字，只写形声用痕。\n体裁：七言绝句，四句；指定基本谱：ping_rhyme。",
+                  "requirement": "为旧饭盒题诗；题目标注器物，正文不得出现饭、盒二字，只写形声用痕。\n体裁：七言绝句，四句；指定基本谱：ping_rhyme。"
+                }
+              ],
+              "violations": [],
+              "semantics_verified": false,
+              "repair_requests": [],
+              "usage": {
+                "prompt_tokens": 721,
+                "completion_tokens": 99,
+                "total_tokens": 820,
+                "prompt_tokens_details": {
+                  "cached_tokens": 256
+                },
+                "prompt_cache_hit_tokens": 256,
+                "prompt_cache_miss_tokens": 465
+              }
+            }
+          }
+        },
+        "blind": {
+          "data": {
+            "reading": "读到的是一件被倒扣、敲响的旧容器：空腔与清鸣先立其形与声，旧渍、勺声、钢匙刮口把日常进食的痕迹层层叠上，末句把不擦拭的划痕视为可辨认的自身记录。整体有朴素的怀旧感，没有刻意拔高，但'记勺声''沿口刮'的动作感较实，'自分明'收得略平。",
+            "evidence": [
+              {
+                "quote": "空腔倒扣作清鸣",
+                "role": "以倒扣动作和空腔发声建立器物当下的形与声，避免直说器物名，是全诗的起点。"
+              },
+              {
+                "quote": "旧渍沾唇记勺声",
+                "role": "由形声转入使用痕迹，渍与勺声并置，把触觉、听觉和残存物联系起来，推进到日常经验。"
+              },
+              {
+                "quote": "数载钢匙沿口刮",
+                "role": "时间跨度与重复动作叠加，使前句的'记'具体化为长期摩擦留下的物理痕迹。"
+              },
+              {
+                "quote": "留痕不拭自分明",
+                "role": "收束到对痕迹的态度，把不擦拭解释为清晰可辨，完成从物到意味的转折，但'自分明'略直白。"
+              }
+            ],
+            "movement": "从外形与声响（空腔倒扣）到残留痕迹（旧渍、勺声），再到长期摩擦（钢匙刮口），最后落到对痕迹的保留与辨认，四句由表及里、由动作到时间再到态度，推进自然。",
+            "gap": "'旧渍沾唇'中的'唇'指器口还是人唇，存在轻微歧义；若指器口被沾，则'记勺声'的听感来源不够明确，但不妨碍整体理解。",
+            "device_risks": [
+              "'清鸣'与'勺声'同属听觉意象，略密集，可能削弱声音的层次。",
+              "'自分明'偏抽象，收束力度不如前三句具体。"
+            ],
+            "decision": "keep"
+          },
+          "meta": {
+            "usage": {
+              "prompt_tokens": 379,
+              "completion_tokens": 424,
+              "total_tokens": 803,
+              "prompt_tokens_details": {
+                "cached_tokens": 128
+              },
+              "prompt_cache_hit_tokens": 128,
+              "prompt_cache_miss_tokens": 251
+            },
+            "cache_hit": false,
+            "request_settings": {
+              "max_tokens": 2200,
+              "response_format": "json_object",
+              "thinking": "disabled"
+            },
+            "model": "deepseek-flash",
+            "attempt": 1
+          },
+          "quality_verified": false
+        }
+      },
+      "adopted": false,
+      "selection_basis": "ordinal_formal_then_expression_proxy_not_literary_certification"
+    }
+  ],
+  "expression_proxy": 1,
+  "literary_quality_verified": false
+}

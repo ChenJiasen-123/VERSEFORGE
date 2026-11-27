@@ -3,10 +3,11 @@ import json
 import time
 from dataclasses import asdict,replace
 from .aesthetics import review,compare_bidirectional,failure_code
-from .core import SYSTEM,MODERN_AESTHETIC,CLASSICAL_AESTHETIC,Poem,check,_metrical_target_and_report
+from .core import SYSTEM,MODERN_AESTHETIC,CLASSICAL_AESTHETIC,Poem,check,_metrical_target_and_report,metrical_revision_feedback
 from .requirement_checks import safe_review
 from .editor_selection import select_revision,compliance_repair_priority
 from .proofreading import proofread
+from .meter_changes import stable_unknown_revision
 
 
 def edit_once(prompt,poem,task,requirements,client,*,proofread_text=False):
@@ -51,7 +52,7 @@ def edit_once(prompt,poem,task,requirements,client,*,proofread_text=False):
             if initial_meter is not None:
                 payload['metrical_target']=initial_meter[0]
                 result['original_meter']=initial_meter[1]
-                payload['revision']['meter_report']=initial_meter[1]
+                payload['revision']['metrical_feedback']=metrical_revision_feedback(poem,task)
         response=client.complete(SYSTEM+(MODERN_AESTHETIC if task.genre=='modern' else CLASSICAL_AESTHETIC),
             json.dumps(payload,ensure_ascii=False),timeout=90,max_tokens=8192,
             thinking='disabled' if task.genre=='modern' else 'enabled')
@@ -60,7 +61,8 @@ def edit_once(prompt,poem,task,requirements,client,*,proofread_text=False):
         if task.genre != 'modern':
             final_meter=_metrical_target_and_report(revised,task)
             result['revision_meter']=final_meter[1] if final_meter is not None else None
-            if final_meter is None or final_meter[1].get('status')!='pass':
+            result['revision_meter_guard'] = stable_unknown_revision(poem,revised,original_meter,final_meter)
+            if (final_meter is None or final_meter[1].get('status')!='pass') and not result['revision_meter_guard']['accepted']:
                 result['status']='revision_meter_failed' if final_meter and final_meter[1].get('status')=='failed' else 'revision_meter_unconfirmed'
                 result['meter_next_action']='修复明确平仄或押韵错误，保留已通过位置；读音不确定不是失律，不为过谱自行选音。' if result['status']=='revision_meter_failed' else '现有字表或语境读音不足以确认。可自然重组句意，但不要用生僻替字制造新的缺字，也不要将未确认称作错误。'
                 return result

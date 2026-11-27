@@ -3,6 +3,7 @@ import json
 import time
 from .text_structure import inspect_structure, compare_lineation, literal_repetitions
 from .sound_basis import validate_basis
+from .allusion_policy import READER as ALLUSION_COMPRESSION_REVIEW
 
 TASK_MODALITY = '''
 准确解释题目语气：“不必／无需”只是不强制，“可以／允许”表示可选，不等于禁止其他成立写法。
@@ -14,6 +15,7 @@ TASK_MODALITY = '''
 '''
 
 TEXT_EVIDENCE = '''
+回忆或时间折返不自动等于深化：区分事件先后、人物当时知道什么与后来怎样改释。直接陈述若确实改变对前文的理解，可以成立；不能只因结尾说清感情就要求改成物象，也不能替人物补出诗未呈现的觉悟。
 人物关系标签不自动给出全部经历：“陌生人”可以多次照面而未相识，不能自行增加“只此一晚”“首次相遇”等原题没有的限制。若质疑相识程度，须区分知道姓名、互有交往与仅观察习惯，不能把一种可能读法直接定为违规。
 核对发话动机：若有寄语、请求或承诺，问为什么偏偏说这句话，正文的处境、动作或关系是否赋予它不可随意替换的作用。不能因为缺少背景说明就判错，也不能替作者编造背景来使其成立。
 核对文本是否完成：以“又补一句：”等引出内容却终止时，区分有文本支撑的有意省略与未完成输出。未完成不是自动成立的留白。
@@ -159,6 +161,8 @@ AI代理接收或回复不意味着收件人不在场；收件人可以正在做
 
 def review(poem, task, client, timeout):
     system = REVIEW_SYSTEM + TASK_MODALITY + TEXT_EVIDENCE
+    if task.get('genre') in ('qijue','wujue','qilv','wulv','ci'):
+        system += ALLUSION_COMPRESSION_REVIEW
     schema = {'decision': 'keep或revise', 'preserve': '要保护的效果',
               'quote': '正文连续原文',
               'problem': 'revise写具体问题；keep写最强合理质疑，不得只称赞',

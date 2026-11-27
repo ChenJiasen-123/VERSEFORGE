@@ -1,22 +1,33 @@
 """Bibliographic membership lookup. Partial excerpts cannot resolve readings."""
 import json
+import hashlib
 import re
 from pathlib import Path
 from functools import lru_cache
 from .prosody import Reading, validate
-from .glyphs import with_glyph_candidates
+from .glyphs import with_glyph_candidates,SHA256 as GLYPH_SHA256
 from .qijue_profiles import specification
 from .variant_notes import variant_note
 
 
 @lru_cache(maxsize=1)
 def historical_lexicon():
-    data = json.loads((Path(__file__).parent / 'data/pingshui-excerpts.json').read_text(encoding='utf-8'))
+    raw=(Path(__file__).parent/'data/pingshui-excerpts.json').read_bytes()
+    data = json.loads(raw)
     lexicon = {}
     for group in data['groups']:
         for char in group['characters']:
             lexicon.setdefault(char, []).append(Reading(group['tone'], group['name'], data['source']))
-    return with_glyph_candidates(lexicon)
+    supplemental_raw=(Path(__file__).parent/'data/historical-supplements.json').read_bytes()
+    supplements=json.loads(supplemental_raw)
+    for entry in supplements['entries']:
+        lexicon.setdefault(entry['character'],[]).append(Reading(entry['tone'],entry['rhyme'],entry['source']))
+    result=with_glyph_candidates(lexicon)
+    result.provenance={'main_sha256':hashlib.sha256(raw).hexdigest(),
+                       'supplements_sha256':hashlib.sha256(supplemental_raw).hexdigest(),
+                       'glyph_dictionary_sha256':GLYPH_SHA256,
+                       'complete_reading_inventory':False}
+    return result
 
 
 def lookup_excerpt(character):
@@ -30,6 +41,7 @@ def lookup_excerpt(character):
             (r.tone, r.rhyme) for r in lexicon.get(character, ())})], 'source': data['source'],
         'glyph_evidence': lexicon.glyph_evidence.get(character),
         'reading_resolved': False, 'coverage': 'partial',
+        'membership_sources':[{'tone':r.tone,'rhyme':r.rhyme,'source':r.source} for r in lexicon.get(character,())],
         'supplemental_variant_note': variant_note(character),
         'limitations': data['limitations']}
 

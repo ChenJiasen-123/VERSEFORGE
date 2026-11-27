@@ -1,0 +1,150 @@
+{
+  "scope": "expression_planning_and_automatic_editor_integration",
+  "quality_certified": false,
+  "changes": [
+    "three_structured_expression_plans",
+    "classical_multiple_candidates",
+    "body_only_independent_review",
+    "allusion_compression_and_naturalness_policy",
+    "exact_poem_passage_evidence_references",
+    "stable_unknown_meter_considered_without_certification",
+    "per_response_provenance_without_key"
+  ],
+  "runs": [
+    {
+      "directory": "expression-flow-live-01",
+      "started_utc": "2026-11-27T04:08:22.803607+00:00",
+      "attempt_records": 1,
+      "successful_calls": 0,
+      "reported_tokens": 0,
+      "failure": {
+        "type": "RuntimeError",
+        "message": "网络连接失败或超时；请确认网络后重试"
+      }
+    },
+    {
+      "directory": "expression-flow-live-20261127T040842Z",
+      "started_utc": "2026-11-27T04:08:42.656800+00:00",
+      "attempt_records": 17,
+      "successful_calls": 17,
+      "reported_tokens": 60572,
+      "candidate_count": 2,
+      "poem": {
+        "title": "旧钥匙",
+        "lines": [
+          "铜牙旧蚀绿痕肥，",
+          "锁孔尘封响转微。",
+          "旧锁空存还可启，",
+          "摩挲亮处露铜辉。"
+        ]
+      },
+      "requirements_confirmed": false,
+      "meter_status": "unknown",
+      "editor_status": "round_limit",
+      "editor_rounds": [
+        {
+          "status": "revision_meter_unconfirmed",
+          "adopted": false
+        },
+        {
+          "status": "revision_meter_unconfirmed",
+          "adopted": false
+        },
+        {
+          "status": "revision_meter_unconfirmed",
+          "adopted": false
+        }
+      ]
+    },
+    {
+      "directory": "expression-flow-live-20261127T041401Z",
+      "started_utc": "2026-11-27T04:14:01.296430+00:00",
+      "attempt_records": 1,
+      "successful_calls": 1,
+      "reported_tokens": 1143,
+      "failure": {
+        "type": "ValueError",
+        "message": "缺少三个表达构思"
+      }
+    },
+    {
+      "directory": "expression-flow-live-20261127T041430Z",
+      "started_utc": "2026-11-27T04:14:30.882522+00:00",
+      "attempt_records": 10,
+      "successful_calls": 10,
+      "reported_tokens": 18752,
+      "candidate_count": 2,
+      "poem": {
+        "title": "旧钥匙",
+        "lines": [
+          "铜环旧齿尚成形",
+          "稚子争吹作哨铃",
+          "老匠低回轻一锉",
+          "摩挲满掌旧铜腥"
+        ]
+      },
+      "requirements_confirmed": false,
+      "meter_status": "unknown",
+      "editor_status": "editor_keep",
+      "editor_rounds": [
+        {
+          "status": "no_revision_requested",
+          "adopted": false
+        }
+      ]
+    },
+    {
+      "directory": "expression-flow-live-20261127T041812Z",
+      "started_utc": "2026-11-27T04:18:12.712709+00:00",
+      "attempt_records": 10,
+      "successful_calls": 10,
+      "reported_tokens": 23555,
+      "candidate_count": 2,
+      "poem": {
+        "title": "旧钥匙",
+        "lines": [
+          "铜光久蚀齿痕平",
+          "旧孔迟疑一涩声",
+          "转腕轻推门半启",
+          "空房旧物对残明"
+        ]
+      },
+      "requirements_confirmed": true,
+      "meter_status": "unknown",
+      "editor_status": "editor_keep",
+      "editor_rounds": [
+        {
+          "status": "no_revision_requested",
+          "adopted": false
+        }
+      ]
+    }
+  ],
+  "remaining_limitations": [
+    "Unknown meter is not certified compliance.",
+    "Model reviews can invent supporting readings; no independent human aesthetic validation.",
+    "The final live run did not request a rewrite; multiround and stable-unknown adoption branches have offline integration tests.",
+    "Source hashes identify code loaded for each live run; later narrow uncertainty guard hardening has offline tests.",
+    "Historical calls without fingerprints cannot establish historical account ownership."
+  ],
+  "verification": {
+    "main_project_tests_passed": 265,
+    "github_checkout_tests_passed": 269,
+    "live_web_health": {
+      "application": "VERSEFORGE",
+      "pid": 45848,
+      "workflow_protocol": "studio-0.9"
+    },
+    "server_restarted_with_zero_active_jobs": true,
+    "historical_jobs_database_preserved": true
+  },
+  "acceptance_evidence": {
+    "expression_plan_to_classical_candidates": "tests/test_studio.py:ClassicalDirectionRoutingTests",
+    "judge_does_not_receive_writer_plan": "tests/test_studio.py:ExpressionPlanningTests",
+    "automatic_rounds_preserve_prior_drafts": "tests/test_editor.py",
+    "stable_unknown_still_requires_literary_selection": "tests/test_stable_unknown.py:StableUnknownEditorTests",
+    "exact_requirement_evidence_references": "tests/test_requirement_checks.py:EvidenceReferenceTests",
+    "receipt_excludes_full_key": "tests/test_response_provenance.py",
+    "latest_live_workflow": "expression-flow-live-20261127T041812Z/result.json"
+  }
+}

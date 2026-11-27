@@ -1,0 +1,26 @@
+{
+  "protocol": "classical-expression-0.1",
+  "topics_sha256": "e38a2b5d9f5f1e1c63d18f2e00a655a56334712ba3fc660e886ad70ce70dd1c7",
+  "population": 3,
+  "generations": 3,
+  "max_edit_rounds": 3,
+  "held_out_policy": "Do not mutate strategies after held-out evaluation",
+  "comparison_groups": [
+    "current",
+    "expression_unmutated",
+    "expression_evolved"
+  ],
+  "budget": {
+    "max_calls": 1800,
+    "max_total_tokens": 8000000,
+    "estimate_not_actual": true,
+    "upper_bound_breakdown": "72 optimization executions (18 parents + 54 children) + 18 held-out executions; <=18 calls/execution + 18 mutation calls + 36 bidirectional comparisons = 1674; reserve126",
+    "note": "Token ceiling may stop before all experiments finish; no automatic budget increase"
+  },
+  "acceptance": {
+    "formal": "6/6 no confirmed task violation; unknown contextual readings are not pass",
+    "expression": "5/6 evidenced coherent experience",
+    "blind_wins_vs_current": "4/6; independent human literary validation pending"
+  },
+  "status": "implementation_started_not_live_run"
+}

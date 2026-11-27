@@ -73,3 +73,31 @@ class RequirementTests(unittest.TestCase):
         result = review_requirements(prompt, {'title': '杯', 'lines': ['旧痕还在']}, [prompt],
             Client([row(source_quote=prompt, evidence='', reason='正文没有出现名称。')]))
         self.assertTrue(result['confirmed'])
+
+class EvidenceReferenceTests(unittest.TestCase):
+    def test_reference_retrieves_exact_line_and_rejects_retyped_join(self):
+        prompt='正文须包含一次开门动作。'
+        poem={'title':'旧物','lines':['铜牙入孔，','推门见月。']}
+        rows=[{'id':'r1','status':'satisfied','source_id':'s1','evidence_id':'p2',
+               'evidence':'铜牙入孔，推门见月。','reason':'第二句实际写出推门。'}]
+        report=review_requirements(prompt,poem,[prompt[:-1]],Client(rows))
+        self.assertTrue(report['confirmed'])
+        self.assertEqual(report['checks'][0]['evidence'],'推门见月。')
+
+    def test_unknown_reference_does_not_fall_back_to_plausible_quote(self):
+        rows=[row(evidence_id='p999',evidence='我把那句话写在便签里，')]
+        with self.assertRaisesRegex(ValueError,'证据编号无效'):
+            review_requirements(PROMPT,POEM,[PROMPT[:-1]],Client(rows))
+
+    def test_reference_does_not_make_placeholder_a_real_utterance(self):
+        report=review_requirements(PROMPT,POEM,[PROMPT[:-1]],Client([row(evidence_id='p1')]))
+        self.assertFalse(report['confirmed'])
+
+class ReferenceOnlyResponseTests(unittest.TestCase):
+    def test_reference_only_response_is_valid_without_retyped_quote(self):
+        prompt='正文必须出现开门。'
+        poem={'title':'题','lines':['开门见月。']}
+        rows=[{'id':'r1','status':'satisfied','source_id':'s1','evidence_id':'p1','reason':'第一句写出了开门。'}]
+        report=review_requirements(prompt,poem,[prompt[:-1]],Client(rows))
+        self.assertTrue(report['confirmed'])
+        self.assertEqual(report['checks'][0]['evidence'],'开门见月。')

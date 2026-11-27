@@ -11,6 +11,13 @@ def report(text, pattern, lexicon):
 
 
 class MeterChangeTests(unittest.TestCase):
+    def test_source_update_cannot_be_counted_as_poem_repair(self):
+        before=report('甲','P',{'甲':[Reading('Z','a','source')]})
+        after=report('甲','P',{'甲':[Reading('P','a','source')]})
+        before['lexicon_provenance']={'main_sha256':'old'}
+        after['lexicon_provenance']={'main_sha256':'new'}
+        r=compare_meter(['甲'],['甲'],before,after)
+        self.assertFalse(r['applicable']);self.assertEqual(r['reason'],'reading_source_revision_changed')
     def test_actual_repair_exposes_moved_failure_and_damage_to_passed_positions(self):
         path = Path(__file__).parents[1] / 'runs/metrical-feedback-trial-03/ze_rhyme-previous.json'
         data = json.loads(path.read_text(encoding='utf-8'))

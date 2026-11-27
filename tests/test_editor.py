@@ -1,10 +1,12 @@
 import unittest
+import json
 from unittest.mock import patch
 from poetry_agent.editor import edit_once,edit_rounds
 from poetry_agent.core import Task
 
 class Client:
     def complete(self,*args,**kwargs):
+        self.payload=json.loads(args[1])
         return {'content':'{"title":"新","lines":["新的一行"]}'}
 
 class EditorTests(unittest.TestCase):
@@ -71,8 +73,10 @@ class EditorTests(unittest.TestCase):
     @patch('poetry_agent.editor._metrical_target_and_report',side_effect=[({}, {'status':'pass'}),({}, {'status':'failed'})])
     @patch('poetry_agent.editor.review',return_value={'assessment':{'decision':'revise'}})
     def test_classical_failed_meter_retains_original(self,review,meter):
-        r=edit_once('五绝',{'title':'原','lines':['旧的一行']},Task('诗','wujue',4,wujue_pattern='ze_no_rhyme'),[],Client())
+        c=Client()
+        r=edit_once('五绝',{'title':'原','lines':['旧的一行']},Task('诗','wujue',4,wujue_pattern='ze_no_rhyme'),[],c)
         self.assertEqual(r['status'],'revision_meter_failed');self.assertFalse(r['adopted'])
+        self.assertEqual(c.payload['revision']['metrical_feedback']['feedback_protocol'],'metrical-feedback-0.2')
 
     def run_editor(self):
         return edit_once('写一首诗',{'title':'原','lines':['旧的一行']},Task('诗','modern',30),['写一首诗'],Client())

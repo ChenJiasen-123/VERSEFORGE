@@ -80,4 +80,5 @@ def validate(lines, tones, rhyme_positions, lexicon, rule_source, contextual_rea
                          for i, j in rhyme_positions]})
     statuses = {x['status'] for x in findings}
     return {'status': 'failed' if 'failed' in statuses else ('unknown' if 'unknown' in statuses else 'pass'),
+            'lexicon_provenance':getattr(lexicon,'provenance',None),
             'rule_source': rule_source, 'findings': findings, 'scope': 'supplied_rules_only'}

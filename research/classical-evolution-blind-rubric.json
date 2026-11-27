@@ -1,0 +1,35 @@
+{
+  "version": "assistant-blind-reading-0.1",
+  "declared_before_opening_held_out_packet": true,
+  "reviewer": "assistant; not user or external expert",
+  "scope": "仅按原题与实际正文作文学阅读；不看组别、代数、作者构思、模型分数、计算成本或结果状态",
+  "scores": {
+    "0": "全篇关系难成立或基本需要重写",
+    "1": "有局部可取，整体仍主要是通用描写、解释或牵强搭配，需重构",
+    "2": "有可感的表达对象，多数诗句共同推进，值得保留作局部打磨",
+    "3": "表达集中，语言与修辞有效，整体有独特发现或准确的体验",
+    "4": "全篇关系与语言高度完成，有持续余味；不要求猎奇或金句"
+  },
+  "worth_keeping_threshold": 2,
+  "required_fields": [
+    "blind_id",
+    "score",
+    "actual_experience",
+    "quoted_evidence",
+    "main_problem",
+    "allusion_guess_or_uncertainty",
+    "worth_keeping"
+  ],
+  "principles": [
+    "描写成为表达的手段，不按意象数量和华丽程度加分",
+    "允许朴素快乐、直抒、议论、复沓、留白及非线性关系，不强制尖锐、反转或完整故事",
+    "不为生硬词组补造故事，不将能由语境理解的压缩一律改成白话",
+    "用典看实际语意关系与压缩作用，不将主题相近或普通词相同当作确证",
+    "题意、格律与文学评分分开；此评分不认证历史读音和完整合律",
+    "揭示组别后只汇总，不回改已提交的盲读评分"
+  ],
+  "limits": [
+    "熟悉项目偏好的助手评阅不等于用户本人认可",
+    "24次小样本不证明任意题材或实际赛时稳定"
+  ]
+}

@@ -8,7 +8,7 @@ from poetry_agent.style.corpus import write as atomic_write
 def audit(directory):
  b=json.loads((directory/'experiment-binding.json').read_text(encoding='utf-8'));violations=[];rows=[]
  for j in b['jobs']:
-  job=directory/'jobs'/j['key'];p=job/'result.json'
+  job=Path(j.get('result_directory') or directory/'jobs'/j['key']);p=job/'result.json'
   if not p.exists():violations.append({'job':j['key'],'issue':'missing terminal result'});continue
   r=json.loads(p.read_text(encoding='utf-8'));binding=json.loads((job/'binding.json').read_text(encoding='utf-8'))
   topic=next(t for t in b['topics'] if t['id']==j['topic_id']);task=make_task(topic)

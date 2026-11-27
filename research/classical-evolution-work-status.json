@@ -46,9 +46,30 @@
   "remaining": [
     "轮询已有会话75196，不因观察超时重启；冻结后不修改生成相关源码或资料",
     "48次全部终态后运行review_classical_evolution.py和audit_classical_evolution.py",
+    "主批次结束后执行control_classical_evolution.py补24次旧三候选流程；保留原48次对照，不重复生成已有新算法24份样本。",
     "用snapshot_classical_evolution.py verify核对依赖未变",
     "阅读隐藏组别的实际诗作，记录助手判断，与模型判断及用户偏好验证分开",
     "汇总12题重复结果、失败、资源代价和不确定项；按原标准审计完成状态"
   ],
-  "warning": "四题模型盲评两轮均1胜1负2平；不代表新流程整体优于旧流程。目标尚未完成，保持active。"
+  "warning": "四题模型盲评两轮均1胜1负2平；不代表新流程整体优于旧流程。目标尚未完成，保持active。",
+  "audit_tools_commit": "b5fece2",
+  "regression_session_id": null,
+  "held_out_terminal_results": 23,
+  "completion_state": "active: frozen held-out runs executing; no stability claim",
+  "followup_review_items": [
+    "检查盲读失败/预算耗尽时是否保住此前已核的父稿，不把新稿未审冒充已审；若需修正，另记版本，不在冻结测试中途改程序。",
+    "当前配置请求deepseek-reasoner，已保存的实际服务返回模型名为deepseek-flash；两臂一致，汇总时明确记录。"
+  ],
+  "supplementary_control": {
+    "directory": "runs/classical-evolution-multicandidate-control-01",
+    "additional_runs": 24,
+    "state": "registered before reading held-out poems; not started until primary terminal",
+    "reason": "兑现现有多候选改稿基线，当前默认单候选对照不够充分",
+    "intervention": "旧studio仅将candidate_count从1改为3，其余保留",
+    "registration": "experiment-binding.json",
+    "original_results_preserved": true
+  },
+  "combined_unique_runs_expected": 72,
+  "blind_reading_plan": "两批完成后，合并去掉引用重复的新算法样本，形成72首/诊断稿的隐藏组别阅读包；不先阅读组别映射。",
+  "verified_related_tests": 102
 }

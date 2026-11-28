@@ -11,8 +11,9 @@ from poetry_agent.requirement_checks import safe_review
 from experiments.classical_evolution.engine import ClassicalEvolution,DEFAULT_CONFIG,known_checks,eligible,rank_key
 from experiments.classical_evolution.protocol import validate_reviews
 from experiments.classical_evolution.store import RunStore,RecordedClient,code_digest,digest
+from classical_diction import SYSTEM as DICTION_SYSTEM, POLICY as DICTION_POLICY, validate_diction, passes_diction
 ROOT=Path(__file__).resolve().parent
-VERSION='raw-classical-agent-0.8'
+VERSION='raw-classical-agent-0.9'
 CRITIC_POLICY={'unit':'one complete poem per request','thinking':'disabled',
     'parent_review_reuse':'validated identical poem, topic, source cards and reader policy only',
     'final_review':'fresh individual reading across all recorded generations',
@@ -261,7 +262,9 @@ def run_raw(prompt,directory,client,*,hint='auto',library=None,config=None,progr
     poetics='\n'.join(SYSTEM.strip().splitlines()[:3]+knowledge['principles'])
     binding={'protocol':VERSION,'entry_source_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         'code_sha256':code_digest(),'prompt':prompt,'hint':hint,'source_library':library,'config':config,
-        'poetics_knowledge':knowledge,'critic_policy':CRITIC_POLICY,'model':client.model,'mode':'mock' if getattr(client,'mock',False) else 'live'}
+        'poetics_knowledge':knowledge,'critic_policy':CRITIC_POLICY,
+        'diction_policy':DICTION_POLICY,'diction_source_sha256':hashlib.sha256((ROOT/'classical_diction.py').read_bytes()).hexdigest(),
+        'model':client.model,'mode':'mock' if getattr(client,'mock',False) else 'live'}
     store=RunStore(directory,binding);done=store.load('result.json')
     if done:return done
     api=RecordedClient(client,store,seconds=config['seconds'],max_calls=config['max_calls'],generation_tokens=config['generation_tokens'],progress=progress)
@@ -291,22 +294,39 @@ def run_raw(prompt,directory,client,*,hint='auto',library=None,config=None,progr
             store.save('independent-brief.json',second)
             reviewed=kernel.store.load('final-blind-reviews.json') or []
             others=sorted((p for p in reviewed if eligible(p,topic)),key=lambda p:rank_key(p,topic),reverse=True)
-            queue=[r['selected']]+others;seen=set();attempts=[];approved=None
+            queue=[r['selected']]+others;seen=set();attempts=[];approved=None;approved_diction=None
             for candidate in queue:
+                if len(attempts)>=3:break
                 # Do not solicit another verdict on the same body under a new title or punctuation.
                 body_key=digest([re.sub(r'[\s，。！？、；：,.!?;:]+','',line) for line in candidate['poem']['lines']])
                 if body_key in seen:continue
                 seen.add(body_key)
                 mechanical=known_checks(candidate['poem'],task)
-                check_client=NamedClient(api,f'independent-requirement-check-{len(attempts)+1:02d}',
+                attempt={'candidate_id':candidate['id'],'check':None,'known_hard_issues':mechanical['hard_issues'],'bare_diction':None}
+                attempts.append(attempt)
+                if mechanical['hard_issues']:continue
+                # First read only the poem, before supplying topic/source hints.
+                # This does not generate another poem or ask a human to rewrite it.
+                passages={f'p{i}':line for i,line in enumerate(candidate['poem']['lines'],1)}
+                action=f'bare-diction-check-{len(attempts):02d}'
+                try:
+                    diction=api.json(action,DICTION_SYSTEM,{'title':candidate['poem']['title'],'passages':passages},
+                        lambda v:validate_diction(v,passages),thinking=DICTION_POLICY['thinking'],max_tokens=DICTION_POLICY['max_tokens'])
+                except (ValueError,KeyError,TypeError,RuntimeError):
+                    attempt['bare_diction_status']='incomplete'
+                    continue
+                bare={'poem_sha256':digest(candidate['poem']),'action':action,'review':diction,'approved':passes_diction(diction)}
+                attempt['bare_diction']=bare
+                if not bare['approved']:continue
+                check_client=NamedClient(api,f'independent-requirement-check-{len(attempts):02d}',
                     suffix='\n用典核对只用以下已核典源，不另猜出处：'+json.dumps(sources,ensure_ascii=False))
                 final=safe_review(prompt,candidate['poem'],second['requirements'] or [prompt],check_client)
-                attempts.append({'candidate_id':candidate['id'],'check':final,'known_hard_issues':mechanical['hard_issues']})
+                attempt['check']=final
                 if final['confirmed'] and not mechanical['hard_issues']:
-                    approved=candidate;break
-                if len(attempts)>=3:break
+                    approved=candidate;approved_diction=bare;break
             result['postcheck_attempts']=attempts
-            result['independent_requirement_check']=attempts[-1 if approved else 0]['check']
+            result['independent_requirement_check']=attempts[-1]['check'] if approved else next((a['check'] for a in attempts if a['check'] is not None),None)
+            result['bare_diction_check']=approved_diction
             if approved:
                 status='candidate_with_unresolved_readings' if approved['checks']['meter']['status']=='unknown' else 'candidate_ready'
                 result.update(status=status,poem=approved['poem'],selected=approved,best_unfinished=None)

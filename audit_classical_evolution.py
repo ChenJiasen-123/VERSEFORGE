@@ -1,5 +1,5 @@
 """Recompute mechanical consistency from actual saved poems, not report flags."""
-import argparse,copy,json,sys
+import argparse,copy,json,re,sys
 from pathlib import Path
 from experiments.classical_evolution.engine import make_task,known_checks,eligible
 from experiments.classical_evolution.store import digest
@@ -35,6 +35,8 @@ def audit(directory):
     violations.append({'job':j['key'],'issue':'raw poetics differ from registration'})
    if binding.get('critic_policy')!=b.get('critic_policy'):
     violations.append({'job':j['key'],'issue':'raw reader policy differs from registration'})
+   if binding.get('diction_policy')!=b.get('diction_policy') or binding.get('diction_source_sha256')!=b.get('diction_source_sha256'):
+    violations.append({'job':j['key'],'issue':'raw diction policy or implementation differs from registration'})
    if r.get('selected') and (topic['task']['genre']!=gold['task']['genre'] or bool(topic.get('allusion_required'))!=bool(gold.get('allusion_required'))):
     violations.append({'job':j['key'],'issue':'raw interpretation differs from explicit gold genre/allusion constraint'})
   if binding['code_sha256']!=b['code_sha256']:violations.append({'job':j['key'],'issue':'mixed implementation versions'})
@@ -56,6 +58,23 @@ def audit(directory):
    if mechanical['meter']['status']=='unknown' and r['status']!='candidate_with_unresolved_readings':
     violations.append({'job':j['key'],'issue':'unknown reading not disclosed'})
    if raw:
+    if binding.get('diction_policy'):
+     try:
+      from classical_diction import validate_diction,passes_diction
+      bare=r.get('bare_diction_check') or {}
+      passages={f'p{i}':line for i,line in enumerate(c['poem']['lines'],1)}
+      validate_diction(bare.get('review'),passages)
+      if bare.get('poem_sha256')!=digest(c['poem']) or bare.get('approved') is not True or not passes_diction(bare['review']):
+       raise ValueError('unapproved or different bare poem')
+      action=bare.get('action')
+      if not isinstance(action,str) or not re.fullmatch(r'bare-diction-check-\d{2}',action):raise ValueError('invalid bare action')
+      call=json.loads((job/'calls'/(action+'.json')).read_text(encoding='utf-8'))
+      if call['request']['user']!={'title':c['poem']['title'],'passages':passages}:
+       raise ValueError('diction request not the exact bare poem')
+      settings=call['request']['settings']
+      if any(settings[k]!=binding['diction_policy'][k] for k in ('thinking','max_tokens')):raise ValueError('diction settings changed')
+     except (ValueError,KeyError,TypeError,OSError):
+      violations.append({'job':j['key'],'issue':'selected raw output lacks valid independent bare-poem diction check'})
     if (binding.get('critic_policy') or {}).get('semantic_gate'):
      try:
       from classical_agent import apply_semantic_gate

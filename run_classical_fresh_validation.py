@@ -33,6 +33,7 @@ def register(topics_file,directory):
         'driver_source_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         'topics_file_sha256':hashlib.sha256(topics_file.read_bytes()).hexdigest(),
         'poetics_sha256':digest(knowledge),'critic_policy':classical_agent.CRITIC_POLICY,
+        'diction_source_sha256':hashlib.sha256((ROOT/'classical_diction.py').read_bytes()).hexdigest(),'diction_policy':classical_agent.DICTION_POLICY,
         'creation_inputs':'original prompt + auto hint + full verified library only; all task/requirements metadata are evaluation-only',
         'previous_study':'classical-evolution-combined-02; frozen results and failures retained',
         'acceptance':'original 22/24 known-hard-clear and topic-supported, 18/24 worth keeping, every submitted required allusion independently read; unresolved readings separate',

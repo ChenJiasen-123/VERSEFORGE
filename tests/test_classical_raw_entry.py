@@ -24,6 +24,10 @@ class RawFixture(FixtureClient):
         if 'verified_sources' in d:
             self.requests.append((system,d,kw))
             return {'content':json.dumps({'source_ids':list(d['verified_sources'])[:1],'allusion_required':True,'requirement_quote':'须用典','reason':'唤归关系'},ensure_ascii=False),'usage':{'total_tokens':10}}
+        if 'passages' in d and set(d)=={'title','passages'}:
+            self.requests.append((system,d,kw))
+            return {'content':json.dumps({'status':'clear','reading':[{'passage_id':i,'meaning':'动作与对象可读'} for i in d['passages']],
+                'issues':[],'reason':'诗中呼告与归来关系成立。'},ensure_ascii=False),'usage':{'total_tokens':10}}
         result=super().complete(system,user,**kw)
         if 'poems' in d:
             obj=json.loads(result['content'])
@@ -61,6 +65,34 @@ class IdEvidenceFixture(RawFixture):
         return {'content':json.dumps({'reviews':rows},ensure_ascii=False),'usage':{'total_tokens':10}}
 
 class RawEntryTests(unittest.TestCase):
+    def test_bare_diction_rejection_uses_different_reviewed_poem_without_rewriting_or_topic_hint(self):
+        class FirstBareReject(VariedRawFixture):
+            def __init__(self):super().__init__();self.bare_calls=0
+            def complete(self,system,user,**kw):
+                result=super().complete(system,user,**kw);data=json.loads(user)
+                if 'passages' in data:
+                    self.bare_calls+=1
+                    if self.bare_calls==1:
+                        value=json.loads(result['content']);value.update(status='uncertain',issues=[{'passage_id':'p1','importance':'central','problem':'核心搭配无法确定。'}])
+                        result['content']=json.dumps(value,ensure_ascii=False)
+                return result
+        c=FirstBareReject();mechanical={'hard_issues':[],'meter':{'status':'unknown','findings':[]}}
+        with tempfile.TemporaryDirectory() as directory, \
+             patch('experiments.classical_evolution.engine.known_checks',return_value=mechanical), \
+             patch('classical_agent.known_checks',return_value=mechanical), \
+             patch('classical_agent.safe_review',return_value={'complete':True,'confirmed':True}) as check:
+            result=run_raw(TOPIC['prompt'],directory,c,library=SOURCES,config={'generations':0,'pairwise':False})
+            original=json.loads((Path(directory)/'kernel/result.json').read_text(encoding='utf-8'))
+        self.assertEqual(c.bare_calls,2);self.assertEqual(c.writes,3);self.assertEqual(check.call_count,1)
+        self.assertNotEqual(result['selected']['id'],original['selected']['id'])
+        self.assertIsNone(result['postcheck_attempts'][0]['check'])
+        self.assertFalse(result['postcheck_attempts'][0]['bare_diction']['approved'])
+        self.assertTrue(result['bare_diction_check']['approved'])
+        for _,data,settings in c.requests:
+            if 'passages' in data:
+                self.assertEqual(set(data),{'title','passages'})
+                self.assertEqual(settings['thinking'],'enabled');self.assertEqual(settings['max_tokens'],8192)
+
     def test_central_uncertainty_overrides_optimistic_scores_and_reaches_selection_gate(self):
         for status in ('uncertain','broken'):
             with self.subTest(status=status):
@@ -281,6 +313,10 @@ class RawEntryTests(unittest.TestCase):
             (root/'experiment-binding.json').write_text(json.dumps(experiment),encoding='utf-8')
             self.assertEqual(audit(root)['violations'],[])
             result=json.loads((job/'result.json').read_text(encoding='utf-8'))
+            result['bare_diction_check']['poem_sha256']='changed-body'
+            (job/'result.json').write_text(json.dumps(result),encoding='utf-8')
+            self.assertIn('selected raw output lacks valid independent bare-poem diction check',[v['issue'] for v in audit(root)['violations']])
+            result['bare_diction_check']['poem_sha256']=digest(result['poem'])
             result['selected']['review']['central_relation']['status']='uncertain'
             (job/'result.json').write_text(json.dumps(result),encoding='utf-8')
             self.assertIn('selected raw output fails semantic judgment gate',[v['issue'] for v in audit(root)['violations']])

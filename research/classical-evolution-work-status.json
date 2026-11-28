@@ -57,7 +57,7 @@
   "audit_tools_commit": "b5fece2",
   "regression_session_id": null,
   "held_out_terminal_results": 48,
-  "completion_state": "active: raw0.6 pilot running; full held-out expansion remains pending until actual pilot quality checked",
+  "completion_state": "active: same-version pilot06 running after pilot05 time-budget failure; no literary stability claim",
   "followup_review_items": [
     "检查盲读失败/预算耗尽时是否保住此前已核的父稿，不把新稿未审冒充已审；若需修正，另记版本，不在冻结测试中途改程序。",
     "当前配置请求deepseek-reasoner，已保存的实际服务返回模型名为deepseek-flash；两臂一致，汇总时明确记录。"
@@ -75,7 +75,7 @@
   "blind_reading_plan": "全部计划批次结束后合并唯一结果，隐藏组别逐首阅读。无成稿的失败仍计入总分母，不伪造诗作数量。",
   "verified_related_tests": 121,
   "active_sessions": {
-    "individual_review_pilot05": 14095
+    "individual_review_replication06": 35679
   },
   "raw_entry_validation": {
     "directory": "runs/classical-evolution-raw-pilot-01",
@@ -85,7 +85,7 @@
     "auditor": "复核实际自动谱体、原题禁字、独立要求确认、嵌套演化谱系与全局预算",
     "next_directory": "runs/classical-evolution-raw-pilot-04",
     "next_version": "raw-classical-agent-0.5",
-    "next_state": "running; registered before calls; preserves3 candidates2 generations45 calls900 seconds",
+    "next_state": "same-version replication running; pilot05 terminal0/4 after synchronized runtime interruption; original failures retained",
     "revision": "范围不强制全覆盖；语境人物不强制标签复述；表达/句法审读校准；最多三份不同已核稿末轮回选",
     "pilot02": "terminal4/4; selected3/4; one false unsupported; zero mechanical inconsistencies",
     "revision04": "默认auto；明确支持体裁与解析结果冲突时有界重解析；保留选项与否定体裁，不强制人工谱体",
@@ -96,7 +96,7 @@
       "reason": "合并实跑中已发现的引文传输修正后再测，保留空登记但不计完成样本"
     },
     "revision05": "审读用编号引用当前诗句，保留服务原始响应；不存在编号和标题作为正文锚点仍被拦截，未放宽语义标准",
-    "latest_directory": "runs/classical-evolution-raw-pilot-05",
+    "latest_directory": "runs\\classical-evolution-raw-pilot-06",
     "latest_version": "raw-classical-agent-0.6",
     "pilot_review": "research/classical-evolution-raw-pilot04-review.json",
     "revision06": "单稿快速审读；同题同典源同正文同审读策略才沿用父稿已核意见；最终逐首重新盲读"
@@ -116,5 +116,6 @@
     "held_out_poems_unopened": true,
     "matched_single_fast": "runs/classical-reader-single-fast-probe-01: complete6.844s5461tokens across2 calls incl structure repair; flags actor ambiguity too",
     "inference": "Exploratory one-case evidence favors testing individual feedback; not proof that reasoning mode or the whole new route is superior."
-  }
+  },
+  "runtime_incident": "research/classical-evolution-runtime-incident-05.json"
 }

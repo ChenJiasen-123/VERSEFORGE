@@ -1,0 +1,64 @@
+{
+  "scope": "Frozen0.9 fresh12topics twice; all24 terminal, no overwritten runs",
+  "status_counts": {
+    "candidate_with_unresolved_readings": 5,
+    "incomplete": 18,
+    "needs_review": 1
+  },
+  "generation2_tasks": 9,
+  "recorded_drafts": 72,
+  "readable_poems": 6,
+  "blind_notes_locked_commit": "d4dbdd9",
+  "selected_worth_keeping": 4,
+  "submitted_required_source_audits": 3,
+  "submitted_required_sources_supported": 3,
+  "failure_categories": {
+    "output_length": 3,
+    "service_error": 67
+  },
+  "postfailure_service_diagnostic": "research/classical-evolution-fresh-service-diagnostic-02.json",
+  "diagnostic_http": 402,
+  "individual_http_codes_not_retained": true,
+  "causal_limit": "调用账本以service_error归类；事后单请求诊断确认当前余额不足，不能逐条回填每次错误都为402。",
+  "median_successful_selected_seconds": 535.422,
+  "all_run_median_not_generation_speed": "18 incomplete and one needs_review remain in denominator; early failures make the all-run median misleading as a generation-speed measure.",
+  "fallback_cases": [
+    {
+      "job": "fresh-03-r1-raw_classical_evolution",
+      "attempts": [
+        {
+          "candidate_id": "g02-x0",
+          "diction_complete": false,
+          "diction_approved": null,
+          "requirement_confirmed": null,
+          "diction_status": "incomplete"
+        },
+        {
+          "candidate_id": "g00-i0",
+          "diction_complete": true,
+          "diction_approved": true,
+          "requirement_confirmed": true,
+          "diction_status": null
+        }
+      ],
+      "selected": true
+    }
+  ],
+  "acceptance": {
+    "raw_classical_evolution": {
+      "checks": {
+        "all_runs_finished": true,
+        "at_least_22_selected_without_known_hard_errors": false,
+        "no_selected_output_with_explicit_task_violation": true,
+        "at_least_18_selected_worth_keeping": false,
+        "submitted_allusion_exercises_checked": true,
+        "submitted_allusions_supported": true,
+        "mechanical_audit_complete": true
+      },
+      "research_targets_met": false,
+      "scope": "仅本次绝句题集和给定资料；不认证任意题材、完整历史读音、用户审美偏好或正式赛时表现"
+    }
+  },
+  "passed": false,
+  "next": "补足账户余额后，先做服务预检。保留本次24次失败批次；若复测，必须另目录、同冻结代码并预先登记完整24次，独立报告，不择优填补本批。"
+}

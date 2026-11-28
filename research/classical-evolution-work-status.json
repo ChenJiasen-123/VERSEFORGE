@@ -45,15 +45,15 @@
   "freeze": "runs/classical-evolution-freeze-01.json",
   "source_snapshot": "runs/classical-evolution-source-snapshot-01.json",
   "remaining": [
-    "监控既有新题验收会话82236；保持冻结，不因观察超时另开重复生成",
-    "全部24次终态后先复核输入与记录一致性，再匿名逐首读稿并锁分，之后核典与看代数、成本",
-    "按原22/24、18/24与逐首典源标准审计，保留失败并整理交付"
+    "在同冻结0.9代码与同输入下完成独立24次复测，原失败分母保留",
+    "复测全部结束后重新匿名读稿、锁分、核典并核原验收标准",
+    "完成报告、代码与归档交付，不把账户恢复后的表现替换原失败批次"
   ],
   "warning": "第一轮完整原题流程20/24值得保留、22/24题意支持、所选用典11/12关系成立；研究目标尚未全部达成。",
   "audit_tools_commit": "b5fece2",
   "regression_session_id": null,
   "held_out_terminal_results": 48,
-  "completion_state": "active: 0.9 four development poems read and source-checked, frozen; fresh twelve topics twice running; no fresh poem bodies opened",
+  "completion_state": "active: fresh02 all24 terminal, failed acceptance after service errors; six readings locked and three source audits complete; account available again; exact24 replication03 preregistered",
   "followup_review_items": [
     "检查盲读失败/预算耗尽时是否保住此前已核的父稿，不把新稿未审冒充已审；若需修正，另记版本，不在冻结测试中途改程序。",
     "当前配置请求deepseek-reasoner，已保存的实际服务返回模型名为deepseek-flash；两臂一致，汇总时明确记录。"
@@ -70,9 +70,7 @@
   "combined_unique_runs_expected": 96,
   "blind_reading_plan": "四组共96次唯一运行，全部终态后合并隐藏组别逐首阅读；无正文的失败计在总分母，不伪造96首作品。先保存盲读意见，再揭盲、逐首核典与汇总。",
   "verified_related_tests": 122,
-  "active_sessions": {
-    "fresh_validation": 82236
-  },
+  "active_sessions": {},
   "raw_entry_validation": {
     "directory": "runs/classical-evolution-raw-pilot-01",
     "state": "version0.2 pilot terminal 4/4; selected2/4; no mechanical inconsistency; range-interpretation and review weaknesses found",
@@ -140,15 +138,37 @@
     "driver": "run_classical_fresh_validation.py",
     "topics": "research/classical-evolution-fresh-topics-02.json",
     "runs_expected": 24,
-    "runs_started": 4,
-    "state": "registered, frozen and running; no fresh poems opened",
+    "runs_started": 24,
+    "state": "terminal; failed acceptance; reports and full failures archived",
     "limits": "同一已核典源库中的新情境，不是未见典源泛化；仅原题与完整典源库进入创作者。",
     "directory": "runs/classical-evolution-fresh-held-02",
     "freeze": "runs/classical-evolution-fresh-freeze-02.json",
     "session_id": 82236,
-    "terminal_results": 0,
+    "terminal_results": 24,
     "freeze_unchanged": true
   },
   "verified_current_related_tests": 52,
-  "usage_guide": "research/古诗演化使用说明.txt"
+  "usage_guide": "research/古诗演化使用说明.txt",
+  "remote_sync": {
+    "verified_utc": "2026-11-28T07:31:26.106840+00:00",
+    "repository": "https://github.com/ChenJiasen-123/VERSEFORGE",
+    "visibility": "public",
+    "user_authorized_public_sync": true,
+    "verified_remote_main": "96ec879b9ab1eadf6d7fae47a93372a0dd70ead2",
+    "new_commits_uploaded": 25,
+    "history_blobs_checked": 484,
+    "archive_members_checked": 6677,
+    "credential_like_strings_detected": 0,
+    "ongoing_fresh_results_not_included": true
+  },
+  "service_incident": "research/classical-evolution-fresh02-findings.json",
+  "account_preflight": "research/classical-evolution-balance-preflight-02.json",
+  "replication03": {
+    "directory": "runs\\classical-evolution-replication-03",
+    "freeze": "runs/classical-evolution-replication-freeze-03.json",
+    "expected": 24,
+    "state": "registered before any model calls",
+    "same_generation_inputs": true,
+    "not_new_unseen_topics": true
+  }
 }

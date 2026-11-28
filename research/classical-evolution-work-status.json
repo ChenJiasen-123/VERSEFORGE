@@ -45,18 +45,16 @@
   "freeze": "runs/classical-evolution-freeze-01.json",
   "source_snapshot": "runs/classical-evolution-source-snapshot-01.json",
   "remaining": [
-    "监控既有会话27656，保持生成代码/题集/典源冻结；不因观察超时另启重复运行",
-    "端到端24次完成后做机械复核、原题理解核对和父子稿导出",
-    "合并96次唯一运行，隐藏组别实际阅读成品或诊断稿；读前不看映射和模型胜负",
-    "逐首核查所提交的用典专项，保留不成立与强贴判断及原文依据",
-    "完成旧默认/旧三候选与新核心的对称模型比较，单独报告模型偏好",
-    "汇总质量、失败、两次重复表现、资源代价与局限，逐项核对22/24和18/24等原验收目标"
+    "完成其余34首所提交用典作品的逐首典源核查",
+    "完成旧默认/旧三候选对新核心的交换顺序模型比较；补充对比不是用户评分",
+    "将组合盲读按实际job映射回各试验，并检查实际父子稿变化",
+    "汇总质量、失败、重复与代价，核对原验收标准；未通过项不能宣布完成"
   ],
-  "warning": "四题模型盲评两轮均1胜1负2平；不代表新流程整体优于旧流程。目标尚未完成，保持active。",
+  "warning": "新原题流程盲读20/24值得保留，题意支持22/24，但用典12首中1首关系待确认，完整读音尚未确认；原验收尚未全部达到。",
   "audit_tools_commit": "b5fece2",
   "regression_session_id": null,
   "held_out_terminal_results": 48,
-  "completion_state": "active: raw end-to-end twelve topics twice running; original72 unique runs retained; final blind reading and source audit pending",
+  "completion_state": "active: 96/96 terminal; 95 anonymous readings locked before reveal; raw mandatory source audit 12/12 read, 11/12 supported; other source audits and paired comparisons pending",
   "followup_review_items": [
     "检查盲读失败/预算耗尽时是否保住此前已核的父稿，不把新稿未审冒充已审；若需修正，另记版本，不在冻结测试中途改程序。",
     "当前配置请求deepseek-reasoner，已保存的实际服务返回模型名为deepseek-flash；两臂一致，汇总时明确记录。"
@@ -74,7 +72,7 @@
   "blind_reading_plan": "四组共96次唯一运行，全部终态后合并隐藏组别逐首阅读；无正文的失败计在总分母，不伪造96首作品。先保存盲读意见，再揭盲、逐首核典与汇总。",
   "verified_related_tests": 122,
   "active_sessions": {
-    "raw_held_out": 27656
+    "supplemental_paired_comparison": 90915
   },
   "raw_entry_validation": {
     "directory": "runs/classical-evolution-raw-pilot-01",
@@ -128,5 +126,13 @@
   },
   "runtime_incident": "research/classical-evolution-runtime-incident-05.json",
   "combined_reading_directory": "runs/classical-evolution-combined-02",
-  "blind_reading_record_validation": "全量覆盖、实际引文、体验、主要问题、典故辨认或不确定项均须填写；空分数表不能冒充完成阅读。"
+  "blind_reading_record_validation": "全量覆盖、实际引文、体验、主要问题、典故辨认或不确定项均须填写；空分数表不能冒充完成阅读。",
+  "combined_unique_runs_terminal": 96,
+  "blind_reading": {
+    "count": 95,
+    "commit": "cde8516",
+    "notes_sha256": "5c9f4a1d1f4cb436243c4b14ceeb11c6fe90740a69923de27b2942a80feb6083",
+    "mapping_revealed_after_lock": true
+  },
+  "raw_held_out_state": "terminal24/24; 24 selected; interpretations24 checked; frozen dependencies unchanged; mechanical violations zero"
 }

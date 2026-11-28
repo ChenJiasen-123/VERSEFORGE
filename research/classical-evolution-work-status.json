@@ -45,15 +45,15 @@
   "freeze": "runs/classical-evolution-freeze-01.json",
   "source_snapshot": "runs/classical-evolution-source-snapshot-01.json",
   "remaining": [
-    "观察既有pilot09会话78646至终态，核对新增语句关口的真实调用、回选、耗时和预算",
-    "实际逐首阅读四道开发题与典源，不能以机器标clear代替阅读",
-    "开发结果可用后冻结新十二题各两次；原22/24、18/24及逐首典源标准不变"
+    "监控既有新题验收会话82236；保持冻结，不因观察超时另开重复生成",
+    "全部24次终态后先复核输入与记录一致性，再匿名逐首读稿并锁分，之后核典与看代数、成本",
+    "按原22/24、18/24与逐首典源标准审计，保留失败并整理交付"
   ],
   "warning": "第一轮完整原题流程20/24值得保留、22/24题意支持、所选用典11/12关系成立；研究目标尚未全部达成。",
   "audit_tools_commit": "b5fece2",
   "regression_session_id": null,
   "held_out_terminal_results": 48,
-  "completion_state": "active: independent bare-poem final diction gate implemented and tested; pilot09 running; pilot08 failures retained; fresh validation not started",
+  "completion_state": "active: 0.9 four development poems read and source-checked, frozen; fresh twelve topics twice running; no fresh poem bodies opened",
   "followup_review_items": [
     "检查盲读失败/预算耗尽时是否保住此前已核的父稿，不把新稿未审冒充已审；若需修正，另记版本，不在冻结测试中途改程序。",
     "当前配置请求deepseek-reasoner，已保存的实际服务返回模型名为deepseek-flash；两臂一致，汇总时明确记录。"
@@ -71,7 +71,7 @@
   "blind_reading_plan": "四组共96次唯一运行，全部终态后合并隐藏组别逐首阅读；无正文的失败计在总分母，不伪造96首作品。先保存盲读意见，再揭盲、逐首核典与汇总。",
   "verified_related_tests": 122,
   "active_sessions": {
-    "raw_pilot09": 78646
+    "fresh_validation": 82236
   },
   "raw_entry_validation": {
     "directory": "runs/classical-evolution-raw-pilot-01",
@@ -141,8 +141,11 @@
     "topics": "research/classical-evolution-fresh-topics-02.json",
     "runs_expected": 24,
     "runs_started": 0,
-    "state": "prepared only; pending actual pilot08 reading and source review; no fresh binding or calls yet",
-    "limits": "同一已核典源库中的新情境，不是未见典源泛化；仅原题与完整典源库进入创作者。"
+    "state": "registered, frozen and running; no fresh poems opened",
+    "limits": "同一已核典源库中的新情境，不是未见典源泛化；仅原题与完整典源库进入创作者。",
+    "directory": "runs/classical-evolution-fresh-held-02",
+    "freeze": "runs/classical-evolution-fresh-freeze-02.json",
+    "session_id": 82236
   },
   "verified_current_related_tests": 52
 }

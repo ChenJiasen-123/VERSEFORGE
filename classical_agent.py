@@ -12,7 +12,61 @@ from experiments.classical_evolution.engine import ClassicalEvolution,DEFAULT_CO
 from experiments.classical_evolution.protocol import validate_reviews
 from experiments.classical_evolution.store import RunStore,RecordedClient,code_digest,digest
 ROOT=Path(__file__).resolve().parent
-VERSION='raw-classical-agent-0.3'
+VERSION='raw-classical-agent-0.5'
+
+EVIDENCE_POLICY='''
+原文证据改用每首poem_passages内的编号，程序会取回对应原文。不要重抄或拼接诗句。
+每项review用evidence_ids:["p1"]替代evidence；每项requirements用evidence_id:"p1"替代evidence，无需引文的否定或行数判断可用null并在reason说明。
+allusion用anchor_ids:["p1"]替代anchors；不用典时为空数组。p0是标题，仅requirements可引用；表达和用典的依据须在p1起的正文。
+编号是每首诗局部的，不可借用另一首的编号。其他字段及所有实际判断要求仍按原协议，全量返回给定id。
+'''
+
+def reader_request(payload):
+    data=copy.deepcopy(payload);inner=data.get('original_input',data)
+    passages={p['id']:{'p0':p['poem']['title'],**{f'p{i}':line for i,line in enumerate(p['poem']['lines'],1)}}
+        for p in inner.get('poems',[])}
+    for p in inner.get('poems',[]):p['poem_passages']=passages[p['id']]
+    return data,passages
+
+def resolve_reader_evidence(content,passages):
+    try:value=json.loads(content)
+    except (ValueError,TypeError):return content
+    if not isinstance(value,dict) or not isinstance(value.get('reviews'),list):return content
+    for row in value['reviews']:
+        if not isinstance(row,dict):continue
+        ident=row.get('id');available=passages.get(ident,{}) if isinstance(ident,str) else {}
+        def quote(key,body_only=False):
+            if key is None:return None if body_only else ''
+            if not isinstance(key,str) or key not in available or (body_only and key=='p0'):
+                return None
+            return available[key]
+        if 'evidence_ids' in row:
+            ids=row['evidence_ids'];row['evidence']=[quote(i,True) for i in ids] if isinstance(ids,list) else None
+        for req in row.get('requirements',[]) if isinstance(row.get('requirements'),list) else []:
+            if isinstance(req,dict) and 'evidence_id' in req:req['evidence']=quote(req['evidence_id'])
+        allusion=row.get('allusion')
+        if isinstance(allusion,dict) and 'anchor_ids' in allusion:
+            ids=allusion['anchor_ids'];allusion['anchors']=[quote(i,True) for i in ids] if isinstance(ids,list) else None
+    return json.dumps(value,ensure_ascii=False)
+
+PARSER_POLICY='''
+genre_hint只是没有明示体裁时的偏好，auto表示无偏好；原题明写的体裁优先，不构成冲突，不得因hint不同返回unsupported。
+五绝、五言绝句和五言律绝对应wujue；七绝、七言绝句对应qijue；五律对应wulv，七律对应qilv。不要因简称与全称不同误判不支持。
+'''
+
+FORM_NAMES={'五绝':'wujue','五言绝句':'wujue','五言律绝':'wujue',
+            '七绝':'qijue','七言绝句':'qijue','七言律绝':'qijue',
+            '五律':'wulv','五言律诗':'wulv','七律':'qilv','七言律诗':'qilv'}
+
+def unambiguous_requested_form(prompt):
+    names='|'.join(sorted(FORM_NAMES,key=len,reverse=True))
+    mentioned={FORM_NAMES[m.group()] for m in re.finditer(names,prompt)}
+    if len(mentioned)!=1 or re.search(r'现代诗|散文诗|古绝',prompt):return None
+    for m in re.finditer(r'(?:写|作|题|采用|体裁为|诗体为)\s*(?:一首)?\s*('+names+')',prompt):
+        before=prompt[max(0,m.start()-8):m.start()]
+        if not re.search(r'不要|不得|不必|无需|不要求|例如|比如|可以|可选|(?:不|别|勿|可)\s*$',before):
+            return FORM_NAMES[m.group(1)]
+    return None
 
 TASK_SEMANTICS='''
 解释原题时区分限制范围和逐项覆盖：“只能写其形、声、用、痕”规定允许的描写范围，不等于四项必须全部出现；原题明说逐项须有时才逐项核对。
@@ -32,19 +86,23 @@ class NamedClient:
     def __init__(self,api,prefix,suffix=''):self.api,self.prefix,self.suffix=api,prefix,suffix;self.n=0;self.model=api.model;self.mock=api.mock
     def complete(self,system,user,**kw):
         self.n+=1
-        return self.api.call(f'{self.prefix}-{self.n:02d}',system+TASK_SEMANTICS+self.suffix,json.loads(user),
+        policy=PARSER_POLICY+TASK_SEMANTICS if 'parse' in self.prefix else TASK_SEMANTICS
+        return self.api.call(f'{self.prefix}-{self.n:02d}',system+policy+self.suffix,json.loads(user),
             thinking=kw.get('thinking') or 'disabled',max_tokens=min(kw.get('max_tokens',8192),16384))
 
 class KernelClient:
     def __init__(self,api,poetics=''):self.api=api;self.poetics=poetics;self.action=None;self.model=api.model;self.mock=api.mock
     def complete(self,system,user,**kw):
         if self.action is None:raise ValueError('missing kernel action identity')
+        payload=json.loads(user);passages=None
         system=TASK_SEMANTICS+system
         if self.action.startswith(('initial-plans','reviewed-plans','write-')):
             system=self.poetics+'\n'+system
         elif self.action.startswith('read-'):
-            system=READER_CALIBRATION+system
-        r=self.api.call('kernel-'+self.action,system,json.loads(user),thinking=kw.get('thinking') or 'disabled',max_tokens=kw.get('max_tokens',8192))
+            system=READER_CALIBRATION+system+EVIDENCE_POLICY
+            payload,passages=reader_request(payload)
+        r=self.api.call('kernel-'+self.action,system,payload,thinking=kw.get('thinking') or 'disabled',max_tokens=kw.get('max_tokens',8192))
+        if passages is not None:r={**r,'content':resolve_reader_evidence(r.get('content'),passages)}
         return {**r,'response_metadata':r.get('provider',{})}
 
 class PreservingEvolution(ClassicalEvolution):
@@ -70,8 +128,12 @@ def interpret_raw(prompt,hint,api,prefix):
     error=''
     for attempt in range(2):
         try:
-            return interpret_modular(prompt,hint,'仅提取原题硬要求，不将所选基本谱写成题目额外要求。',None,
+            brief,task=interpret_modular(prompt,hint,'仅提取原题硬要求，不将所选基本谱写成题目额外要求。',None,
                 NamedClient(api,f'{prefix}-{attempt}',suffix=('\n上次结构校验失败：'+error+'。仅修正字段结构与合法枚举，不添加原题要求。') if attempt else ''),expansion_mode='none')
+            expected=unambiguous_requested_form(prompt)
+            if expected and (task is None or task.genre!=expected):
+                raise ValueError('原题明示支持的体裁'+expected+'，不得因genre_hint不同拒绝或改成其他体裁')
+            return brief,task
         except (ValueError,KeyError,TypeError) as exc:
             error=str(exc)[:120]
             if attempt:raise
@@ -100,7 +162,7 @@ def select_sources(prompt,library,api):
     selected=api.json('source-selection',SOURCE_SELECTOR,{'original_prompt':prompt,'verified_sources':library},validate,max_tokens=3000)
     return selected,{i:library[i] for i in selected['source_ids']}
 
-def run_raw(prompt,directory,client,*,hint='qijue',library=None,config=None,progress=lambda _:None):
+def run_raw(prompt,directory,client,*,hint='auto',library=None,config=None,progress=lambda _:None):
     if not isinstance(prompt,str) or not prompt.strip() or len(prompt)>10000:raise ValueError('原题须为1—10000字文本')
     library=library if library is not None else json.loads((ROOT/'experiments/classical_evolution/sources.json').read_text(encoding='utf-8'))
     config={**DEFAULT_CONFIG,**(config or {})}
@@ -169,7 +231,7 @@ def run_raw(prompt,directory,client,*,hint='qijue',library=None,config=None,prog
 def main():
     sys.stdout.reconfigure(encoding='utf-8');p=argparse.ArgumentParser(description='直接输入原题的古诗演化入口')
     p.add_argument('--prompt',required=True);p.add_argument('--out',type=Path,required=True)
-    p.add_argument('--genre-hint',default='qijue',choices=['auto','wujue','qijue','wulv','qilv','ci'])
+    p.add_argument('--genre-hint',default='auto',choices=['auto','wujue','qijue','wulv','qilv','ci'])
     p.add_argument('--model',default='deepseek-reasoner');p.add_argument('--env-file',type=Path,default=ROOT.parent/'poetry-agent'/'.env')
     a=p.parse_args();load_env(a.env_file)
     r=run_raw(a.prompt,a.out,DeepSeekClient(model=a.model),hint=a.genre_hint,progress=lambda s:print(s,flush=True))

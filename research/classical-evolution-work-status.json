@@ -45,7 +45,7 @@
   "source_snapshot": "runs/classical-evolution-source-snapshot-01.json",
   "remaining": [
     "主批次48次已终态并完成机械复核；保持冻结版本，完成待办对照与独立阅读",
-    "主批次结束后执行control_classical_evolution.py补24次旧三候选流程；保留原48次对照，不重复生成已有新算法24份样本。",
+    "旧三候选补充24次已完成并复核，待对称盲评、实际阅读及逐首典源核查",
     "用snapshot_classical_evolution.py verify核对依赖未变",
     "阅读隐藏组别的实际诗作，记录助手判断，与模型判断及用户偏好验证分开",
     "汇总12题重复结果、失败、资源代价和不确定项；按原标准审计完成状态",
@@ -56,7 +56,7 @@
   "audit_tools_commit": "b5fece2",
   "regression_session_id": null,
   "held_out_terminal_results": 48,
-  "completion_state": "active: old three-candidate control still live; version0.3 raw pilot awaits current batch; held-out blind reading unopened",
+  "completion_state": "active: raw0.3 pilot finishing; raw0.5 syntax/genre fixes implemented, registered, not live-verified",
   "followup_review_items": [
     "检查盲读失败/预算耗尽时是否保住此前已核的父稿，不把新稿未审冒充已审；若需修正，另记版本，不在冻结测试中途改程序。",
     "当前配置请求deepseek-reasoner，已保存的实际服务返回模型名为deepseek-flash；两臂一致，汇总时明确记录。"
@@ -64,7 +64,7 @@
   "supplementary_control": {
     "directory": "runs/classical-evolution-multicandidate-control-01",
     "additional_runs": 24,
-    "state": "running: process 40555",
+    "state": "terminal24/24; selected23/24; combined48 references audited with zero violations",
     "reason": "兑现现有多候选改稿基线，当前默认单候选对照不够充分",
     "intervention": "旧studio仅将candidate_count从1改为3，其余保留",
     "registration": "experiment-binding.json",
@@ -72,9 +72,9 @@
   },
   "combined_unique_runs_expected": 72,
   "blind_reading_plan": "全部计划批次结束后合并唯一结果，隐藏组别逐首阅读。无成稿的失败仍计入总分母，不伪造诗作数量。",
-  "verified_related_tests": 116,
+  "verified_related_tests": 120,
   "active_sessions": {
-    "multicandidate_control": 40555
+    "raw_entry_pilot02": 69167
   },
   "raw_entry_validation": {
     "directory": "runs/classical-evolution-raw-pilot-01",
@@ -82,10 +82,19 @@
     "purpose": "automatic raw-prompt interpretation and verified-source selection; separate from typed-core benchmark",
     "fallback": "preserve prior validated review only for exact unchanged poem body",
     "auditor": "复核实际自动谱体、原题禁字、独立要求确认、嵌套演化谱系与全局预算",
-    "next_directory": "runs/classical-evolution-raw-pilot-02",
-    "next_version": "raw-classical-agent-0.3",
-    "next_state": "registered; waits for current control batch before network calls",
-    "revision": "范围不强制全覆盖；语境人物不强制标签复述；表达/句法审读校准；最多三份不同已核稿末轮回选"
+    "next_directory": "runs/classical-evolution-raw-pilot-04",
+    "next_version": "raw-classical-agent-0.5",
+    "next_state": "registered; waits for pilot02 process69167 terminal",
+    "revision": "范围不强制全覆盖；语境人物不强制标签复述；表达/句法审读校准；最多三份不同已核稿末轮回选",
+    "pilot02": "running0.3; five-character quatrain was falsely rejected because default seven-character preference was treated as mandatory",
+    "revision04": "默认auto；明确支持体裁与解析结果冲突时有界重解析；保留选项与否定体裁，不强制人工谱体",
+    "skipped_registration": {
+      "directory": "runs/classical-evolution-raw-pilot-03",
+      "version": "0.4",
+      "api_calls": 0,
+      "reason": "合并实跑中已发现的引文传输修正后再测，保留空登记但不计完成样本"
+    },
+    "revision05": "审读用编号引用当前诗句，保留服务原始响应；不存在编号和标题作为正文锚点仍被拦截，未放宽语义标准"
   },
   "primary_mechanical_audit": {
     "terminal_results": 48,

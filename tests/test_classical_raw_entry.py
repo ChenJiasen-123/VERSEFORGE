@@ -1,8 +1,8 @@
 import copy,json,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch,Mock
-from tests.test_classical_evolution import FixtureClient,TOPIC,SOURCES,POEM,candidate
-from classical_agent import run_raw,PreservingEvolution,select_sources
+from tests.test_classical_evolution import FixtureClient,TOPIC,SOURCES,POEM,candidate,review
+from classical_agent import run_raw,PreservingEvolution,select_sources,interpret_raw
 from experiments.classical_evolution.engine import ClassicalEvolution
 from experiments.classical_evolution.store import RunStore,RecordedClient,digest
 from audit_classical_evolution import audit
@@ -38,6 +38,18 @@ class VariedRawFixture(RawFixture):
             self.writes+=1;r['content']=json.dumps(obj,ensure_ascii=False)
         return r
 
+class IdEvidenceFixture(RawFixture):
+    def __init__(self,bad_anchor=None):super().__init__();self.bad_anchor=bad_anchor
+    def complete(self,system,user,**kw):
+        d=json.loads(user);inner=d.get('original_input',d)
+        if 'poems' not in inner:return super().complete(system,user,**kw)
+        self.requests.append((system,d,kw));rows=[]
+        for p in inner['poems']:
+            row=review(p['id']);row.pop('evidence');row['evidence_ids']=['p3']
+            for req in row['requirements']:req.pop('evidence');req['evidence_id']=None
+            row['allusion'].pop('anchors');row['allusion']['anchor_ids']=[self.bad_anchor or 'p3'];rows.append(row)
+        return {'content':json.dumps({'reviews':rows},ensure_ascii=False),'usage':{'total_tokens':10}}
+
 class RawEntryTests(unittest.TestCase):
     def test_raw_prompt_parses_selects_sources_and_rechecks_without_manual_task(self):
         c=RawFixture()
@@ -54,12 +66,60 @@ class RawEntryTests(unittest.TestCase):
             self.assertEqual(len(c.requests),before)
         parses=[d for _,d,_ in c.requests if 'prompt' in d and 'genre_hint' in d]
         self.assertTrue(all('poem' not in d and 'expression_plan' not in d for d in parses))
+        self.assertTrue(all(d['genre_hint']=='auto' for d in parses))
+
+    def test_explicit_supported_form_overrides_conflicting_hint_with_bounded_repair(self):
+        class WrongFirst:
+            model='fixture';mock=True
+            def __init__(self,wrong):self.wrong=wrong;self.calls=0
+            def complete(self,system,user,**kw):
+                self.calls+=1;genre=self.wrong if self.calls==1 else 'wujue'
+                return {'content':json.dumps({'genre':genre,'topic':'渡口送行','max_lines':4,
+                    'requirements':['五绝一首'],'examples':[],'required_words':[],'forbidden_words':[],
+                    'pattern':'ping_rhyme' if genre!='unsupported' else None,'unsupported_reason':''})}
+        for wrong in ('unsupported','qijue'):
+            with self.subTest(wrong=wrong),tempfile.TemporaryDirectory() as directory:
+                c=WrongFirst(wrong);api=RecordedClient(c,RunStore(directory,{}))
+                brief,task=interpret_raw('写五绝一首：渡口送行。','qijue',api,'initial-parse')
+                self.assertEqual(task.genre,'wujue');self.assertEqual(c.calls,2)
+                self.assertEqual(api.summary()['calls'],2)
+
+    def test_alternatives_and_negated_forms_are_not_promoted_to_mandatory_form(self):
+        for prompt in ('写五绝或七绝一首。','不要写五绝，体裁自选。'):
+            with self.subTest(prompt=prompt),tempfile.TemporaryDirectory() as directory:
+                c=RawFixture();api=RecordedClient(c,RunStore(directory,{}))
+                _,task=interpret_raw(prompt,'auto',api,'initial-parse')
+                self.assertEqual(task.genre,'qijue');self.assertEqual(c.parses,1)
 
     def test_global_budget_does_not_reset_between_frontend_and_kernel(self):
         c=RawFixture()
         with tempfile.TemporaryDirectory() as directory:
             r=run_raw(TOPIC['prompt'],directory,c,library=SOURCES,config={'generations':0,'max_calls':4})
         self.assertLessEqual(len(c.requests),4);self.assertIsNone(r['poem'])
+
+    def test_passage_ids_resolve_to_actual_lines_while_raw_provider_record_is_preserved(self):
+        mechanical={'hard_issues':[],'meter':{'status':'unknown','findings':[]}}
+        with tempfile.TemporaryDirectory() as directory, \
+             patch('experiments.classical_evolution.engine.known_checks',return_value=mechanical), \
+             patch('classical_agent.known_checks',return_value=mechanical), \
+             patch('classical_agent.safe_review',return_value={'complete':True,'confirmed':True}):
+            r=run_raw(TOPIC['prompt'],directory,IdEvidenceFixture(),library=SOURCES,config={'generations':0,'pairwise':False})
+            saved=json.loads((Path(directory)/'calls/kernel-read-g00.json').read_text(encoding='utf-8'))
+        self.assertIsNotNone(r['selected'])
+        self.assertEqual(r['selected']['review']['allusion']['anchors'],[POEM['lines'][2]])
+        raw=json.loads(saved['response']['content'])['reviews'][0]
+        self.assertIn('evidence_ids',raw);self.assertNotIn('evidence',raw)
+
+    def test_unknown_or_title_anchor_id_is_never_treated_as_body_evidence(self):
+        mechanical={'hard_issues':[],'meter':{'status':'unknown','findings':[]}}
+        for bad in ('p999','p0'):
+            with self.subTest(bad=bad),tempfile.TemporaryDirectory() as directory, \
+                 patch('experiments.classical_evolution.engine.known_checks',return_value=mechanical), \
+                 patch('classical_agent.known_checks',return_value=mechanical):
+                c=IdEvidenceFixture(bad)
+                r=run_raw(TOPIC['prompt'],directory,c,library=SOURCES,config={'generations':0,'pairwise':False})
+            self.assertIsNone(r['poem']);self.assertEqual(r['status'],'needs_review')
+            self.assertLess(len(c.requests),20)
 
     def test_rejected_winner_can_fall_back_to_a_different_already_reviewed_ancestor(self):
         c=VariedRawFixture();mechanical={'hard_issues':[],'meter':{'status':'unknown','findings':[]}}

@@ -18,7 +18,7 @@ def main():
   'arms':['raw_classical_evolution'],'jobs':jobs,'model':'deepseek-reasoner','config':DEFAULT_CONFIG,
   'code_sha256':code_digest(),'entry_source_sha256':hashlib.sha256((ROOT/'classical_agent.py').read_bytes()).hexdigest(),
   'driver_source_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'poetics_sha256':digest(knowledge),
-  'creation_inputs':'raw prompt + default qijue genre preference + full verified source library only; task/profile/source IDs selected automatically',
+  'creation_inputs':'raw prompt + auto genre preference + full verified source library only; task/profile/source IDs selected automatically',
   'expected_task_fields':'topic.task and topic.requirements retained as evaluation metadata, never passed into run_raw',
   'limits':'Not a causal isolation of genetic operators; evaluates the complete raw-prompt route including automatic source selection and restored poetics.'}
  binding['experiment_sha256']=digest(binding)
@@ -35,7 +35,7 @@ def main():
   if (out/'result.json').exists():return
   t=next(t for t in topics if t['id']==j['topic_id'])
   progress=lambda s:print(j['key'],s,flush=True)
-  result=classical_agent.run_raw(t['prompt'],out,DeepSeekClient(model=binding['model']),hint='qijue',library=library,
+  result=classical_agent.run_raw(t['prompt'],out,DeepSeekClient(model=binding['model']),hint='auto',library=library,
     config=DEFAULT_CONFIG,progress=progress)
   progress('terminal-'+result['status'])
  errors=[]

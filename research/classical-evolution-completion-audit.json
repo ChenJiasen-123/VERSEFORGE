@@ -7,95 +7,116 @@
   "requirements": [
     {
       "requirement": "复用既有种群选择与交叉配对，古诗专用评判",
-      "state": "implemented_and_tested",
+      "state": "verified_with_stated_limits",
       "evidence": [
         "experiments/evolution/selection.py",
         "experiments/classical_evolution/engine.py",
-        "tests/test_classical_evolution.py"
-      ]
+        "tests/test_classical_evolution.py",
+        "research/classical-evolution-final-verification.json"
+      ],
+      "verification": "Shared survival/pairing is imported by classical engine; classical gates and expression/source critic remain specialized.61 current related tests passed."
     },
     {
       "requirement": "三候选、两代；构思交叉、定向变异、保留父稿",
-      "state": "observed_in_primary_runs",
+      "state": "verified_with_stated_limits",
       "evidence": [
-        "runs/classical-evolution-held-01/lineage-statistics.json",
-        "runs/classical-evolution-held-01/mechanical-audit.json"
-      ]
+        "runs/classical-evolution-replication-03/lineage-statistics.json",
+        "runs/classical-evolution-replication-03/mechanical-audit.json"
+      ],
+      "verification": "All24 current runs completed2 generations;207 recorded drafts;45 crossover children;parents retained;selected generations0:7,1:7,2:10. Failed writes not counted as drafts."
     },
     {
       "requirement": "四题对照及父子稿与选稿理由",
-      "state": "complete_for_frozen_core",
+      "state": "verified_with_stated_limits",
       "evidence": [
-        "runs/classical-evolution-pilot-02/作品与运行汇总.txt",
-        "runs/classical-evolution-pilot-02/演化过程/索引.txt"
-      ]
+        "research/classical-evolution-lineage-review.json",
+        "research/classical-evolution-replication-lineage-review-03.json",
+        "runs/classical-evolution-pilot-02/作品与运行汇总.txt"
+      ],
+      "verification": "Original four-topic paired pilot plus8 first-study qualitative cases preserved;5 additional current-version cases inspected against actual poems, including failed improvement and actual fallback."
     },
     {
       "requirement": "冻结后十二道陌生题、每题独立两次，不丢失败",
-      "state": "primary48_terminal",
+      "state": "verified_with_stated_limits",
       "evidence": [
-        "runs/classical-evolution-freeze-01.json",
-        "runs/classical-evolution-source-snapshot-01.json",
         "runs/classical-evolution-held-01/experiment-binding.json",
-        "runs/classical-evolution-held-01/descriptive-report.json"
-      ]
+        "runs/classical-evolution-combined-02/descriptive-report.json",
+        "runs/classical-evolution-replication-freeze-03.json",
+        "research/classical-evolution-final-freeze-check.json"
+      ],
+      "verification": "Initial fixed unseen12x2 experiment completed before reading; latest replication preserves failures and is explicitly same topics, not a second unseen test. Frozen entry/rubrics and65 dependency hashes unchanged."
     },
     {
       "requirement": "与现有多候选改稿流程比较",
-      "state": "complete_with_default_and_three_candidate_controls",
+      "state": "verified_with_stated_limits",
       "evidence": [
+        "research/classical-evolution-study-01-summary.json",
         "runs/classical-evolution-held-01/paired-blind-summary.json",
-        "runs/classical-evolution-multicandidate-control-01/paired-blind-summary.json",
-        "runs/classical-evolution-combined-02/assistant-blind-review.json"
-      ]
+        "runs/classical-evolution-multicandidate-control-01/paired-blind-summary.json"
+      ],
+      "verification": "Both default and three-candidate controls, all95 readable first-study poems and AB/BA outcomes retained; unequal realized compute and no isolated GA causality. Latest0.9 is not claimed directly superior to old baselines."
     },
     {
       "requirement": "原题自动审题、表达规划、选典、创作、审读与多轮打磨",
-      "state": "implemented_and_first_end_to_end_validation_complete_but_not_all_targets_met",
+      "state": "verified_with_stated_limits",
       "evidence": [
-        "runs/classical-evolution-raw-held-01/descriptive-report.json",
-        "research/classical-evolution-study-01-summary.json"
-      ]
+        "classical_agent.py",
+        "classical_diction.py",
+        "runs/classical-evolution-replication-03/mechanical-audit.json",
+        "research/classical-evolution-cli-cache-smoke-03.json"
+      ],
+      "verification": "Current automatic raw-topic entry generated24 jobs without user editing, interprets original requirements, chooses sources and applies generation/selection/postchecks. Cache CLI smoke is supplementary, not proof of paid generation."
     },
     {
       "requirement": "至少22/24通过明确硬检查；待核音单列",
-      "state": "raw22_of24_task_supported_and24_selected_known_hard_clear; typed_core21_of24_task_supported",
+      "state": "verified_with_stated_limits",
       "evidence": [
-        "runs/classical-evolution-combined-02/descriptive-report.json"
+        "runs/classical-evolution-replication-03/descriptive-report.json",
+        "runs/classical-evolution-replication-03/assistant-blind-review.json"
       ],
-      "unknown_readings": "原题新流程24份所选稿均仍有未决项；未知不等于错，也不认证全谱合律。"
+      "unknown_readings": "原题新流程24份所选稿均仍有未决项；未知不等于错，也不认证全谱合律。",
+      "verification": "Latest24 selected known-hard-clear,23 topic-supported;1 unresolved longevity/appearance nuance.24 unresolved tone inventories remain outside full meter certification."
     },
     {
       "requirement": "用典专项每首核查，无明显误用、复述、硬贴",
-      "state": "all46_selected_required_read; raw11_of12_supported_one_unresolved_so_target_not_met",
+      "state": "verified_with_stated_limits",
       "evidence": [
-        "runs/classical-evolution-combined-02/assistant-source-audit.json"
+        "runs/classical-evolution-replication-03/assistant-source-audit.json",
+        "research/古诗演化复测完整作品24首.txt"
       ],
-      "model_proxy_only": 12
+      "model_proxy_only": 12,
+      "verification": "Latest12 mandatory sources individually read against registered cards and supported at relation level;守园夜漏 reversal remains artistically risky. First-study1 unresolved source stays unresolved; no claim all historic versions passed."
     },
     {
       "requirement": "盲读至少18/24值得保留，非整首推倒",
-      "state": "raw20_of24_and_typed20_of24_worth_keeping; threshold_met_by_assistant_blind_reading",
+      "state": "verified_with_stated_limits",
       "evidence": [
-        "runs/classical-evolution-combined-02/assistant-blind-review.json"
+        "runs/classical-evolution-replication-03/assistant-blind-review.json",
+        "runs/classical-evolution-replication-03/descriptive-report.json"
       ],
-      "no_substitution": "模型keep数量不能代替逐首实际阅读。"
+      "no_substitution": "模型keep数量不能代替逐首实际阅读。",
+      "verification": "Locked anonymous notes in commit1baf952 before reveal;22/24 selected judged worth local revision,2 scored1 retained in collection. Assistant reading is not user/expert preference."
     },
     {
       "requirement": "有明确错误如实标未完成；无需用户代改；记录失败、资源与时间",
-      "state": "first_round_all96_terminal_and_mechanically_consistent; remaining_semantic_false_acceptance_found",
+      "state": "verified_with_stated_limits",
       "evidence": [
-        "runs/classical-evolution-combined-02/mechanical-audit.json",
-        "research/classical-evolution-study-01-summary.json"
-      ]
+        "research/classical-evolution-final-summary.json",
+        "research/classical-evolution-fresh02-archive/manifest.json",
+        "research/classical-evolution-replication03-archive/manifest.json",
+        "research/古诗演化文本阶段最终报告.txt"
+      ],
+      "verification": "All144 main runs retained, including24 failed-batch jobs with18 incomplete and1 needs_review. Service failures, separately confirmed402 and schema failures recorded; model checks can still miss weak diction, so no promise of zero semantic false acceptance."
     },
     {
       "requirement": "实际读诗并对照修改是否有效，报告失败和局限",
-      "state": "first_round_poems_read_and_lineages_inspected; weaknesses_remain_to_fix",
+      "state": "verified_with_stated_limits",
       "evidence": [
         "research/classical-evolution-lineage-review.json",
-        "research/古诗演化第一轮验收报告.txt"
-      ]
+        "research/classical-evolution-replication-lineage-review-03.json",
+        "research/古诗演化文本阶段最终报告.txt"
+      ],
+      "verification": "Actual parent/child texts inspected; report includes improvement, unchanged flaws, lost opportunities, initial survivors and all limitations. All24 poems delivered unchanged, not cherry-picked."
     }
   ],
   "goal_complete": false,
@@ -103,12 +124,25 @@
   "ordering": "试验数据完成后隐藏组别阅读，提交阅读意见后揭盲汇总；端到端版本独立记账，不冒称等算力或单一因素消融。",
   "latest_raw_version": "raw-classical-agent-0.9",
   "raw_live_pilot": "runs/classical-evolution-raw-pilot-09",
-  "raw_held_out": "runs/classical-evolution-fresh-held-02",
-  "raw_held_live_session": 9436,
+  "raw_held_out": "runs/classical-evolution-replication-03",
+  "raw_held_live_session": null,
   "original_pilot05_interruption_retained": "runs/classical-evolution-raw-pilot-05",
-  "next_action": "同协议独立24次复测正在运行；保留402失败批，全部完成后重新匿名评阅与核典，不包装成未见题验证。",
+  "next_action": "Verify archive members and staged history for credentials, commit and fast-forward push, then check remote SHA and complete the text-stage goal.",
   "current_development_session": null,
   "first_raw_held_out": "runs/classical-evolution-raw-held-01",
   "failed_fresh_study": "runs/classical-evolution-fresh-held-02",
-  "replication_study": "runs/classical-evolution-replication-03"
+  "replication_study": "runs/classical-evolution-replication-03",
+  "completion_gate": "All text-stage experiment requirements inspected; pending final GitHub synchronization and archive-delivery verification",
+  "verified_current_related_tests": 61,
+  "universal_stability_proven": false,
+  "limitations": [
+    "24/24 latest tone inventories unresolved",
+    "延医 task-fit uncertain;23/24 task-supported",
+    "守园夜漏 allusive reversal supported but circuitous",
+    "Weak diction can pass automatic checks",
+    "No user/expert certification",
+    "Failed24 retained;replication is not unseen topics",
+    "No equal-compute or GA causal superiority claim",
+    "Scope remains text CLI and registered five/seven-character quatrains"
+  ]
 }

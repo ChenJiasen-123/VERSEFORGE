@@ -1,0 +1,201 @@
+{
+  "expected_runs": 96,
+  "terminal_runs": 96,
+  "missing_jobs": [],
+  "complete": true,
+  "requested_model": "deepseek-reasoner",
+  "by_arm": {
+    "baseline_studio": {
+      "expected_runs": 24,
+      "terminal_runs": 24,
+      "selected_outputs": 21,
+      "no_output_runs": 3,
+      "full_basic_meter_pass": 0,
+      "meter_unresolved": 21,
+      "allusion_required_runs": 12,
+      "allusion_proxy_pass_on_required": 10,
+      "model_keep_proxy": 15,
+      "topics_with_all_repetitions_finished": 12,
+      "topics_with_output_on_every_repetition": 9,
+      "calls": 294,
+      "known_tokens": 1472844,
+      "usage_unknown_calls": 0,
+      "median_seconds": 124.6325,
+      "p90_seconds": 217.765,
+      "assistant_blind_worth_any_recorded_draft": 19,
+      "assistant_blind_worth_selected_output": 17,
+      "assistant_blind_task_supported_selected": 20,
+      "assistant_blind_explicit_task_violations_selected": 0,
+      "assistant_blind_score_histogram": {
+        "0": 0,
+        "1": 4,
+        "2": 15,
+        "3": 4,
+        "4": 0
+      }
+    },
+    "multi_candidate_studio": {
+      "expected_runs": 24,
+      "terminal_runs": 24,
+      "selected_outputs": 23,
+      "no_output_runs": 1,
+      "full_basic_meter_pass": 1,
+      "meter_unresolved": 22,
+      "allusion_required_runs": 12,
+      "allusion_proxy_pass_on_required": 12,
+      "model_keep_proxy": 14,
+      "topics_with_all_repetitions_finished": 12,
+      "topics_with_output_on_every_repetition": 11,
+      "calls": 445,
+      "known_tokens": 1722731,
+      "usage_unknown_calls": 1,
+      "median_seconds": 159.4375,
+      "p90_seconds": 309.594,
+      "assistant_blind_worth_any_recorded_draft": 19,
+      "assistant_blind_worth_selected_output": 18,
+      "assistant_blind_task_supported_selected": 23,
+      "assistant_blind_explicit_task_violations_selected": 0,
+      "assistant_blind_score_histogram": {
+        "0": 0,
+        "1": 5,
+        "2": 16,
+        "3": 3,
+        "4": 0
+      }
+    },
+    "classical_evolution": {
+      "expected_runs": 24,
+      "terminal_runs": 24,
+      "selected_outputs": 23,
+      "no_output_runs": 1,
+      "full_basic_meter_pass": 0,
+      "meter_unresolved": 23,
+      "allusion_required_runs": 12,
+      "allusion_proxy_pass_on_required": 12,
+      "model_keep_proxy": 18,
+      "topics_with_all_repetitions_finished": 12,
+      "topics_with_output_on_every_repetition": 11,
+      "calls": 458,
+      "known_tokens": 2309194,
+      "usage_unknown_calls": 10,
+      "median_seconds": 378.156,
+      "p90_seconds": 496.875,
+      "assistant_blind_worth_any_recorded_draft": 21,
+      "assistant_blind_worth_selected_output": 20,
+      "assistant_blind_task_supported_selected": 21,
+      "assistant_blind_explicit_task_violations_selected": 0,
+      "assistant_blind_score_histogram": {
+        "0": 0,
+        "1": 3,
+        "2": 16,
+        "3": 5,
+        "4": 0
+      }
+    },
+    "raw_classical_evolution": {
+      "expected_runs": 24,
+      "terminal_runs": 24,
+      "selected_outputs": 24,
+      "no_output_runs": 0,
+      "full_basic_meter_pass": 0,
+      "meter_unresolved": 24,
+      "allusion_required_runs": 12,
+      "allusion_proxy_pass_on_required": 12,
+      "model_keep_proxy": 18,
+      "topics_with_all_repetitions_finished": 12,
+      "topics_with_output_on_every_repetition": 12,
+      "calls": 848,
+      "known_tokens": 3162229,
+      "usage_unknown_calls": 9,
+      "median_seconds": 479.00750000000005,
+      "p90_seconds": 596.875,
+      "assistant_blind_worth_any_recorded_draft": 20,
+      "assistant_blind_worth_selected_output": 20,
+      "assistant_blind_task_supported_selected": 22,
+      "assistant_blind_explicit_task_violations_selected": 0,
+      "assistant_blind_score_histogram": {
+        "0": 0,
+        "1": 4,
+        "2": 13,
+        "3": 7,
+        "4": 0
+      }
+    }
+  },
+  "model_paired_blind": {},
+  "mechanical_audit": {
+    "expected_runs": 96,
+    "terminal_results": 96,
+    "violations": [],
+    "mechanical_consistency_verified": true,
+    "scope": "Recomputed hard constraints, recorded review quotations, lineage, versions and call counts. Not literary quality or source interpretation certification."
+  },
+  "assistant_blind_reading": {
+    "status": "complete",
+    "reviewer": "assistant; not user or external expert",
+    "poems_read": 95,
+    "user_preference_verified": false
+  },
+  "stability_proven": false,
+  "limits": [
+    "本轮五绝、七绝和给定典源；不能外推任意题材、律诗或词",
+    "两流程资源上限相同，实际资源消耗不同；不属于等算力对照",
+    "读音待核不计入全谱确认，模型语义判断不等于已认证",
+    "失败和未出稿始终留在分母，不能只比较最好几首",
+    "模型盲评不是用户偏好验证；稳定性结论需结合实际诗作与独立阅读"
+  ],
+  "research_acceptance": {
+    "baseline_studio": {
+      "checks": {
+        "all_runs_finished": true,
+        "at_least_22_selected_without_known_hard_errors": false,
+        "no_selected_output_with_explicit_task_violation": true,
+        "at_least_18_selected_worth_keeping": false,
+        "submitted_allusion_exercises_checked": true,
+        "submitted_allusions_supported": true,
+        "mechanical_audit_complete": true
+      },
+      "research_targets_met": false,
+      "scope": "仅本次绝句题集和给定资料；不认证任意题材、完整历史读音、用户审美偏好或正式赛时表现"
+    },
+    "multi_candidate_studio": {
+      "checks": {
+        "all_runs_finished": true,
+        "at_least_22_selected_without_known_hard_errors": true,
+        "no_selected_output_with_explicit_task_violation": true,
+        "at_least_18_selected_worth_keeping": true,
+        "submitted_allusion_exercises_checked": true,
+        "submitted_allusions_supported": true,
+        "mechanical_audit_complete": true
+      },
+      "research_targets_met": true,
+      "scope": "仅本次绝句题集和给定资料；不认证任意题材、完整历史读音、用户审美偏好或正式赛时表现"
+    },
+    "classical_evolution": {
+      "checks": {
+        "all_runs_finished": true,
+        "at_least_22_selected_without_known_hard_errors": false,
+        "no_selected_output_with_explicit_task_violation": true,
+        "at_least_18_selected_worth_keeping": true,
+        "submitted_allusion_exercises_checked": true,
+        "submitted_allusions_supported": true,
+        "mechanical_audit_complete": true
+      },
+      "research_targets_met": false,
+      "scope": "仅本次绝句题集和给定资料；不认证任意题材、完整历史读音、用户审美偏好或正式赛时表现"
+    },
+    "raw_classical_evolution": {
+      "checks": {
+        "all_runs_finished": true,
+        "at_least_22_selected_without_known_hard_errors": true,
+        "no_selected_output_with_explicit_task_violation": true,
+        "at_least_18_selected_worth_keeping": true,
+        "submitted_allusion_exercises_checked": true,
+        "submitted_allusions_supported": false,
+        "mechanical_audit_complete": true
+      },
+      "research_targets_met": false,
+      "scope": "仅本次绝句题集和给定资料；不认证任意题材、完整历史读音、用户审美偏好或正式赛时表现"
+    }
+  }
+}

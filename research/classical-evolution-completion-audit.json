@@ -42,62 +42,59 @@
     },
     {
       "requirement": "与现有多候选改稿流程比较",
-      "state": "generation_and_mechanical_audit_complete; symmetric_model_comparison_and_actual_blind_reading_pending",
+      "state": "complete_with_default_and_three_candidate_controls",
       "evidence": [
-        "runs/classical-evolution-multicandidate-control-01/experiment-binding.json",
-        "runs/classical-evolution-multicandidate-control-01/descriptive-report.json",
-        "runs/classical-evolution-multicandidate-control-01/mechanical-audit.json"
+        "runs/classical-evolution-held-01/paired-blind-summary.json",
+        "runs/classical-evolution-multicandidate-control-01/paired-blind-summary.json",
+        "runs/classical-evolution-combined-02/assistant-blind-review.json"
       ]
     },
     {
       "requirement": "原题自动审题、表达规划、选典、创作、审读与多轮打磨",
-      "state": "implemented_but_end_to_end_validation_incomplete",
+      "state": "implemented_and_first_end_to_end_validation_complete_but_not_all_targets_met",
       "evidence": [
-        "classical_agent.py",
-        "runs/classical-evolution-raw-pilot-01/descriptive-report.json",
-        "research/classical-evolution-raw-pilot-findings.json"
-      ],
-      "next": "修正版四题实跑后，再冻结端到端十二题各两次；旧版失败不覆盖。"
+        "runs/classical-evolution-raw-held-01/descriptive-report.json",
+        "research/classical-evolution-study-01-summary.json"
+      ]
     },
     {
       "requirement": "至少22/24通过明确硬检查；待核音单列",
-      "state": "core_selected23_of24_but_full_entry_not_yet_validated",
+      "state": "raw22_of24_task_supported_and24_selected_known_hard_clear; typed_core21_of24_task_supported",
       "evidence": [
-        "runs/classical-evolution-held-01/mechanical-audit.json"
+        "runs/classical-evolution-combined-02/descriptive-report.json"
       ],
-      "unknown_readings": "全部23份所选稿仍有未决项，不能声称全谱合律。"
+      "unknown_readings": "原题新流程24份所选稿均仍有未决项；未知不等于错，也不认证全谱合律。"
     },
     {
       "requirement": "用典专项每首核查，无明显误用、复述、硬贴",
-      "state": "pending_assistant_source_audit",
+      "state": "all46_selected_required_read; raw11_of12_supported_one_unresolved_so_target_not_met",
       "evidence": [
-        "experiments/classical_evolution/sources.json"
+        "runs/classical-evolution-combined-02/assistant-source-audit.json"
       ],
       "model_proxy_only": 12
     },
     {
       "requirement": "盲读至少18/24值得保留，非整首推倒",
-      "state": "pending_actual_blind_reading",
+      "state": "raw20_of24_and_typed20_of24_worth_keeping; threshold_met_by_assistant_blind_reading",
       "evidence": [
-        "research/classical-evolution-blind-rubric.json"
+        "runs/classical-evolution-combined-02/assistant-blind-review.json"
       ],
       "no_substitution": "模型keep数量不能代替逐首实际阅读。"
     },
     {
       "requirement": "有明确错误如实标未完成；无需用户代改；记录失败、资源与时间",
-      "state": "core_recorded_raw_entry_checks_pending",
+      "state": "first_round_all96_terminal_and_mechanically_consistent; remaining_semantic_false_acceptance_found",
       "evidence": [
-        "runs/classical-evolution-held-01/descriptive-report.json",
-        "tests/test_classical_raw_entry.py"
+        "runs/classical-evolution-combined-02/mechanical-audit.json",
+        "research/classical-evolution-study-01-summary.json"
       ]
     },
     {
       "requirement": "实际读诗并对照修改是否有效，报告失败和局限",
-      "state": "pending_final_reading_and_report",
+      "state": "first_round_poems_read_and_lineages_inspected; weaknesses_remain_to_fix",
       "evidence": [
-        "export_classical_evolution.py",
-        "review_classical_evolution.py",
-        "report_classical_evolution.py"
+        "research/classical-evolution-lineage-review.json",
+        "research/古诗演化第一轮验收报告.txt"
       ]
     }
   ],
@@ -107,6 +104,7 @@
   "latest_raw_version": "raw-classical-agent-0.6",
   "raw_live_pilot": "runs/classical-evolution-raw-pilot-06",
   "raw_held_out": "runs/classical-evolution-raw-held-01",
-  "raw_held_live_session": 27656,
-  "original_pilot05_interruption_retained": "runs/classical-evolution-raw-pilot-05"
+  "raw_held_live_session": null,
+  "original_pilot05_interruption_retained": "runs/classical-evolution-raw-pilot-05",
+  "next_action": "保全原0.6版及第一轮全部记录，修正关键语义关系与典源接入审读，开发后另冻新的十二题各两次，不覆盖旧数据。"
 }

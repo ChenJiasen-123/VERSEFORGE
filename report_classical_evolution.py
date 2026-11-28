@@ -79,6 +79,7 @@ def report(directory):
    if type(n['score']) is not int or not 0<=n['score']<=4 or type(n['worth_keeping']) is not bool or n['worth_keeping']!=(n['score']>=2):raise ValueError('invalid blind score')
    for field in ('actual_experience','main_problem','allusion_guess_or_uncertainty'):
     if not isinstance(n.get(field),str) or not n[field].strip():raise ValueError('missing actual blind reading field: '+field)
+   if n.get('task_fit_non_allusion') not in ('supported','violated','uncertain'):raise ValueError('missing independent non-allusion task judgment')
    quotes=n.get('quoted_evidence')
    if not isinstance(quotes,list) or not quotes or any(not isinstance(q,str) or not q.strip() or not any(q in line for line in poems[n['blind_id']]['lines']) for q in quotes):raise ValueError('invalid assistant quote')
   reading_status={'status':'complete','reviewer':submitted.get('reviewer','assistant'),'poems_read':len(notes),'user_preference_verified':False}
@@ -86,6 +87,8 @@ def report(directory):
    ms=[m for m in mapping if m['arm']==arm]
    by_arm[arm]['assistant_blind_worth_any_recorded_draft']=sum(by_id[m['blind_id']]['worth_keeping'] for m in ms)
    by_arm[arm]['assistant_blind_worth_selected_output']=sum(by_id[m['blind_id']]['worth_keeping'] and m['selected'] for m in ms)
+   by_arm[arm]['assistant_blind_task_supported_selected']=sum(m['selected'] and by_id[m['blind_id']]['task_fit_non_allusion']=='supported' for m in ms)
+   by_arm[arm]['assistant_blind_explicit_task_violations_selected']=sum(m['selected'] and by_id[m['blind_id']]['task_fit_non_allusion']=='violated' for m in ms)
    by_arm[arm]['assistant_blind_score_histogram']={str(i):sum(by_id[m['blind_id']]['score']==i for m in ms) for i in range(5)}
  pair_path=directory/'paired-blind-summary.json';paired=json.loads(pair_path.read_text(encoding='utf-8')) if pair_path.exists() else None
  audit_path=directory/'mechanical-audit.json';audit=json.loads(audit_path.read_text(encoding='utf-8')) if audit_path.exists() else None
@@ -109,8 +112,11 @@ def report(directory):
   source_complete=source_audit is not None and all(j in source_rows for j in required_outputs)
   allusion_valid=source_complete and all(source_rows[j].get('supported') is True for j in required_outputs)
   score=stats.get('assistant_blind_worth_selected_output')
+  task_supported=stats.get('assistant_blind_task_supported_selected')
+  task_violated=stats.get('assistant_blind_explicit_task_violations_selected')
   checks={'all_runs_finished':stats['terminal_runs']==stats['expected_runs'],
-   'at_least_22_selected_without_known_hard_errors':stats['selected_outputs']>=22,
+   'at_least_22_selected_without_known_hard_errors':stats['selected_outputs']>=22 and task_supported>=22 if task_supported is not None else None,
+   'no_selected_output_with_explicit_task_violation':task_violated==0 if task_violated is not None else None,
    'at_least_18_selected_worth_keeping':score>=18 if score is not None else None,
    'submitted_allusion_exercises_checked':source_complete,
    'submitted_allusions_supported':allusion_valid if source_complete else None,

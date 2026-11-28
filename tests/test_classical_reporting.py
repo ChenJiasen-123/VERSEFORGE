@@ -60,16 +60,18 @@ class BlindReadingReportingTests(unittest.TestCase):
             (job/'result.json').write_text(json.dumps(result),encoding='utf-8');report(root)
             packet=json.loads((root/'blind-packet.json').read_text(encoding='utf-8'))
             note={'blind_id':packet[0]['id'],'score':2,'worth_keeping':True,'quoted_evidence':['魂兮'],
-                  'actual_experience':'唤归的愿望','main_problem':'局部措辞可修','allusion_guess_or_uncertainty':'招魂语典，仍待单独核对。'}
+                  'actual_experience':'唤归的愿望','main_problem':'局部措辞可修','allusion_guess_or_uncertainty':'招魂语典，仍待单独核对。','task_fit_non_allusion':'supported'}
             path=root/'assistant-blind-review.json'
             def save(n):path.write_text(json.dumps({'reviewer':'assistant','readings':[n]}),encoding='utf-8')
             save(note);self.assertEqual(report(root)['assistant_blind_reading']['status'],'complete')
             for change in ({'actual_experience':''},{'main_problem':'  '},
                            {'allusion_guess_or_uncertainty':None},{'quoted_evidence':'魂兮'},
-                           {'quoted_evidence':['虚构引文']},{'worth_keeping':1}):
+                           {'quoted_evidence':['虚构引文']},{'worth_keeping':1},{'task_fit_non_allusion':None}):
                 with self.subTest(change=change):
                     save({**note,**change})
                     with self.assertRaises(ValueError):report(root)
+            save({**note,'task_fit_non_allusion':'violated'});r=report(root)
+            self.assertFalse(r['research_acceptance']['classical_evolution']['checks']['no_selected_output_with_explicit_task_violation'])
 
 
 if __name__ == '__main__':

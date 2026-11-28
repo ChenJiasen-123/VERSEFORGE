@@ -76,8 +76,11 @@ def report(directory):
   if len(notes)!=len(poems) or {n['blind_id'] for n in notes}!=set(poems):raise ValueError('incomplete assistant blind reading')
   by_id={n['blind_id']:n for n in notes}
   for n in notes:
-   if type(n['score']) is not int or not 0<=n['score']<=4 or n['worth_keeping']!=(n['score']>=2):raise ValueError('invalid blind score')
-   if not n['quoted_evidence'] or any(not any(q in line for line in poems[n['blind_id']]['lines']) for q in n['quoted_evidence']):raise ValueError('invalid assistant quote')
+   if type(n['score']) is not int or not 0<=n['score']<=4 or type(n['worth_keeping']) is not bool or n['worth_keeping']!=(n['score']>=2):raise ValueError('invalid blind score')
+   for field in ('actual_experience','main_problem','allusion_guess_or_uncertainty'):
+    if not isinstance(n.get(field),str) or not n[field].strip():raise ValueError('missing actual blind reading field: '+field)
+   quotes=n.get('quoted_evidence')
+   if not isinstance(quotes,list) or not quotes or any(not isinstance(q,str) or not q.strip() or not any(q in line for line in poems[n['blind_id']]['lines']) for q in quotes):raise ValueError('invalid assistant quote')
   reading_status={'status':'complete','reviewer':submitted.get('reviewer','assistant'),'poems_read':len(notes),'user_preference_verified':False}
   for arm in binding['arms']:
    ms=[m for m in mapping if m['arm']==arm]

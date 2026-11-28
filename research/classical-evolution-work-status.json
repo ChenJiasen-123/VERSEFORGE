@@ -45,15 +45,15 @@
   "freeze": "runs/classical-evolution-freeze-01.json",
   "source_snapshot": "runs/classical-evolution-source-snapshot-01.json",
   "remaining": [
-    "修正关键关系和典源接入的审读关口，保全原0.6代码与第一轮数据",
-    "开发验证后冻结新题集十二题各两次；本轮题集只能作为开发材料",
-    "原完成标准不变，复测后逐项审计再交付"
+    "观察既有pilot08会话26972，终态后实际读稿与机械复核；禁止同目录覆盖或因观察超时重跑",
+    "若开发结果可用，冻结独立新十二题各两次；准备的新题尚未生成",
+    "保留原验收标准，逐项审计未通过处，不将格式正确当文学改善"
   ],
   "warning": "第一轮完整原题流程20/24值得保留、22/24题意支持、所选用典11/12关系成立；研究目标尚未全部达成。",
   "audit_tools_commit": "b5fece2",
   "regression_session_id": null,
   "held_out_terminal_results": 48,
-  "completion_state": "active: first study fully read, sourced and compared; allusion gate failed on one raw output; semantic-reader correction and fresh validation required",
+  "completion_state": "active: first study fully archived; 0.7 schema failure stopped and all4 interruptions retained; 0.8 format probe5/5 complete but did not correct old semantic judgments; four development poems running",
   "followup_review_items": [
     "检查盲读失败/预算耗尽时是否保住此前已核的父稿，不把新稿未审冒充已审；若需修正，另记版本，不在冻结测试中途改程序。",
     "当前配置请求deepseek-reasoner，已保存的实际服务返回模型名为deepseek-flash；两臂一致，汇总时明确记录。"
@@ -70,7 +70,9 @@
   "combined_unique_runs_expected": 96,
   "blind_reading_plan": "四组共96次唯一运行，全部终态后合并隐藏组别逐首阅读；无正文的失败计在总分母，不伪造96首作品。先保存盲读意见，再揭盲、逐首核典与汇总。",
   "verified_related_tests": 122,
-  "active_sessions": {},
+  "active_sessions": {
+    "raw_pilot08": 26972
+  },
   "raw_entry_validation": {
     "directory": "runs/classical-evolution-raw-pilot-01",
     "state": "version0.2 pilot terminal 4/4; selected2/4; no mechanical inconsistency; range-interpretation and review weaknesses found",
@@ -132,5 +134,6 @@
     "mapping_revealed_after_lock": true
   },
   "raw_held_out_state": "terminal24/24; 24 selected; interpretations24 checked; frozen dependencies unchanged; mechanical violations zero",
-  "first_study_summary": "research/classical-evolution-study-01-summary.json"
+  "first_study_summary": "research/classical-evolution-study-01-summary.json",
+  "latest_raw_version": "raw-classical-agent-0.8"
 }

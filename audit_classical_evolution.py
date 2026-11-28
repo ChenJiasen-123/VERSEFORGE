@@ -1,5 +1,5 @@
 """Recompute mechanical consistency from actual saved poems, not report flags."""
-import argparse,json,sys
+import argparse,copy,json,sys
 from pathlib import Path
 from experiments.classical_evolution.engine import make_task,known_checks,eligible
 from experiments.classical_evolution.store import digest
@@ -33,6 +33,8 @@ def audit(directory):
     violations.append({'job':j['key'],'issue':'raw source library differs from registration'})
    if b.get('poetics_sha256') and digest(binding.get('poetics_knowledge'))!=b['poetics_sha256']:
     violations.append({'job':j['key'],'issue':'raw poetics differ from registration'})
+   if binding.get('critic_policy')!=b.get('critic_policy'):
+    violations.append({'job':j['key'],'issue':'raw reader policy differs from registration'})
    if r.get('selected') and (topic['task']['genre']!=gold['task']['genre'] or bool(topic.get('allusion_required'))!=bool(gold.get('allusion_required'))):
     violations.append({'job':j['key'],'issue':'raw interpretation differs from explicit gold genre/allusion constraint'})
   if binding['code_sha256']!=b['code_sha256']:violations.append({'job':j['key'],'issue':'mixed implementation versions'})
@@ -54,6 +56,15 @@ def audit(directory):
    if mechanical['meter']['status']=='unknown' and r['status']!='candidate_with_unresolved_readings':
     violations.append({'job':j['key'],'issue':'unknown reading not disclosed'})
    if raw:
+    if (binding.get('critic_policy') or {}).get('semantic_gate'):
+     try:
+      from classical_agent import apply_semantic_gate
+      normalized=copy.deepcopy(c['review'])
+      passages={'p0':c['poem']['title'],**{f'p{i}':line for i,line in enumerate(c['poem']['lines'],1)}}
+      apply_semantic_gate(normalized,passages,sources)
+      if not eligible({**c,'review':normalized},topic):raise ValueError('unresolved central relation')
+     except (ValueError,KeyError,TypeError):
+      violations.append({'job':j['key'],'issue':'selected raw output fails semantic judgment gate'})
     if not (r.get('independent_requirement_check') or {}).get('confirmed'):
      violations.append({'job':j['key'],'issue':'raw output lacks independent original-prompt confirmation'})
     body=''.join(c['poem']['lines'])

@@ -12,16 +12,28 @@ from experiments.classical_evolution.engine import ClassicalEvolution,DEFAULT_CO
 from experiments.classical_evolution.protocol import validate_reviews
 from experiments.classical_evolution.store import RunStore,RecordedClient,code_digest,digest
 ROOT=Path(__file__).resolve().parent
-VERSION='raw-classical-agent-0.6'
+VERSION='raw-classical-agent-0.8'
 CRITIC_POLICY={'unit':'one complete poem per request','thinking':'disabled',
     'parent_review_reuse':'validated identical poem, topic, source cards and reader policy only',
-    'final_review':'fresh individual reading across all recorded generations'}
+    'final_review':'fresh individual reading across all recorded generations',
+    'semantic_gate':'explicit central-relation status and sourced allusion integration; unresolved is ineligible',
+    'response_schema':'complete semantic-reader schema appended last, version 0.8'}
 
 EVIDENCE_POLICY='''
 原文证据改用每首poem_passages内的编号，程序会取回对应原文。不要重抄或拼接诗句。
 每项review用evidence_ids:["p1"]替代evidence；每项requirements用evidence_id:"p1"替代evidence，无需引文的否定或行数判断可用null并在reason说明。
 allusion用anchor_ids:["p1"]替代anchors；不用典时为空数组。p0是标题，仅requirements可引用；表达和用典的依据须在p1起的正文。
 编号是每首诗局部的，不可借用另一首的编号。其他字段及所有实际判断要求仍按原协议，全量返回给定id。
+'''
+
+SEMANTIC_SCHEMA='''
+最终返回格式以下列完整JSON为准，替代前文旧字段示意。每首必须包含central_relation，以及allusion.integration、source_quote，不能省略；语义判断须依正文，不能为填格式一律填clear或natural。
+{"reviews":[{"id":"给定id","experience":"实际体验","evidence_ids":["p1"],
+"central_relation":{"status":"clear|uncertain|broken","reading":"实际关键关系","evidence_ids":["p1"],"reason":"成立或缺口的依据"},
+"requirements":[{"id":"给定r1等","status":"satisfied|violated|unknown","evidence_id":null,"reason":"实际依据"}],
+"allusion":{"source_id":null,"anchor_ids":[],"supported":false,"integration":"natural|uncertain|forced|not_used","source_quote":"典源text中的连续原文，不用典时为空","relation":"与当下实际关系或无","compression":"实际省去什么或无","redundancy":"重复说明或无"},
+"scores":{"expression":2,"progression":2,"diction":2,"allusion":0},"problem":"最重要问题或无","suggestion":"方向或保留理由","decision":"keep|revise","parallelism":"confirmed|unconfirmed|not_applicable"}]}。
+上面竖线分隔的枚举须选一项，数字按实际阅读填写。requirements全量逐项返回，每个给定诗id恰好一项review。
 '''
 
 def reader_request(payload):
@@ -31,7 +43,7 @@ def reader_request(payload):
     for p in inner.get('poems',[]):p['poem_passages']=passages[p['id']]
     return data,passages
 
-def resolve_reader_evidence(content,passages):
+def resolve_reader_evidence(content,passages,sources=None):
     try:value=json.loads(content)
     except (ValueError,TypeError):return content
     if not isinstance(value,dict) or not isinstance(value.get('reviews'),list):return content
@@ -50,7 +62,53 @@ def resolve_reader_evidence(content,passages):
         allusion=row.get('allusion')
         if isinstance(allusion,dict) and 'anchor_ids' in allusion:
             ids=allusion['anchor_ids'];allusion['anchors']=[quote(i,True) for i in ids] if isinstance(ids,list) else None
+        if sources is not None:
+            # This is a model judgment gate, not automatic semantic certification.
+            # Missing/invalid judgments must trigger the existing bounded repair,
+            # rather than quietly accepting an old-format optimistic review.
+            try:apply_semantic_gate(row,available,sources)
+            except (ValueError,KeyError,TypeError):
+                row['evidence']=None
     return json.dumps(value,ensure_ascii=False)
+
+
+def apply_semantic_gate(row,passages,sources):
+    meaning=row.get('central_relation')
+    if not isinstance(meaning,dict) or meaning.get('status') not in ('clear','uncertain','broken'):
+        raise ValueError('missing central relation judgment')
+    for key in ('reading','reason'):
+        if not isinstance(meaning.get(key),str) or not meaning[key].strip():
+            raise ValueError('missing actual relation reading')
+    ids=meaning.get('evidence_ids')
+    if not isinstance(ids,list) or not ids or any(not isinstance(i,str) or i=='p0' or i not in passages for i in ids):
+        raise ValueError('central relation needs actual body evidence')
+    meaning['evidence']=[passages[i] for i in ids]
+    a=row['allusion']
+    if a.get('integration') not in ('natural','uncertain','forced','not_used'):
+        raise ValueError('missing allusion integration judgment')
+    source_quote=a.get('source_quote')
+    if not isinstance(source_quote,str):raise ValueError('missing source quotation')
+    if a.get('supported'):
+        sid=a.get('source_id')
+        if sid not in sources or not source_quote or source_quote not in sources[sid]['text']:
+            raise ValueError('allusion quotation absent from verified source')
+        if a['integration']=='not_used':raise ValueError('contradictory allusion judgment')
+    if a['integration']=='natural' and not a.get('supported'):
+        raise ValueError('natural integration without supported allusion')
+    problems=[]
+    if meaning['status']!='clear':
+        row['scores']['expression']=min(row['scores']['expression'],1)
+        row['scores']['diction']=min(row['scores']['diction'],1)
+        problems.append('关键关系尚未成立：'+meaning['reason'])
+    if a['integration'] in ('uncertain','forced'):
+        a['supported']=False
+        row['scores']['allusion']=min(row['scores']['allusion'],1)
+        # Optional allusion must not excuse a forced phrase either.
+        row['scores']['diction']=min(row['scores']['diction'],1)
+        problems.append('典语接入尚未成立：'+a['relation'])
+    if problems:
+        row['decision']='revise'
+        row['problem']='；'.join(problems)+'；原审读：'+row['problem']
 
 PARSER_POLICY='''
 genre_hint只是没有明示体裁时的偏好，auto表示无偏好；原题明写的体裁优先，不构成冲突，不得因hint不同返回unsupported。
@@ -83,6 +141,12 @@ expression：0=关系无法成立；1=大部分只将题面换成古语或堆叠
 progression看各句使经验如何变化、深入、受阻或回应，不把换地点、加景物本身当作推进。朴素喜悦、平稳展开、直抒和必要复沓都可能有效，不强制反转、冲突、故事或金句。
 diction看实际句法和语意搭配，压缩可以含蓄，但不能替生硬短语补造事件。指出具体原文的对象或语义问题；不要只说“略直、可更含蓄”，也不为解释清楚而要求改成白话。
 给experience、problem和suggestion填写上述实际阅读，而不是复述作者可能想写什么；评分可以低，不能为保证出稿把明显未成立处评过门槛。
+先辨认全篇关键关系，再评价修辞。每项review另填central_relation:{"status":"clear|uncertain|broken","reading":"不补造事件时，从正文及原题语境能读出的关键人物、动作对象和时间关系","evidence_ids":["p1"],"reason":"成立依据，或具体缺口"}。
+只有影响全篇成立的歧义才标uncertain；允许省略、换主语、历史插入、回忆、比拟和非线性。题目已给的亲属身份不必再写一遍，也不要求解释所有留白。不能因为找不到唯一白话改写就否定诗句。
+若两种读法导致关键人物或事件相反而正文无足够指向，不用构思替诗选定一版；标uncertain并指出缺口。改稿若只把相邻字词换得更雅，关键缺口仍在，就不能当作已解决。
+allusion另填integration:"natural|uncertain|forced|not_used"和source_quote:"给定典源text内连续原文，不用典时为空"。原句引用可辨与接入当下成立分开判断。
+relation须说明典源承载的关系在眼前人物、动作或判断中如何落地；compression须说明实际省去了什么。不能只说有典名或来源相同。若核心谓语、发问者或所求对象必须靠代补才接上，integration为uncertain或forced，不能同时把典故判为自然。
+允许有意迁移典源人物、反用原意、只借关系的一部分；无需复述完整故事，不强迫写出原典的情绪。直接引用可以有效，不能仅凭引用本身认定硬贴。无用典时integration为not_used。
 '''
 
 class NamedClient:
@@ -102,10 +166,12 @@ class KernelClient:
         if self.action.startswith(('initial-plans','reviewed-plans','write-')):
             system=self.poetics+'\n'+system
         elif self.action.startswith('read-'):
-            system=READER_CALIBRATION+system+EVIDENCE_POLICY
+            system=READER_CALIBRATION+system+EVIDENCE_POLICY+SEMANTIC_SCHEMA
             payload,passages=reader_request(payload)
         r=self.api.call('kernel-'+self.action,system,payload,thinking=kw.get('thinking') or 'disabled',max_tokens=kw.get('max_tokens',8192))
-        if passages is not None:r={**r,'content':resolve_reader_evidence(r.get('content'),passages)}
+        if passages is not None:
+            inner=payload.get('original_input',payload)
+            r={**r,'content':resolve_reader_evidence(r.get('content'),passages,inner.get('sources',{}))}
         return {**r,'response_metadata':r.get('provider',{})}
 
 class PreservingEvolution(ClassicalEvolution):
@@ -131,7 +197,7 @@ class IndividualEvolution(PreservingEvolution):
     def _read(self,action,pool):
         context=digest({'topic':self.topic,'sources':self.sources,'policy':CRITIC_POLICY,
             'reader_calibration':READER_CALIBRATION,'task_semantics':TASK_SEMANTICS,
-            'evidence_policy':EVIDENCE_POLICY})
+            'evidence_policy':EVIDENCE_POLICY,'semantic_schema':SEMANTIC_SCHEMA})
         requirements={f'r{i+1}':r for i,r in enumerate(self.topic['requirements'])}
         result=[]
         for i,item in enumerate(pool):

@@ -2,10 +2,15 @@ import copy,json,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch,Mock
 from tests.test_classical_evolution import FixtureClient,TOPIC,SOURCES,POEM,candidate,review
-from classical_agent import run_raw,PreservingEvolution,IndividualEvolution,select_sources,interpret_raw
+from classical_agent import run_raw,PreservingEvolution,IndividualEvolution,select_sources,interpret_raw,resolve_reader_evidence
 from experiments.classical_evolution.engine import ClassicalEvolution
 from experiments.classical_evolution.store import RunStore,RecordedClient,digest
 from audit_classical_evolution import audit
+
+def semantic_fixture(row):
+    row['central_relation']={'status':'clear','reading':'妻子向亡夫唤归，归处在灯前。','evidence_ids':['p3'],'reason':'呼告与归来有明确对象。'}
+    row['allusion'].update(integration='natural',source_quote='魂兮归来')
+    return row
 
 class RawFixture(FixtureClient):
     def __init__(self):super().__init__();self.parses=0
@@ -19,7 +24,12 @@ class RawFixture(FixtureClient):
         if 'verified_sources' in d:
             self.requests.append((system,d,kw))
             return {'content':json.dumps({'source_ids':list(d['verified_sources'])[:1],'allusion_required':True,'requirement_quote':'须用典','reason':'唤归关系'},ensure_ascii=False),'usage':{'total_tokens':10}}
-        return super().complete(system,user,**kw)
+        result=super().complete(system,user,**kw)
+        if 'poems' in d:
+            obj=json.loads(result['content'])
+            for row in obj['reviews']:semantic_fixture(row)
+            result['content']=json.dumps(obj,ensure_ascii=False)
+        return result
 
 class FinalFail(FixtureClient):
     def complete(self,system,user,**kw):
@@ -45,12 +55,64 @@ class IdEvidenceFixture(RawFixture):
         if 'poems' not in inner:return super().complete(system,user,**kw)
         self.requests.append((system,d,kw));rows=[]
         for p in inner['poems']:
-            row=review(p['id']);row.pop('evidence');row['evidence_ids']=['p3']
+            row=semantic_fixture(review(p['id']));row.pop('evidence');row['evidence_ids']=['p3']
             for req in row['requirements']:req.pop('evidence');req['evidence_id']=None
             row['allusion'].pop('anchors');row['allusion']['anchor_ids']=[self.bad_anchor or 'p3'];rows.append(row)
         return {'content':json.dumps({'reviews':rows},ensure_ascii=False),'usage':{'total_tokens':10}}
 
 class RawEntryTests(unittest.TestCase):
+    def test_central_uncertainty_overrides_optimistic_scores_and_reaches_selection_gate(self):
+        for status in ('uncertain','broken'):
+            with self.subTest(status=status):
+                row=semantic_fixture(review('c1',4));row['central_relation'].update(status=status,reason='无法确定谁向谁指路。')
+                obj=json.loads(resolve_reader_evidence(json.dumps({'reviews':[row]}),{'c1':{'p3':'魂兮若有归来日'}},SOURCES))
+                judged=obj['reviews'][0]
+                self.assertEqual(judged['decision'],'revise')
+                self.assertEqual(judged['scores']['expression'],1)
+                self.assertEqual(judged['scores']['diction'],1)
+                from experiments.classical_evolution.engine import eligible
+                c=candidate();c['review']=judged
+                self.assertFalse(eligible(c,TOPIC))
+
+    def test_recognizable_source_does_not_override_uncertain_integration(self):
+        row=semantic_fixture(review('c1',4));row['allusion'].update(integration='uncertain',relation='有原句，但发问者与播种人尚接不上。')
+        judged=json.loads(resolve_reader_evidence(json.dumps({'reviews':[row]}),{'c1':{'p3':'魂兮若有归来日'}},SOURCES))['reviews'][0]
+        self.assertFalse(judged['allusion']['supported'])
+        self.assertEqual(judged['scores']['allusion'],1)
+        self.assertEqual(judged['decision'],'revise')
+        self.assertIn('发问者',judged['problem'])
+
+    def test_missing_semantic_status_title_evidence_and_fabricated_source_cannot_pass(self):
+        rows=[]
+        missing=semantic_fixture(review('c1'));missing.pop('central_relation');rows.append(missing)
+        title=semantic_fixture(review('c1'));title['central_relation']['evidence_ids']=['p0'];rows.append(title)
+        invented=semantic_fixture(review('c1'));invented['allusion']['source_quote']='并不存在的典源原句';rows.append(invented)
+        for row in rows:
+            judged=json.loads(resolve_reader_evidence(json.dumps({'reviews':[row]}),{'c1':{'p0':'标题','p3':'魂兮若有归来日'}},SOURCES))['reviews'][0]
+            self.assertIsNone(judged['evidence'])
+
+    def test_unresolved_allusion_drives_rebuild_and_never_reaches_final_output(self):
+        class UnresolvedSource(RawFixture):
+            def complete(self,system,user,**kw):
+                result=super().complete(system,user,**kw)
+                obj=json.loads(result['content'])
+                for row in obj.get('reviews',[]):
+                    row['allusion'].update(integration='uncertain',relation='发问者与眼前人物尚无可辨联系。')
+                    row['scores']=dict.fromkeys(row['scores'],4)
+                result['content']=json.dumps(obj,ensure_ascii=False)
+                return result
+        c=UnresolvedSource();mechanical={'hard_issues':[],'meter':{'status':'unknown','findings':[]}}
+        with tempfile.TemporaryDirectory() as directory, \
+             patch('experiments.classical_evolution.engine.known_checks',return_value=mechanical), \
+             patch('classical_agent.known_checks',return_value=mechanical), \
+             patch('classical_agent.safe_review') as final_check:
+            r=run_raw(TOPIC['prompt'],directory,c,library=SOURCES,config={'generations':1,'pairwise':False})
+        self.assertIsNone(r['poem']);self.assertEqual(r['status'],'needs_review')
+        self.assertFalse(final_check.called)
+        repairs=[d for _,d,_ in c.requests if d.get('operator')=='allusion_rebuild']
+        self.assertTrue(repairs)
+        self.assertTrue(all('发问者' in d['problem_to_address'] for d in repairs))
+
     def test_raw_prompt_parses_selects_sources_and_rechecks_without_manual_task(self):
         c=RawFixture()
         with tempfile.TemporaryDirectory() as directory, \
@@ -219,6 +281,10 @@ class RawEntryTests(unittest.TestCase):
             (root/'experiment-binding.json').write_text(json.dumps(experiment),encoding='utf-8')
             self.assertEqual(audit(root)['violations'],[])
             result=json.loads((job/'result.json').read_text(encoding='utf-8'))
+            result['selected']['review']['central_relation']['status']='uncertain'
+            (job/'result.json').write_text(json.dumps(result),encoding='utf-8')
+            self.assertIn('selected raw output fails semantic judgment gate',[v['issue'] for v in audit(root)['violations']])
+            result['selected']['review']['central_relation']['status']='clear'
             result['independent_requirement_check']['confirmed']=False
             (job/'result.json').write_text(json.dumps(result),encoding='utf-8')
             self.assertIn('raw output lacks independent original-prompt confirmation',[v['issue'] for v in audit(root)['violations']])

@@ -12,7 +12,10 @@ from experiments.classical_evolution.engine import ClassicalEvolution,DEFAULT_CO
 from experiments.classical_evolution.protocol import validate_reviews
 from experiments.classical_evolution.store import RunStore,RecordedClient,code_digest,digest
 ROOT=Path(__file__).resolve().parent
-VERSION='raw-classical-agent-0.5'
+VERSION='raw-classical-agent-0.6'
+CRITIC_POLICY={'unit':'one complete poem per request','thinking':'disabled',
+    'parent_review_reuse':'validated identical poem, topic, source cards and reader policy only',
+    'final_review':'fresh individual reading across all recorded generations'}
 
 EVIDENCE_POLICY='''
 原文证据改用每首poem_passages内的编号，程序会取回对应原文。不要重抄或拼接诗句。
@@ -124,6 +127,28 @@ class PreservingEvolution(ClassicalEvolution):
         if restored:self.store.event('validated_prior_reviews_preserved',action=action,candidate_ids=restored)
         return result
 
+class IndividualEvolution(PreservingEvolution):
+    def _read(self,action,pool):
+        context=digest({'topic':self.topic,'sources':self.sources,'policy':CRITIC_POLICY,
+            'reader_calibration':READER_CALIBRATION,'task_semantics':TASK_SEMANTICS,
+            'evidence_policy':EVIDENCE_POLICY})
+        requirements={f'r{i+1}':r for i,r in enumerate(self.topic['requirements'])}
+        result=[]
+        for i,item in enumerate(pool):
+            p=copy.deepcopy(item)
+            reusable=bool(p.get('review')) and p.get('review_body_sha256')==digest(p['poem']) and p.get('review_context_sha256')==context
+            if reusable:
+                try:validate_reviews({'reviews':[p['review']]},[p],requirements,self.sources)
+                except (ValueError,KeyError,TypeError):reusable=False
+            if reusable and action!='read-final-archive':
+                self.store.event('unchanged_parent_review_reused',action=action,candidate_id=p['id'])
+            else:
+                if not reusable:p['review']=None
+                p=super()._read(f'{action}-single-{i:03d}',[p])[0]
+                if p.get('review') is not None:p['review_context_sha256']=context
+            result.append(p)
+        return result
+
 def interpret_raw(prompt,hint,api,prefix):
     error=''
     for attempt in range(2):
@@ -170,7 +195,7 @@ def run_raw(prompt,directory,client,*,hint='auto',library=None,config=None,progr
     poetics='\n'.join(SYSTEM.strip().splitlines()[:3]+knowledge['principles'])
     binding={'protocol':VERSION,'entry_source_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         'code_sha256':code_digest(),'prompt':prompt,'hint':hint,'source_library':library,'config':config,
-        'poetics_knowledge':knowledge,'model':client.model,'mode':'mock' if getattr(client,'mock',False) else 'live'}
+        'poetics_knowledge':knowledge,'critic_policy':CRITIC_POLICY,'model':client.model,'mode':'mock' if getattr(client,'mock',False) else 'live'}
     store=RunStore(directory,binding);done=store.load('result.json')
     if done:return done
     api=RecordedClient(client,store,seconds=config['seconds'],max_calls=config['max_calls'],generation_tokens=config['generation_tokens'],progress=progress)
@@ -190,8 +215,8 @@ def run_raw(prompt,directory,client,*,hint='auto',library=None,config=None,progr
             store.save('result.json',result);return result
         proxy=KernelClient(api,poetics)
         def stage(action):proxy.action=action;progress('演化：'+action)
-        kernel=PreservingEvolution(topic,sources,proxy,Path(directory)/'kernel',
-            config={**config,'entry_source_sha256':binding['entry_source_sha256'],'poetics_knowledge_sha256':digest(knowledge)},progress=stage)
+        kernel=IndividualEvolution(topic,sources,proxy,Path(directory)/'kernel',
+            config={**config,'entry_source_sha256':binding['entry_source_sha256'],'poetics_knowledge_sha256':digest(knowledge),'critic_policy':CRITIC_POLICY},progress=stage)
         r=kernel.run();result={**r,'protocol':VERSION,'effective_topic':topic,'kernel_protocol':r['protocol']}
         result['kernel_budget']=r['budget'];result['budget']=api.summary()
         if r.get('selected'):

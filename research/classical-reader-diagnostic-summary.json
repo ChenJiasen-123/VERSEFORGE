@@ -1,0 +1,57 @@
+{
+  "mode": "pilot diagnostic, not held-out acceptance",
+  "input": "same first poem in pilot04 topic02 recorded anonymous final reading",
+  "first_request_equal_except_thinking": true,
+  "single_fast": {
+    "directory": "runs\\classical-reader-single-fast-probe-01",
+    "budget": {
+      "calls": 2,
+      "max_calls": 3,
+      "elapsed_seconds": 6.844,
+      "budget_seconds": 240,
+      "tokens": 5461,
+      "usage_known_calls": 2,
+      "usage_unknown_calls": 0,
+      "exhausted": false
+    },
+    "scores": {
+      "expression": 3,
+      "progression": 3,
+      "diction": 2,
+      "allusion": 3
+    },
+    "problem": "“归魂石语认缠痕”句法较紧，“石语认缠痕”的主客动作关系不够稳；“补褐”与“旧战袍”在首二句对象重叠，稍显滞。",
+    "structure_repair_used": true
+  },
+  "single_reasoning": {
+    "directory": "runs\\classical-reader-reasoning-probe-03",
+    "budget": {
+      "calls": 1,
+      "max_calls": 3,
+      "elapsed_seconds": 32.906,
+      "budget_seconds": 240,
+      "tokens": 7034,
+      "usage_known_calls": 1,
+      "usage_unknown_calls": 0,
+      "exhausted": false
+    },
+    "scores": {
+      "expression": 2,
+      "progression": 2,
+      "diction": 2,
+      "allusion": 2
+    },
+    "problem": "末句“归魂石语认缠痕”语法关系纠缠：望夫石典中“石”本该是等待的妻子，此处妻子尚在灯下缝补，而“归魂”“石语”“认缠痕”三层主客未理清，石到底指谁、谁在认痕难以确定；“成绝笔”与“归魂”、“断线”与“缠痕”又各重复一次报死与写线。"
+  },
+  "failed_probes_preserved": [
+    "runs/classical-reader-reasoning-probe-01",
+    "runs/classical-reader-reasoning-probe-02"
+  ],
+  "limits": [
+    "单稿与原九首批量上下文不同，不能把变化都归因于推理模式。",
+    "单稿快速模式使用了一次结构修复，最终响应条件并非严格相同。",
+    "两种单稿审读都指出主客关系问题，但仍判用典成立；并未自动解决语义判断。",
+    "单一试验不能证明普遍提升；0.6只是待验证的单稿反馈策略，验收标准不变。"
+  ],
+  "next_study": "runs/classical-evolution-raw-pilot-05"
+}

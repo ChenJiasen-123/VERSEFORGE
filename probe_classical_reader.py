@@ -1,5 +1,6 @@
 """Fixed-input diagnostic: reread existing anonymous poems without regenerating them."""
 import argparse
+import copy
 import hashlib
 import json
 import sys
@@ -20,9 +21,11 @@ def main():
     parser.add_argument('--out', type=Path, required=True)
     parser.add_argument('--thinking', choices=['enabled', 'disabled'], default='enabled')
     parser.add_argument('--max-tokens', type=int, default=14000)
+    parser.add_argument('--limit', type=int, choices=[1, 2, 3, 6, 9], default=9)
     args = parser.parse_args()
     cached = json.loads((args.job / 'calls/kernel-read-final-archive.json').read_text(encoding='utf-8'))
-    request = cached['request']
+    request = copy.deepcopy(cached['request'])
+    request['user']['poems'] = request['user']['poems'][:args.limit]
     data = request['user']
     passages = {p['id']: p['poem_passages'] for p in data['poems']}
 
@@ -34,6 +37,7 @@ def main():
                'script_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                'input_request_sha256': digest(request), 'model': request['model'],
                'thinking': args.thinking, 'max_tokens': args.max_tokens,
+               'selection': f'first {args.limit} poems in the recorded anonymous input; no poem-specific instruction',
                'original_call': str((args.job / 'calls/kernel-read-final-archive.json').resolve()),
                'interpretation_limit': 'One fixed case cannot establish general improvement. No old review, author plan or expected criticism is sent to the model.'}
     store = RunStore(args.out, binding)
@@ -46,7 +50,10 @@ def main():
         reviews = api.json('fixed-poems-read', request['system'], data, validate,
                            thinking=args.thinking, max_tokens=args.max_tokens)
         try:
-            baseline = validate(json.loads(cached['response']['content']))
+            old = json.loads(cached['response']['content'])
+            wanted = {p['id'] for p in data['poems']}
+            old['reviews'] = [r for r in old['reviews'] if r['id'] in wanted]
+            baseline = validate(old)
         except (ValueError, KeyError, TypeError):
             baseline = {}
         rows = [{'id': p['id'], 'poem': p['poem'], 'original_review': baseline.get(p['id']),

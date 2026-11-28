@@ -2,7 +2,7 @@ import copy,json,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch,Mock
 from tests.test_classical_evolution import FixtureClient,TOPIC,SOURCES,POEM,candidate,review
-from classical_agent import run_raw,PreservingEvolution,select_sources,interpret_raw
+from classical_agent import run_raw,PreservingEvolution,IndividualEvolution,select_sources,interpret_raw
 from experiments.classical_evolution.engine import ClassicalEvolution
 from experiments.classical_evolution.store import RunStore,RecordedClient,digest
 from audit_classical_evolution import audit
@@ -104,7 +104,7 @@ class RawEntryTests(unittest.TestCase):
              patch('classical_agent.known_checks',return_value=mechanical), \
              patch('classical_agent.safe_review',return_value={'complete':True,'confirmed':True}):
             r=run_raw(TOPIC['prompt'],directory,IdEvidenceFixture(),library=SOURCES,config={'generations':0,'pairwise':False})
-            saved=json.loads((Path(directory)/'calls/kernel-read-g00.json').read_text(encoding='utf-8'))
+            saved=json.loads((Path(directory)/'calls/kernel-read-g00-single-000.json').read_text(encoding='utf-8'))
         self.assertIsNotNone(r['selected'])
         self.assertEqual(r['selected']['review']['allusion']['anchors'],[POEM['lines'][2]])
         raw=json.loads(saved['response']['content'])['reviews'][0]
@@ -187,6 +187,23 @@ class RawEntryTests(unittest.TestCase):
         with patch.object(ClassicalEvolution,'_read',return_value=[{**copy.deepcopy(row),'review':None}]):
             r=e._read('failed',[row])
         self.assertIsNone(r[0]['review']);self.assertNotIn('review_fallback',r[0])
+
+    def test_individual_reading_reuses_only_unchanged_context_and_rereads_every_finalist(self):
+        c=FixtureClient()
+        with tempfile.TemporaryDirectory() as directory:
+            e=IndividualEvolution(copy.deepcopy(TOPIC),copy.deepcopy(SOURCES),c,directory)
+            pool=e._read('read-g00',[candidate()]);self.assertEqual(len(c.requests),1)
+            pool=e._read('read-g01',pool);self.assertEqual(len(c.requests),1)
+            pool[0]['plan']['experience']='作者改了意图但正文没改'
+            pool=e._read('read-g02',pool);self.assertEqual(len(c.requests),1)
+            pool=e._read('read-final-archive',pool);self.assertEqual(len(c.requests),2)
+            pool[0]['poem']['lines'][0]='塞外今宵音信断'
+            pool=e._read('read-new-body',pool);self.assertEqual(len(c.requests),3)
+            e.topic['prompt']+='另一个题目语境。'
+            pool=e._read('read-new-topic',pool);self.assertEqual(len(c.requests),4)
+            e.sources['s']['scope']='changed source scope'
+            e._read('read-new-sources',pool);self.assertEqual(len(c.requests),5)
+        self.assertTrue(all(len(d['poems'])==1 and 'expression_plan' not in d and 'parent' not in d for _,d,_ in c.requests))
 
     def test_raw_archive_audit_checks_original_constraints_and_independent_confirmation(self):
         mechanical={'hard_issues':[],'meter':{'status':'unknown','findings':[]}}

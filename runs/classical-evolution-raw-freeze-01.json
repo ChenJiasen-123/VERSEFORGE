@@ -1,0 +1,35 @@
+{
+  "role": "raw-prompt held-out freeze after development pilot06, before opening held-out poems",
+  "version": "raw-classical-agent-0.6",
+  "entry_source_sha256": "16deec2b0c94d56ea2a8d9de73708c750f14c7bb890c0bd0997a8afc3906b3d7",
+  "driver_source_sha256": "4af14e09885fb4ab4cdf39d39c4cdc5da79c35890491c4130fb55ec17f28e622",
+  "core_code_sha256": "b717b167f17cd5a189c56c446c84e8fc6135762bf88cee0c91f1ca6d85b12b32",
+  "source_library_sha256": "105795a871a159c5209d94b8eab1d62b6e5a75a00b6c4563038d593d29b60263",
+  "poetics_sha256": "21d8d4130bf651714de52740aad14751ca98ca4ce2aef150b523677c8702102d",
+  "critic_policy": {
+    "unit": "one complete poem per request",
+    "thinking": "disabled",
+    "parent_review_reuse": "validated identical poem, topic, source cards and reader policy only",
+    "final_review": "fresh individual reading across all recorded generations"
+  },
+  "model": "deepseek-reasoner",
+  "config": {
+    "population": 3,
+    "generations": 2,
+    "mutation_count": 2,
+    "crossover_count": 1,
+    "max_similarity": 0.88,
+    "seconds": 900,
+    "max_calls": 45,
+    "generation_tokens": 16384,
+    "pairwise": true
+  },
+  "pilot": "runs\\classical-evolution-raw-pilot-06",
+  "pilot_selected": 4,
+  "pilot_assistant_worth_keeping": 4,
+  "pilot_source_audit_supported": 2,
+  "primary_dependency_snapshot": "runs/classical-evolution-source-snapshot-01.json",
+  "historical_interrupted_same_version_pilot_retained": "runs/classical-evolution-raw-pilot-05",
+  "held_out_poems_unopened": true,
+  "limitations": "One route with several changes; not an isolation of genetic operators. Independent reading remains assistant judgment."
+}
